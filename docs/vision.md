@@ -50,7 +50,6 @@ The Go Room 是独立的围棋学习与对弈项目，目录为 `the-go-room`，
 
 ## 尚未决定
 
-- 远程仓库的创建与托管方式。
 - 技术栈、部署方式，以及是否需要后端。
 - 具体视觉风格和声音设计。
 - 第一版是否必须支持人机对弈。
@@ -59,9 +58,9 @@ The Go Room 是独立的围棋学习与对弈项目，目录为 `the-go-room`，
 
 ## 仓库起点与后续步骤
 
-本地仓库的首次提交保存 `README.md` 与 `docs/vision.md`，提交说明为 `docs: capture The Go Room vision`。远程仓库尚未创建。
+本地仓库的首次提交保存 `README.md` 与 `docs/vision.md`，提交说明为 `docs: capture The Go Room vision`。GitHub 远程仓库为 `https://github.com/Minjia-Hu/the-go-room`，可见性为 Private，本地 `main` 已关联 `origin/main`。
 
-后续先细化第一版范围与验收标准，再确定规则体系和技术方案。需要云端备份时，可创建远程仓库并推送。
+后续先细化第一版范围与验收标准，再确定规则体系和技术方案。后续提交可推送至该私有仓库备份。
 
 ## 下次对话可以直接使用的提示
 

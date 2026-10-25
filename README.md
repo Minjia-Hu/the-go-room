@@ -8,6 +8,8 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 项目处于规划阶段，已保存愿景与后续开发方向，尚无可运行的应用。
 
+GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)（Private）。
+
 ## 产品方向
 
 第一版建议从互动教学、9 路引导对局和易懂复盘开始。具体功能范围、规则体系与技术方案将在开发前细化。
