@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getCell, parseBoard } from './board'
-import { createGame, play } from './game'
+import { createGame, pass, play } from './game'
 import type { GameState, PlayResult } from './types'
 
 /** 断言落子成功并返回新状态。 */
@@ -114,5 +114,34 @@ describe('play', () => {
     game = expectOk(play(game, { x: 0, y: 0 }))
     game = expectOk(play(game, { x: 1, y: 1 }))
     expect(game.positionKeys).toHaveLength(3)
+  })
+})
+
+describe('pass', () => {
+  it('停一手后轮到对方并记录', () => {
+    const game = expectOk(pass(createGame()))
+    expect(game.toPlay).toBe('white')
+    expect(game.consecutivePasses).toBe(1)
+    expect(game.history).toEqual([{ kind: 'pass', color: 'black' }])
+    expect(game.phase).toBe('playing')
+  })
+
+  it('落子会把连续停一手清零', () => {
+    let game = expectOk(pass(createGame()))
+    game = expectOk(play(game, { x: 0, y: 0 }))
+    expect(game.consecutivePasses).toBe(0)
+  })
+
+  it('连续两次停一手进入终局', () => {
+    let game = expectOk(pass(createGame()))
+    game = expectOk(pass(game))
+    expect(game.phase).toBe('scoring')
+  })
+
+  it('终局后不能再落子或停一手', () => {
+    let game = expectOk(pass(createGame()))
+    game = expectOk(pass(game))
+    expect(play(game, { x: 0, y: 0 })).toEqual({ ok: false, reason: 'game-over' })
+    expect(pass(game)).toEqual({ ok: false, reason: 'game-over' })
   })
 })

@@ -73,3 +73,19 @@ export function play(state: GameState, point: Point): PlayResult {
     },
   }
 }
+
+/** 当前行棋方停一手。双方连续停一手后进入终局(数子)阶段。 */
+export function pass(state: GameState): PlayResult {
+  if (state.phase !== 'playing') return reject('game-over')
+  const consecutivePasses = state.consecutivePasses + 1
+  return {
+    ok: true,
+    state: {
+      ...state,
+      toPlay: opponent(state.toPlay),
+      consecutivePasses,
+      phase: consecutivePasses >= 2 ? 'scoring' : 'playing',
+      history: [...state.history, { kind: 'pass', color: state.toPlay }],
+    },
+  }
+}
