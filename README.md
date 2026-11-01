@@ -6,7 +6,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 ## 当前状态
 
-项目处于规划阶段，已保存愿景与后续开发方向，尚无可运行的应用。
+已完成项目脚手架与规则引擎(`src/engine/`),按中国规则实现落子、提子、禁入点、全局同形禁止、停一手和数子,测试用 `npm test` 运行。界面尚未开始。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)（Private）。
 
@@ -18,6 +18,6 @@ GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room
 
 ## 接下来的工作
 
-1. 根据第一版设计拆出实施计划。
-2. 实现规则引擎与测试,再接入电脑对手。
-3. 实现可交互棋盘,逐步接入教学、对弈和复盘。
+1. 简单电脑对手(`src/ai/`)。
+2. 棋盘组件与教学关卡。
+3. 引导对局、终局数子与复盘。
