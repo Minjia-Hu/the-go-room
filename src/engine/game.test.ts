@@ -96,8 +96,15 @@ describe('play', () => {
     const board = parseBoard(['.X.OO', 'XOOOO', 'XXXX.', '.....', '.....'])
     let game = expectOk(play(createGame({ board }), { x: 2, y: 0 })) // 黑送第二子,两子只剩一口气
     game = expectOk(play(game, { x: 0, y: 0 })) // 白提两子
-    expect(game.history.at(-1)).toMatchObject({ isKo: false })
-    if (game.history.at(-1)?.kind === 'play') expect(game.history.at(-1)).toMatchObject({ captured: expect.any(Array) })
+    expect(game.history.at(-1)).toMatchObject({
+      isKo: false,
+      captured: expect.arrayContaining([
+        { x: 1, y: 0 },
+        { x: 2, y: 0 },
+      ]),
+    })
+    expect(getCell(game.board, { x: 1, y: 0 })).toBeNull()
+    expect(getCell(game.board, { x: 2, y: 0 })).toBeNull()
     // 黑在 (1,0) 还一子会让盘面回到起点,不是标准劫形,只有全局同形禁止能拦住
     expect(play(game, { x: 1, y: 0 })).toEqual({ ok: false, reason: 'repeated-position' })
   })
