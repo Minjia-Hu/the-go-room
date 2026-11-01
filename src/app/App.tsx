@@ -1,3 +1,5 @@
+import { LESSONS } from '../content/lessons'
+import { LessonPage } from './lessons/LessonPage'
 import { usePage } from './router'
 import type { Page } from './router'
 
@@ -40,7 +42,7 @@ export function App() {
         </nav>
       </header>
       <main>
-        {page === 'lessons' && <Placeholder title="教学" />}
+        {page === 'lessons' && <LessonPage lessons={LESSONS} onFinish={() => navigate('play')} />}
         {page === 'play' && <Placeholder title="对局" />}
         {page === 'replay' && <Placeholder title="复盘" />}
       </main>
