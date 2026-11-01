@@ -58,6 +58,25 @@ describe('对局到复盘的完整路径', () => {
     expect(screen.getByText('已下 0 手')).toBeTruthy()
   })
 
+  it('没有 randomUUID 时也能保存，同一时刻完成两盘不会覆盖棋谱', () => {
+    const originalCrypto = globalThis.crypto
+    vi.stubGlobal('crypto', {})
+    try {
+      vi.setSystemTime(new Date('2026-11-02T00:00:00Z'))
+      render(<App />)
+      finish()
+      expect(screen.getByText('白方胜，领先 7.5')).toBeTruthy()
+      fireEvent.click(screen.getByRole('button', { name: '去对局' }))
+      vi.setSystemTime(new Date('2026-11-02T00:00:00Z'))
+      finish()
+      const games = JSON.parse(window.localStorage.getItem(STORAGE_KEY)!).games
+      expect(games).toHaveLength(2)
+      expect(games[0].id).not.toBe(games[1].id)
+    } finally {
+      vi.stubGlobal('crypto', originalCrypto)
+    }
+  })
+
   it('切页保留对局，离开时取消电脑回合，返回后继续', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByRole('button', { name: '交叉点 4,4' }))

@@ -12,6 +12,14 @@ function click(x: number, y: number) {
 }
 
 describe('LessonPage', () => {
+  it('数气过关后保留五口气供对照，重来时清除', () => {
+    const { container } = render(<LessonPage lessons={[LESSONS[1]]} onFinish={() => {}} />)
+    for (const [x, y] of [[3, 4], [6, 4], [5, 3], [4, 5], [5, 5]]) click(x, y)
+    expect(screen.getByRole('status').textContent).toContain('5 口气')
+    expect(container.querySelectorAll('[data-mark="selected"]')).toHaveLength(5)
+    fireEvent.click(screen.getByRole('button', { name: '重来这一关' }))
+    expect(container.querySelectorAll('[data-mark="selected"]')).toHaveLength(0)
+  })
   it('显示第一关的标题、说明和任务', () => {
     render(<LessonPage lessons={LESSONS} onFinish={() => {}} />)
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('第 1 关:落子')

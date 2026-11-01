@@ -5,7 +5,7 @@ import { PlayPage } from './play/PlayPage'
 import { createMatch } from './play/match'
 import type { Match } from './play/match'
 import { ReplayPage } from './replay/ReplayPage'
-import { prependGame, readGames, saveRecord, writeGames } from './replay/records'
+import { createRecordId, prependGame, readGames, saveRecord, writeGames } from './replay/records'
 import type { SavedGame } from './replay/records'
 import { usePage } from './router'
 import type { Page } from './router'
@@ -27,7 +27,7 @@ export function App() {
 
   function finish(completed: Match) {
     if (completed.game.phase !== 'scoring') return
-    const record = saveRecord(completed, crypto.randomUUID(), new Date().toISOString())
+    const record = saveRecord(completed, createRecordId(games), new Date().toISOString())
     const next = prependGame(games, record)
     let saved = false
     try { saved = writeGames(window.localStorage, next) } catch { /* 浏览器可能禁止访问 localStorage。 */ }

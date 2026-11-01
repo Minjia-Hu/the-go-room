@@ -129,6 +129,18 @@ describe('select 步骤', () => {
     for (const t of targets) run = clickPoint(run, t)
     expect(run.message?.kind).toBe('success')
     expect(isLessonDone(run)).toBe(true)
+    expect(run.selected).toEqual(targets)
+    expect(lessonMarks(run).filter((mark) => mark.kind === 'selected')).toHaveLength(5)
+    expect(startLesson(lesson('liberties')).selected).toEqual([])
+  })
+
+  it('多步骤关卡完成选择步骤后不会把标记带入下一步', () => {
+    const source = lesson('liberties')
+    const multi: Lesson = { ...source, steps: [...source.steps, lesson('place').steps[0]] }
+    let run = startLesson(multi)
+    for (const target of targets) run = clickPoint(run, target)
+    expect(isLessonDone(run)).toBe(false)
+    expect(run.selected).toEqual([])
   })
 })
 

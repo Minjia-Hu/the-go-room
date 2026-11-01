@@ -20,6 +20,16 @@ export interface GameStorage {
   setItem(key: string, value: string): void
 }
 
+/** 棋谱只需在本地列表中唯一，不依赖浏览器的 randomUUID 能力。 */
+export function createRecordId(games: readonly SavedGame[], timestamp = Date.now()): string {
+  const base = `game-${timestamp.toString(36)}`
+  const ids = new Set(games.map((game) => game.id))
+  let id = base
+  let suffix = 0
+  while (ids.has(id)) id = `${base}-${++suffix}`
+  return id
+}
+
 /** 第一版的存档固定为 9 路、黑先、空盘、贴 7.5。事件由引擎重建。 */
 export function saveRecord(match: Match, id: string, endedAt: string): SavedGame {
   return {

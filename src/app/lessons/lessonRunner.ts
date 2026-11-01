@@ -103,7 +103,11 @@ function handleSelect(run: LessonRun, step: SelectStep, p: Point): LessonRun {
     ? run.selected.filter((q) => !samePoint(q, p))
     : [...run.selected, p]
   const complete = step.targets.every((t) => includesPoint(selected, t))
-  if (complete) return advance(run, {}, step.success)
+  if (complete) {
+    const next = advance(run, {}, step.success)
+    // 整关完成后保留答案，方便对照成功说明；进入下一步时仍清空。
+    return isLessonDone(next) ? { ...next, selected } : next
+  }
   return { ...run, selected, message: null }
 }
 
