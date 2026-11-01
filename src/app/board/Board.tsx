@@ -45,6 +45,11 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
       onMouseLeave={() => setHovered(null)}
     >
       <rect className="board__wood" x={-MARGIN} y={-MARGIN} width={total} height={total} rx={UNIT * 0.2} />
+      {marks.filter((mark) => mark.kind.endsWith('-area')).map((mark) => (
+        <rect key={`area-${mark.point.x}-${mark.point.y}`} className={`board__area board__area--${mark.kind}`}
+          data-mark={mark.kind} x={at(mark.point.x) - UNIT / 2} y={at(mark.point.y) - UNIT / 2}
+          width={UNIT} height={UNIT} />
+      ))}
       {indexes.map((i) => (
         <g key={i}>
           <line className="board__line" x1={0} y1={at(i)} x2={span} y2={at(i)} />
@@ -84,6 +89,14 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
         const key = `mark-${mark.kind}-${mark.point.x}-${mark.point.y}`
         const cx = at(mark.point.x)
         const cy = at(mark.point.y)
+        if (mark.kind.endsWith('-area')) return null
+        if (mark.kind === 'dead') {
+          return <path key={key} className="board__dead" data-mark="dead"
+            d={`M${cx - 6},${cy - 6}l12,12 M${cx + 6},${cy - 6}l-12,12`} />
+        }
+        if (mark.kind === 'captured') {
+          return <circle key={key} className="board__captured" data-mark="captured" cx={cx} cy={cy} r={MARK_RADIUS} />
+        }
         if (mark.kind === 'ring') {
           return <circle key={key} className="board__ring" data-mark="ring" cx={cx} cy={cy} r={MARK_RADIUS} />
         }
@@ -103,13 +116,21 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
               role="button"
               aria-label={pointLabel(p)}
               aria-disabled={disabled || undefined}
+              tabIndex={disabled ? -1 : 0}
               x={at(x) - UNIT / 2}
               y={at(y) - UNIT / 2}
               width={UNIT}
               height={UNIT}
               onMouseEnter={() => setHovered(p)}
+              onPointerDown={(event) => event.preventDefault()}
               onClick={() => {
                 if (!disabled) onPointClick?.(p)
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  if (!disabled) onPointClick?.(p)
+                }
               }}
             />
           )

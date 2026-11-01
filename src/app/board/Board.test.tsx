@@ -24,6 +24,19 @@ describe('starPoints', () => {
 })
 
 describe('Board', () => {
+  it('键盘可落子，禁用时不触发且不进入 Tab 顺序', () => {
+    const onPointClick = vi.fn()
+    const { rerender } = render(<Board board={createBoard(9)} onPointClick={onPointClick} />)
+    const point = screen.getByRole('button', { name: pointLabel({ x: 0, y: 0 }) })
+    expect(point.getAttribute('tabindex')).toBe('0')
+    fireEvent.keyDown(point, { key: 'Enter' })
+    fireEvent.keyDown(point, { key: ' ' })
+    expect(onPointClick).toHaveBeenCalledTimes(2)
+    rerender(<Board board={createBoard(9)} disabled onPointClick={onPointClick} />)
+    fireEvent.keyDown(point, { key: 'Enter' })
+    expect(point.getAttribute('tabindex')).toBe('-1')
+    expect(onPointClick).toHaveBeenCalledTimes(2)
+  })
   it('每个交叉点都是一个可点的按钮', () => {
     render(<Board board={createBoard(9)} />)
     expect(screen.getAllByRole('button')).toHaveLength(81)

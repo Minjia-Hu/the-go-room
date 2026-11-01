@@ -1,10 +1,10 @@
 import { getCell } from '../../engine'
 import type { Board, Point } from '../../engine'
 
-/** 棋盘上的辅助标记:ring 套在棋子外,dot 标在空点上,selected 是被用户选中的空点。 */
+/** ring 叫吃/教学，dot/selected 空点提示，dead 死子，captured 提子位置，area 数子归属。 */
 export interface BoardMark {
   readonly point: Point
-  readonly kind: 'ring' | 'dot' | 'selected'
+  readonly kind: 'ring' | 'dot' | 'selected' | 'dead' | 'captured' | 'black-area' | 'white-area'
 }
 
 /** 给一组点生成标记:点上有棋子用 ring,空点用 emptyKind。 */
