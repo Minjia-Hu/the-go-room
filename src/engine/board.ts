@@ -5,7 +5,7 @@ export function createBoard(size: number): Board {
 }
 
 export function isOnBoard(board: Board, p: Point): boolean {
-  return p.x >= 0 && p.y >= 0 && p.x < board.size && p.y < board.size
+  return Number.isInteger(p.x) && Number.isInteger(p.y) && p.x >= 0 && p.y >= 0 && p.x < board.size && p.y < board.size
 }
 
 export function toIndex(board: Board, p: Point): number {

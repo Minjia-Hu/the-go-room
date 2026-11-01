@@ -5,6 +5,12 @@ import { scoreGame, toggleDeadGroup } from './scoring'
 const split = parseBoard(['.X.O.', '.X.O.', '.X.O.', '.X.O.', '.X.O.'])
 
 describe('scoreGame', () => {
+  it('忽略越界和非整数死子坐标，避免移除下一行的活子', () => {
+    const board = parseBoard(['...', 'X..', '...'])
+    const invalid = [{ x: 3, y: 0 }, { x: -1, y: 1 }, { x: 0, y: 3 }, { x: 0.5, y: 0 }, { x: NaN, y: 0 }]
+    expect(scoreGame(board, invalid, 7.5)).toEqual(scoreGame(board, [], 7.5))
+    expect(scoreGame(board, invalid, 7.5).ownership).toHaveLength(9)
+  })
   it('空棋盘双方都是 0,白靠贴目获胜', () => {
     const result = scoreGame(parseBoard(['...', '...', '...']), [], 7.5)
     expect(result).toMatchObject({ black: 0, white: 0, winner: 'white', margin: 7.5 })

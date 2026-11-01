@@ -1,4 +1,4 @@
-import { getCell, neighbors, removeStones, samePoint, toIndex, toPoint } from './board'
+import { getCell, isOnBoard, neighbors, removeStones, samePoint, toIndex, toPoint } from './board'
 import { getGroup } from './groups'
 import type { Board, Cell, Color, Point, ScoreResult } from './types'
 
@@ -19,9 +19,10 @@ export function toggleDeadGroup(board: Board, dead: readonly Point[], point: Poi
 /**
  * 中国规则数子:移除死子后,每方得分 = 盘上活子 + 只被己方包围的空点。
  * 结果 = 黑 − 白 − 贴目。
+ * 越界或非整数死子坐标忽略，避免错误下标影响其他棋子。
  */
 export function scoreGame(board: Board, dead: readonly Point[], komi: number): ScoreResult {
-  const cleared = removeStones(board, dead)
+  const cleared = removeStones(board, dead.filter((point) => isOnBoard(board, point)))
   const ownership: Cell[] = cleared.cells.slice()
   const visited = new Set<number>()
 
