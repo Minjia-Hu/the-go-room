@@ -1,0 +1,5 @@
+export { chooseMove, findAtari, findCapture, findEscape, sensibleMoves } from './simple'
+export type { AiMove } from './simple'
+export { createRng } from './random'
+export type { Rng } from './random'
+export { isOwnEye } from './eyes'
