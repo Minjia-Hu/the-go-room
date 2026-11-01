@@ -56,10 +56,10 @@
 - [ ] **Step 1:在临时目录生成模板**
 
 ```bash
-cd /tmp && rm -rf the-go-room && npm create vite@latest the-go-room -- --template react-ts
+cd /tmp && rm -rf the-go-room && npm create vite@latest the-go-room -- --template react-ts </dev/null
 ```
 
-Expected:输出 `Scaffolding project in /private/tmp/the-go-room...` 和 `Done.`,不会出现交互提问。
+Expected:输出 `Scaffolding project in /private/tmp/the-go-room...` 和 `Done.`。末尾的 `</dev/null` 让 create-vite 跳过"是否安装并启动"之类的交互提问。
 
 - [ ] **Step 2:复制到仓库,保留现有 README**
 
@@ -381,6 +381,12 @@ describe('getGroup', () => {
   it('空点返回 null', () => {
     expect(getGroup(parseBoard(['...', '...', '...']), { x: 0, y: 0 })).toBeNull()
   })
+
+  it('棋盘外的点返回 null,而不是算错下标', () => {
+    const board = parseBoard(['.X.', '...', '...'])
+    expect(getGroup(board, { x: 3, y: 0 })).toBeNull()
+    expect(getGroup(board, { x: 1, y: -1 })).toBeNull()
+  })
 })
 ```
 
@@ -394,11 +400,12 @@ Expected:FAIL,提示无法解析 `./groups`。
 `src/engine/groups.ts`:
 
 ```ts
-import { getCell, neighbors, toIndex } from './board'
+import { getCell, isOnBoard, neighbors, toIndex } from './board'
 import type { Board, Group, Point } from './types'
 
-/** 返回包含 p 的整块棋;p 为空点时返回 null。 */
+/** 返回包含 p 的整块棋;p 为空点或不在棋盘上时返回 null。 */
 export function getGroup(board: Board, p: Point): Group | null {
+  if (!isOnBoard(board, p)) return null
   const color = getCell(board, p)
   if (color === null) return null
 
@@ -431,7 +438,7 @@ export function getGroup(board: Board, p: Point): Group | null {
 - [ ] **Step 4:运行测试,确认通过**
 
 Run:`npx vitest run src/engine/groups.test.ts`
-Expected:4 个测试全部 PASS。
+Expected:5 个测试全部 PASS。
 
 - [ ] **Step 5:提交**
 
@@ -453,6 +460,16 @@ git commit -m "feat(engine): find groups and liberties"
 ```
 .XO..      X 黑  O 白  . 空
 XO...      白下 (0,0) 提黑 (1,0)
+.....
+```
+
+超级劫的测试局面说明("送二还一"):黑先在 (2,0) 送出第二子,白在 (0,0) 提掉两子,黑再在 (1,0) 提回白一子,盘面与起点完全相同。这不是标准劫形,简单劫规则拦不住,只有全局同形禁止能拒绝它。
+
+```
+.X.OO      起点,黑先
+XOOOO      黑 (2,0) → 白 (0,0) 提两子 → 黑 (1,0) 被拒绝
+XXXX.
+.....
 .....
 ```
 
@@ -554,6 +571,17 @@ describe('play', () => {
     expect(game.history.at(-1)).toMatchObject({ captured: [{ x: 0, y: 0 }], isKo: true })
   })
 
+  it('超级劫:送二还一后回到原局面被拒绝', () => {
+    // 黑 (1,0) 一子;白块只有 (2,0) 和 (4,2) 两口气
+    const board = parseBoard(['.X.OO', 'XOOOO', 'XXXX.', '.....', '.....'])
+    let game = expectOk(play(createGame({ board }), { x: 2, y: 0 })) // 黑送第二子,两子只剩一口气
+    game = expectOk(play(game, { x: 0, y: 0 })) // 白提两子
+    expect(game.history.at(-1)).toMatchObject({ isKo: false })
+    if (game.history.at(-1)?.kind === 'play') expect(game.history.at(-1)).toMatchObject({ captured: expect.any(Array) })
+    // 黑在 (1,0) 还一子会让盘面回到起点,不是标准劫形,只有全局同形禁止能拦住
+    expect(play(game, { x: 1, y: 0 })).toEqual({ ok: false, reason: 'repeated-position' })
+  })
+
   it('每次落子都记录盘面', () => {
     let game = createGame()
     game = expectOk(play(game, { x: 0, y: 0 }))
@@ -653,7 +681,7 @@ export function play(state: GameState, point: Point): PlayResult {
 - [ ] **Step 4:运行测试,确认通过**
 
 Run:`npx vitest run src/engine/game.test.ts`
-Expected:11 个测试全部 PASS。
+Expected:12 个测试全部 PASS。
 
 - [ ] **Step 5:提交**
 
@@ -747,7 +775,7 @@ export function pass(state: GameState): PlayResult {
 - [ ] **Step 4:运行测试,确认通过**
 
 Run:`npx vitest run src/engine/game.test.ts`
-Expected:15 个测试全部 PASS。
+Expected:16 个测试全部 PASS。
 
 - [ ] **Step 5:提交**
 
@@ -982,7 +1010,7 @@ export { scoreGame, toggleDeadGroup } from './scoring'
 - [ ] **Step 2:跑全部测试**
 
 Run:`npm test`
-Expected:`Test Files  4 passed (4)`,`Tests  34 passed (34)`。
+Expected:`Test Files  4 passed (4)`,`Tests  36 passed (36)`。
 
 - [ ] **Step 3:类型检查与构建**
 
@@ -1014,10 +1042,11 @@ Expected:没有 error。
 3. 引导对局、终局数子与复盘。
 ```
 
-- [ ] **Step 6:提交并推送**
+- [ ] **Step 6:提交**
 
 ```bash
 git add src/engine/index.ts README.md
 git commit -m "feat(engine): expose public engine API"
-git push origin main
 ```
+
+不要推送。是否推送到 GitHub 由项目负责人决定。
