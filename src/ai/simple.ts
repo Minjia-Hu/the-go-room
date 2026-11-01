@@ -1,5 +1,9 @@
 import { getCell, getGroup, neighbors, opponent, play, toPoint } from '../engine'
 import type { GameState, Point } from '../engine'
+import { isOwnEye } from './eyes'
+import type { Rng } from './random'
+
+export type AiMove = { readonly kind: 'play'; readonly point: Point } | { readonly kind: 'pass' }
 
 /** 棋盘上所有空点,按行从上到下、每行从左到右。 */
 function emptyPoints(state: GameState): Point[] {
@@ -82,4 +86,26 @@ export function findAtari(state: GameState): Point | null {
     }
   }
   return best
+}
+
+/** 所有合法且不填自己眼的落点。 */
+export function sensibleMoves(state: GameState): Point[] {
+  return emptyPoints(state).filter(
+    (p) => !isOwnEye(state.board, p, state.toPlay) && play(state, p).ok,
+  )
+}
+
+/**
+ * 简单电脑对手:提子 → 救自己被叫吃的棋 → 叫吃对方 → 随机选一个合理的点 → 停一手。
+ * 返回的落点保证在当前状态下合法。
+ */
+export function chooseMove(state: GameState, rng: Rng = Math.random): AiMove {
+  if (state.phase !== 'playing') return { kind: 'pass' }
+
+  const urgent = findCapture(state) ?? findEscape(state) ?? findAtari(state)
+  if (urgent !== null) return { kind: 'play', point: urgent }
+
+  const candidates = sensibleMoves(state)
+  if (candidates.length === 0) return { kind: 'pass' }
+  return { kind: 'play', point: candidates[Math.floor(rng() * candidates.length)] }
 }

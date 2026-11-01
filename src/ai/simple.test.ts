@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { createGame, parseBoard } from '../engine'
+import { createGame, parseBoard, pass, play } from '../engine'
 import type { GameState } from '../engine'
-import { findAtari, findCapture, findEscape } from './simple'
+import { createRng } from './random'
+import { chooseMove, findAtari, findCapture, findEscape, sensibleMoves } from './simple'
 
 /** 用文字棋盘建一个轮到 toPlay 下的局面。 */
 function position(rows: string[], toPlay: 'black' | 'white' = 'black'): GameState {
@@ -58,5 +59,59 @@ describe('findAtari', () => {
 
   it('没有可叫吃的棋时返回 null', () => {
     expect(findAtari(createGame())).toBeNull()
+  })
+})
+
+describe('sensibleMoves', () => {
+  it('不包括自己的眼', () => {
+    const state = position(['X.X', 'XXX', 'X.X'])
+    expect(sensibleMoves(state)).toEqual([])
+  })
+
+  it('空棋盘上所有点都合理', () => {
+    expect(sensibleMoves(createGame())).toHaveLength(81)
+  })
+})
+
+describe('chooseMove', () => {
+  it('能提子时优先提子', () => {
+    const state = position(['...XO', '.....', '.XX..', 'XOO..', '.XX..'])
+    expect(chooseMove(state, createRng(1))).toEqual({ kind: 'play', point: { x: 3, y: 3 } })
+  })
+
+  it('没有提子时,救自己的棋优先于叫吃对方', () => {
+    // 黑 (2,3) 被叫吃,可以在 (2,4) 长出;同时黑在 (3,0) 或 (2,1) 能叫吃白 (2,0)
+    const state = position(['.XO..', '.....', '..O..', '.OXO.', '.....'])
+    expect(chooseMove(state, createRng(1))).toEqual({ kind: 'play', point: { x: 2, y: 4 } })
+  })
+
+  it('只剩自己的眼时停一手', () => {
+    expect(chooseMove(position(['X.X', 'XXX', 'X.X']), createRng(1))).toEqual({ kind: 'pass' })
+  })
+
+  it('终局阶段停一手', () => {
+    let state = createGame()
+    state = (pass(state) as { ok: true; state: GameState }).state
+    state = (pass(state) as { ok: true; state: GameState }).state
+    expect(chooseMove(state, createRng(1))).toEqual({ kind: 'pass' })
+  })
+
+  it('同一种子在同一局面下选同一个点', () => {
+    const a = chooseMove(createGame(), createRng(3))
+    const b = chooseMove(createGame(), createRng(3))
+    expect(a).toEqual(b)
+    expect(a.kind).toBe('play')
+  })
+
+  it('电脑自己和自己下,每步都合法,并能走到终局', () => {
+    const rng = createRng(2026)
+    let state = createGame()
+    for (let i = 0; i < 1000 && state.phase === 'playing'; i++) {
+      const move = chooseMove(state, rng)
+      const result = move.kind === 'pass' ? pass(state) : play(state, move.point)
+      expect(result.ok).toBe(true)
+      if (result.ok) state = result.state
+    }
+    expect(state.phase).toBe('scoring')
   })
 })
