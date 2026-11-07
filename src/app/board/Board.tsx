@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { getCell } from '../../engine'
 import type { Board as BoardData, Color, Point } from '../../engine'
 import { pointLabel, starPoints } from './geometry'
@@ -26,6 +26,7 @@ const STAR_RADIUS = UNIT * 0.09
 
 export function Board({ board, lastMove, marks = [], ghostColor = null, disabled = false, onPointClick }: BoardProps) {
   const [hovered, setHovered] = useState<Point | null>(null)
+  const surfaceId = useId()
   const { size } = board
   const span = (size - 1) * UNIT
   const total = span + MARGIN * 2
@@ -35,6 +36,8 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
   const indexes = Array.from({ length: size }, (_, i) => i)
   const showGhost =
     !disabled && ghostColor !== null && hovered !== null && getCell(board, hovered) === null
+  // 字母与讲解对应，必须盖在已选圆点之上，避免选中气后看不见 A / B。
+  const orderedMarks = [...marks.filter((mark) => mark.kind !== 'label'), ...marks.filter((mark) => mark.kind === 'label')]
 
   return (
     <svg
@@ -44,7 +47,18 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
       aria-label={`${size} 路棋盘`}
       onMouseLeave={() => setHovered(null)}
     >
-      <rect className="board__wood" x={-MARGIN} y={-MARGIN} width={total} height={total} rx={UNIT * 0.2} />
+      <defs>
+        <linearGradient id={`${surfaceId}-wood`} x2="1" y2="1">
+          <stop stopColor="#e8cb94" /><stop offset="1" stopColor="#d8b276" />
+        </linearGradient>
+        <radialGradient id={`${surfaceId}-black`} cx=".32" cy=".26" r=".75">
+          <stop stopColor="#555a55" /><stop offset=".5" stopColor="#2a2e2a" /><stop offset="1" stopColor="#171b18" />
+        </radialGradient>
+        <radialGradient id={`${surfaceId}-white`} cx=".32" cy=".26" r=".8">
+          <stop stopColor="#ffffff" /><stop offset=".6" stopColor="#f9f7f0" /><stop offset="1" stopColor="#d8d5ca" />
+        </radialGradient>
+      </defs>
+      <rect className="board__wood" fill={`url(#${surfaceId}-wood)`} x={-MARGIN} y={-MARGIN} width={total} height={total} rx={UNIT * 0.2} />
       {marks.filter((mark) => mark.kind.endsWith('-area')).map((mark) => (
         <rect key={`area-${mark.point.x}-${mark.point.y}`} className={`board__area board__area--${mark.kind}`}
           data-mark={mark.kind} x={at(mark.point.x) - UNIT / 2} y={at(mark.point.y) - UNIT / 2}
@@ -67,6 +81,7 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
           <circle
             key={`stone-${index}`}
             className={`board__stone board__stone--${cell}`}
+            fill={`url(#${surfaceId}-${cell})`}
             data-stone={cell}
             data-x={x}
             data-y={y}
@@ -79,13 +94,14 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
       {showGhost && (
         <circle
           className={`board__stone board__stone--${ghostColor} board__ghost`}
+          fill={`url(#${surfaceId}-${ghostColor})`}
           data-ghost={ghostColor}
           cx={at(hovered.x)}
           cy={at(hovered.y)}
           r={STONE_RADIUS}
         />
       )}
-      {marks.map((mark) => {
+      {orderedMarks.map((mark) => {
         const key = `mark-${mark.kind}-${mark.point.x}-${mark.point.y}`
         const cx = at(mark.point.x)
         const cy = at(mark.point.y)

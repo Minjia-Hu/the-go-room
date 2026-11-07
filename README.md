@@ -20,6 +20,8 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)（Private）。
 
+界面采用纸色、墨绿与木色棋盘的书房风格，首页提供明确的第一课入口和分章课程。桌面并排展示棋盘与讲解，手机改为上下布局；棋子采用 SVG 渐变，不依赖外部图片或字体服务。页面截图与检查记录见[界面验收](docs/qa/visual-refresh/README.md)。
+
 ## 产品方向
 
 第一版做 5 关互动教学、与简单电脑对手的 9 路引导对局,以及带规则事件标注的复盘。范围、规则口径与技术方案见 [第一版设计](docs/superpowers/specs/2026-11-01-v1-design.md)。

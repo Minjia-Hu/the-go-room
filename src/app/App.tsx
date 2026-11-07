@@ -52,7 +52,10 @@ export function App() {
   return (
     <>
       <header className="topbar">
-        <h1 className="topbar__title">The Go Room</h1>
+        <div className="brand">
+          <span className="brand__mark" aria-hidden="true"><i /><i /></span>
+          <div><h1 className="topbar__title">The Go Room</h1><p className="brand__caption">一间小小的围棋教室</p></div>
+        </div>
         <nav className="topbar__nav" aria-label="主导航">
           {NAV.map((item) => (
             <button
@@ -72,6 +75,7 @@ export function App() {
         {page === 'play' && <PlayPage session={session} onChange={setSession} onFinish={finish} coaching={coaching} onCoachingChange={changeCoaching} preferenceMessage={preferenceMessage} />}
         {page === 'replay' && <ReplayPage games={games} selectedId={selectedId} onSelect={setSelectedId} onPlay={() => navigate('play')} storageMessage={storageMessage} />}
       </main>
+      <footer className="site-footer"><span>The Go Room</span><span>不急着赢，先看懂每一步。</span></footer>
     </>
   )
 }
