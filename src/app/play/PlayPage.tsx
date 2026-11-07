@@ -111,6 +111,7 @@ export function PlayPage({ session, onChange, onFinish, coaching, onCoachingChan
   const inDemo = !!preview && view === 'reply'
   return <section className="page page--with-board">
     <div>
+      <p className="figure-number">对局棋盘 / 九路</p>
       <Board board={shown.board} marks={marks} lastMove={shownLast?.kind === 'play' ? shownLast.point : null}
         ghostColor={scoring || review || inDemo ? null : 'black'} disabled={thinking || confirmRestart || !!review || inDemo}
         onPointClick={select} />

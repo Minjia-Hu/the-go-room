@@ -25,6 +25,7 @@ export function SurvivalPage({ run, onChange, onNext, isLast }: Props) {
   }
   return <section className="page page--with-board">
     <div>
+      <p className="figure-number">第 {scene.course} 课 / {scene.guided ? '一起练习' : '自己试试'}</p>
       <Board board={shown.board} marks={marks} lastMove={last?.kind === 'play' ? last.point : null}
         disabled={run.view === 'reply' || run.view.startsWith('contrast') || run.stage === 'done' || run.stage === 'reason'}
         ghostColor={run.stage === 'move' ? 'black' : null} onPointClick={(p) => onChange(choosePracticePoint(run, p))} />

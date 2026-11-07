@@ -129,7 +129,7 @@ describe('App', () => {
   it('默认显示教学页和三个导航按钮', () => {
     render(<App />)
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('The Go Room')
-    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('一步一步，学会照顾自己的棋。')
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('黑白之间，慢慢看懂。')
     expect(screen.getByRole('button', { name: '教学' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: '对局' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '复盘' })).toBeTruthy()

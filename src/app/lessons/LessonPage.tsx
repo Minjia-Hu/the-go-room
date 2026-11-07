@@ -29,14 +29,18 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
 
   return (
     <section className="page page--with-board">
-      <Board
-        board={run.game.board}
-        lastMove={run.lastMove}
-        marks={lessonMarks(run)}
-        ghostColor={step?.kind === 'place' ? run.game.toPlay : null}
-        disabled={done}
-        onPointClick={(p) => update({ index, run: clickPoint(run, p) })}
-      />
+      <div>
+        <p className="figure-number">图 {String(index + 1).padStart(2, '0')} / 认识规则</p>
+        <Board
+          board={run.game.board}
+          lastMove={run.lastMove}
+          marks={lessonMarks(run)}
+          ghostColor={step?.kind === 'place' ? run.game.toPlay : null}
+          disabled={done}
+          onPointClick={(p) => update({ index, run: clickPoint(run, p) })}
+        />
+        <p className="board-caption">9 路棋盘 · 从一个小局面开始</p>
+      </div>
       <div className="panel">
         <ol className="progress" aria-label="教学进度">
           {lessons.map((l, i) => (

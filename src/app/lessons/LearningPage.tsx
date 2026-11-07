@@ -10,26 +10,35 @@ interface Props { readonly session: LearningSession; readonly onChange: (next: L
 export function LearningPage({ session, onChange, onPlay }: Props) {
   const openScene = (sceneIndex: number) => onChange({ ...session, page: 'survival', sceneIndex })
   if (session.page === 'home') return <section className="learning-home">
+    <div className="edition-line"><span>入门手记 · 第一册</span><span lang="en">OBSERVE / TRY / UNDERSTAND</span><span>从一口气开始</span></div>
     <div className="learning-hero">
       <div className="learning-hero__copy">
-        <p className="eyebrow"><span className="eyebrow__line" aria-hidden="true" />从认识规则，到知道为什么这样下</p>
-        <h2>一步一步，学会照顾自己的棋。</h2>
-        <p className="muted">最后比较活着的棋子和围住的空点，吃子只是办法之一。从一个小局面开始，先看懂，再落子。</p>
+        <p className="eyebrow">写给第一次拿起棋子的你</p>
+        <h2>黑白之间，<br />慢慢<span>看懂。</span></h2>
+        <div className="hero-intro"><span className="vertical-note" aria-hidden="true">学棋，不必着急</span><p>一颗棋为什么会被吃？<br />哪一步可以救回它？<br />从一个小局面，读懂棋盘上的因果。</p></div>
         <button className="button hero-button" onClick={() => onChange({ ...session, page: 'rules', rules: { index: 0, run: startLesson(LESSONS[0]) } })}>从第一课开始<span aria-hidden="true">↗</span></button>
-        <span className="hero-note">零基础也可以 · 在棋盘上边下边学</span>
+        <button className="text-button hero-practice" onClick={() => openScene(0)}>先试一道生存练习</button>
       </div>
       <RoomIllustration />
     </div>
-    <div className="section-heading"><h3>你的学棋之路</h3><span>先认识，再练习</span></div>
-    <div className="chapter-grid">
-      <article className="panel chapter"><span className="chapter-number">01</span><h3>认识规则</h3><p className="muted">落子、气、提子、禁入点和劫。</p>
-        {LESSONS.map((lesson, index) => <button key={lesson.id} className="lesson-link" onClick={() => onChange({ ...session, page: 'rules', rules: session.rules.index === index ? session.rules : { index, run: startLesson(lesson) } })}>{lesson.title}<span aria-hidden="true">→</span></button>)}
-      </article>
-      <article className="panel chapter"><span className="chapter-number">02</span><h3>保住自己的棋</h3><p className="muted">四课八个局面。观察、试下、比较原因。</p>
-        {SURVIVAL_SCENES.filter((s) => s.guided).map((scene, index) => <button key={scene.id} className="lesson-link" onClick={() => openScene(index * 2)}>{scene.course}. {scene.title}<span aria-hidden="true">→</span></button>)}
-      </article>
+    <div className="learning-contents">
+      <div className="contents-heading"><span className="eyebrow" lang="en">CONTENTS</span><h3>循序入门</h3><p>每一章，<br />解决一个小困惑。</p><span className="book-seal" aria-hidden="true">弈</span></div>
+      <div className="chapter-list">
+        <article className="chapter">
+          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">壹</span><div><h3>认识规则</h3><p>落子、气、提子、禁入点和劫。</p></div><span className="chapter-count">五关</span></header>
+          <div className="lesson-list">{LESSONS.map((lesson, index) => <button key={lesson.id} className="lesson-link" onClick={() => onChange({ ...session, page: 'rules', rules: session.rules.index === index ? session.rules : { index, run: startLesson(lesson) } })}>{lesson.title}<span aria-hidden="true">↗</span></button>)}</div>
+        </article>
+        <article className="chapter">
+          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">贰</span><div><h3>保住自己的棋</h3><p>四课八个局面。观察、试下、比较原因。</p></div><span className="chapter-count">四课</span></header>
+          <div className="lesson-list">{SURVIVAL_SCENES.filter((s) => s.guided).map((scene, index) => <button key={scene.id} className="lesson-link" onClick={() => openScene(index * 2)}>{scene.course}. {scene.title}<span aria-hidden="true">↗</span></button>)}</div>
+        </article>
+        <article className="chapter practice-invitation">
+          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">叁</span><div><h3>有提示的陪练</h3><p>每手先试下，看懂提示后再确认；也可以退回重试。</p></div><span className="chapter-count">一盘</span></header>
+          <button className="button button--ghost" onClick={onPlay}>直接开始陪练<span aria-hidden="true">↗</span></button>
+        </article>
+      </div>
     </div>
-    <div className="practice-invitation"><div><span className="eyebrow">下一步 · 把学到的用起来</span><h3>有人陪你，慢慢下一盘。</h3><p>每手先试下，看懂提示后再确认；也可以退回重试。</p></div><button className="button" onClick={onPlay}>直接开始陪练<span aria-hidden="true">↗</span></button></div>
+    <div className="learning-note"><p className="learning-quote">先理解一手棋，<br />再慢慢理解一盘棋。</p><p>最后比较活着的棋子和围住的空点，<br />吃子只是办法之一。</p></div>
     <p className="muted small archive-note">切换页面保留当前练习和对局。刷新后练习回到这里，进行中的对局不保留；已完成棋谱仍可复盘。</p>
   </section>
   return <>

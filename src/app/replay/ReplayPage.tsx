@@ -29,6 +29,7 @@ function ReplayBoard({ replay }: { readonly replay: GameReplay }) {
 
   return <div className="page page--with-board">
     <div>
+      <p className="figure-number">棋谱回看 / {atEnd ? '终局' : `第 ${step} 手`}</p>
       <Board board={atEnd ? view.cleared : frame.board} disabled marks={marks} lastMove={!atEnd && last?.kind === 'play' ? last.point : null} />
       <p className="board-caption">{atEnd ? '终局盘面 · 已移除标记的死子' : '历史盘面 · 可逐手回看'}</p>
     </div>

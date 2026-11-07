@@ -53,8 +53,8 @@ export function App() {
     <>
       <header className="topbar">
         <div className="brand">
-          <span className="brand__mark" aria-hidden="true"><i /><i /></span>
-          <div><h1 className="topbar__title">The Go Room</h1><p className="brand__caption">一间小小的围棋教室</p></div>
+          <span className="brand__mark" aria-hidden="true"><i /><i /><i /><i /></span>
+          <h1 className="topbar__title">The Go Room</h1>
         </div>
         <nav className="topbar__nav" aria-label="主导航">
           {NAV.map((item) => (
@@ -69,6 +69,7 @@ export function App() {
             </button>
           ))}
         </nav>
+        <p className="topbar__note">属于你的围棋教室</p>
       </header>
       <main>
         {page === 'lessons' && <LearningPage session={learning} onChange={setLearning} onPlay={() => navigate('play')} />}

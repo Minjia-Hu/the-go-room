@@ -49,7 +49,7 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
     >
       <defs>
         <linearGradient id={`${surfaceId}-wood`} x2="1" y2="1">
-          <stop stopColor="#e8cb94" /><stop offset="1" stopColor="#d8b276" />
+          <stop stopColor="#ecddbd" /><stop offset="1" stopColor="#e4cfa7" />
         </linearGradient>
         <radialGradient id={`${surfaceId}-black`} cx=".32" cy=".26" r=".75">
           <stop stopColor="#555a55" /><stop offset=".5" stopColor="#2a2e2a" /><stop offset="1" stopColor="#171b18" />
@@ -58,7 +58,7 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
           <stop stopColor="#ffffff" /><stop offset=".6" stopColor="#f9f7f0" /><stop offset="1" stopColor="#d8d5ca" />
         </radialGradient>
       </defs>
-      <rect className="board__wood" fill={`url(#${surfaceId}-wood)`} x={-MARGIN} y={-MARGIN} width={total} height={total} rx={UNIT * 0.2} />
+      <rect className="board__wood" fill={`url(#${surfaceId}-wood)`} x={-MARGIN} y={-MARGIN} width={total} height={total} />
       {marks.filter((mark) => mark.kind.endsWith('-area')).map((mark) => (
         <rect key={`area-${mark.point.x}-${mark.point.y}`} className={`board__area board__area--${mark.kind}`}
           data-mark={mark.kind} x={at(mark.point.x) - UNIT / 2} y={at(mark.point.y) - UNIT / 2}
