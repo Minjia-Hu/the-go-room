@@ -52,10 +52,16 @@ export function App() {
   return (
     <>
       <header className="topbar">
-        <div className="brand">
+        <a className="brand" href="#/lessons" aria-label="The Go Room 首页" onClick={(event) => {
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+          event.preventDefault()
+          setLearning((current) => ({ ...current, page: 'home' }))
+          navigate('lessons')
+          window.scrollTo(0, 0)
+        }}>
           <span className="brand__mark" aria-hidden="true"><i /><i /><i /><i /></span>
           <h1 className="topbar__title">The Go Room</h1>
-        </div>
+        </a>
         <nav className="topbar__nav" aria-label="主导航">
           {NAV.map((item) => (
             <button
