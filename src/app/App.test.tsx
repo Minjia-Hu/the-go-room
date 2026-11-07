@@ -4,9 +4,10 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { chooseMove } from '../ai'
 import { App } from './App'
 import { pageFromHash } from './router'
-import { STORAGE_KEY } from './replay/records'
+import { readGames, STORAGE_KEY } from './replay/records'
+import { COACHING_KEY } from './play/preferences'
 
-vi.mock('../ai', () => ({ chooseMove: vi.fn() }))
+vi.mock('../ai', async (importOriginal) => ({ ...await importOriginal<typeof import('../ai')>(), chooseMove: vi.fn() }))
 
 // Node 25 也暴露 localStorage；当前 Vitest 保留它，需显式使用 jsdom 的浏览器存储。
 beforeAll(() => {
@@ -32,6 +33,7 @@ describe('对局到复盘的完整路径', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     window.localStorage.clear()
+    window.localStorage.setItem(COACHING_KEY, JSON.stringify({ version: 1, enabled: false }))
     window.location.hash = '#/play'
     vi.mocked(chooseMove).mockReset().mockReturnValue({ kind: 'pass' })
   })
@@ -40,6 +42,8 @@ describe('对局到复盘的完整路径', () => {
 
   function finish() {
     fireEvent.click(screen.getByRole('button', { name: '停一手' }))
+    const confirm = screen.queryByRole('button', { name: '确认停一手' })
+    if (confirm) fireEvent.click(confirm)
     tick()
     fireEvent.click(screen.getByRole('button', { name: '确认数子，进入复盘' }))
   }
@@ -125,7 +129,7 @@ describe('App', () => {
   it('默认显示教学页和三个导航按钮', () => {
     render(<App />)
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('The Go Room')
-    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('第 1 关:落子')
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('一步一步，学会照顾自己的棋。')
     expect(screen.getByRole('button', { name: '教学' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: '对局' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '复盘' })).toBeTruthy()
@@ -137,5 +141,59 @@ describe('App', () => {
     expect(window.location.hash).toBe('#/play')
     expect(screen.getByRole('button', { name: '对局' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('对局')
+  })
+})
+
+describe('默认陪练的应用闭环', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    window.localStorage.clear()
+    window.location.hash = '#/play'
+    vi.mocked(chooseMove).mockReset().mockReturnValue({ kind: 'pass' })
+  })
+  afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.useRealTimers() })
+  const click = (name: string) => fireEvent.click(screen.getByRole('button', { name }))
+  const tick = () => act(() => { vi.advanceTimersByTime(350) })
+  it('预览换页不提交，确认后切页保留并继续 AI；课程状态也保留', () => {
+    render(<App />)
+    click('交叉点 4,4'); click('教学'); tick(); click('对局')
+    expect(screen.getByText('已下 0 手')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '下在这里' })).toBeNull()
+    click('交叉点 4,4'); click('下在这里'); click('教学'); tick()
+    expect(chooseMove).not.toHaveBeenCalled()
+    click('1. 认出哪块棋危险'); click('交叉点 4,4')
+    click('对局'); tick()
+    expect(screen.getByText('已下 2 手')).toBeTruthy()
+    click('教学')
+    expect(screen.getByText('点出这整块黑棋最后的一口气。')).toBeTruthy()
+  })
+  it('实际提子可重试，存档只包含重试后保留的正式动作', () => {
+    render(<App />)
+    for (const [human, white] of [ [[4,4],[4,3]], [[0,0],[3,4]], [[0,1],[5,4]], [[0,2],[4,5]] ]) {
+      vi.mocked(chooseMove).mockReturnValueOnce({ kind: 'play', point: { x: white[0], y: white[1] } })
+      click(`交叉点 ${human[0]},${human[1]}`); click('下在这里'); tick()
+    }
+    click('被吃前'); click('退回这一回合重试')
+    expect(screen.getByText('已下 6 手')).toBeTruthy()
+    click('交叉点 4,5'); click('下在这里'); tick()
+    click('停一手'); click('确认停一手')
+    click('确认数子，进入复盘')
+    const saved = readGames(window.localStorage)
+    expect(saved).toHaveLength(1)
+    expect(saved[0].moves).toHaveLength(9)
+    expect(saved[0].moves).not.toContainEqual({ kind: 'play', point: { x: 0, y: 2 } })
+    expect(Object.keys(saved[0]).sort()).toEqual(['dead','endedAt','id','moves'])
+    expect(screen.queryByRole('button', { name: '退回这一回合重试' })).toBeNull()
+  })
+  it('关闭偏好可保存；写失败保留本次设置并与棋谱提示区分', () => {
+    const { unmount } = render(<App />)
+    fireEvent.click(screen.getByRole('checkbox', { name: /新手陪练/ }))
+    expect(JSON.parse(window.localStorage.getItem(COACHING_KEY)!).enabled).toBe(false)
+    unmount(); render(<App />)
+    expect((screen.getByRole('checkbox', { name: /新手陪练/ }) as HTMLInputElement).checked).toBe(false)
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('full') })
+    fireEvent.click(screen.getByRole('checkbox', { name: /新手陪练/ }))
+    expect(screen.getByText('本次设置已生效，刷新后可能恢复默认。')).toBeTruthy()
+    expect((screen.getByRole('checkbox', { name: /新手陪练/ }) as HTMLInputElement).checked).toBe(true)
   })
 })

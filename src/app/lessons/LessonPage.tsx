@@ -2,16 +2,21 @@ import { useState } from 'react'
 import type { Lesson } from '../../content/lessons'
 import { Board } from '../board/Board'
 import { clickPoint, currentStep, isLessonDone, lessonMarks, startLesson } from './lessonRunner'
+import type { RuleProgress } from './learningSession'
 
 export interface LessonPageProps {
   readonly lessons: readonly Lesson[]
   /** 最后一关完成后用户点"去对局"时调用。 */
   readonly onFinish: () => void
+  readonly progress?: RuleProgress
+  readonly onProgress?: (progress: RuleProgress) => void
+  readonly onSurvival?: () => void
 }
 
-export function LessonPage({ lessons, onFinish }: LessonPageProps) {
-  const [index, setIndex] = useState(0)
-  const [run, setRun] = useState(() => startLesson(lessons[0]))
+export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival }: LessonPageProps) {
+  const [local, setLocal] = useState<RuleProgress>(() => ({ index: 0, run: startLesson(lessons[0]) }))
+  const { index, run } = progress ?? local
+  const update = onProgress ?? setLocal
 
   const lesson = lessons[index]
   const step = currentStep(run)
@@ -19,8 +24,7 @@ export function LessonPage({ lessons, onFinish }: LessonPageProps) {
   const isLast = index === lessons.length - 1
 
   function goTo(next: number) {
-    setIndex(next)
-    setRun(startLesson(lessons[next]))
+    update({ index: next, run: startLesson(lessons[next]) })
   }
 
   return (
@@ -31,7 +35,7 @@ export function LessonPage({ lessons, onFinish }: LessonPageProps) {
         marks={lessonMarks(run)}
         ghostColor={step?.kind === 'place' ? run.game.toPlay : null}
         disabled={done}
-        onPointClick={(p) => setRun((current) => clickPoint(current, p))}
+        onPointClick={(p) => update({ index, run: clickPoint(run, p) })}
       />
       <div className="panel">
         <ol className="progress" aria-label="教学进度">
@@ -60,9 +64,12 @@ export function LessonPage({ lessons, onFinish }: LessonPageProps) {
             </button>
           )}
           {done && isLast && (
-            <button type="button" className="button" onClick={onFinish}>
-              去对局
-            </button>
+            <>
+              {onSurvival && <button type="button" className="button" onClick={onSurvival}>练习保住自己的棋</button>}{' '}
+              <button type="button" className={onSurvival ? 'button button--ghost' : 'button'} onClick={onFinish}>
+                {onSurvival ? '直接开始陪练' : '去对局'}
+              </button>
+            </>
           )}{' '}
           <button type="button" className="button button--ghost" onClick={() => goTo(index)}>
             重来这一关

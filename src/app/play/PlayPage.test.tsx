@@ -7,12 +7,13 @@ import { createGame, parseBoard } from '../../engine'
 import { PlayPage } from './PlayPage'
 import { computerMove, createMatch, humanMove } from './match'
 import type { Match } from './match'
+import { createPlaySession } from './session'
 
-vi.mock('../../ai', () => ({ chooseMove: vi.fn() }))
+vi.mock('../../ai', async (importOriginal) => ({ ...await importOriginal<typeof import('../../ai')>(), chooseMove: vi.fn() }))
 const ai = vi.mocked(chooseMove)
 function Harness({ initial = createMatch(), finish = () => {} }: { initial?: Match; finish?: (match: Match) => void }) {
-  const [match, setMatch] = useState(initial)
-  return <PlayPage match={match} onChange={setMatch} onFinish={finish} />
+  const [session, setSession] = useState(() => ({ ...createPlaySession(42), match: initial }))
+  return <PlayPage session={session} onChange={setSession} onFinish={finish} coaching={false} onCoachingChange={() => {}} />
 }
 const click = (x: number, y: number) => fireEvent.click(screen.getByRole('button', { name: `交叉点 ${x},${y}` }))
 const tick = (ms = 350) => act(() => { vi.advanceTimersByTime(ms) })
@@ -97,7 +98,7 @@ describe('对局页', () => {
     const match = computerMove(initial, { kind: 'play', point: { x: 0, y: 0 } }).match
     const { container } = render(<Harness initial={match} />)
     expect(container.querySelectorAll('[data-mark="captured"]')).toHaveLength(1)
-    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(screen.getByRole('checkbox', { name: '显示只剩一口气的棋块' }))
     expect(container.querySelectorAll('[data-mark="ring"]').length).toBeGreaterThan(0)
     tick(1200)
     expect(container.querySelectorAll('[data-mark="captured"]')).toHaveLength(0)

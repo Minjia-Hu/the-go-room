@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { LESSONS } from '../content/lessons'
-import { LessonPage } from './lessons/LessonPage'
+import { LearningPage } from './lessons/LearningPage'
+import { createLearningSession } from './lessons/learningSession'
 import { PlayPage } from './play/PlayPage'
-import { createMatch } from './play/match'
+import { createPlaySession } from './play/session'
+import { readCoaching, writeCoaching } from './play/preferences'
 import type { Match } from './play/match'
 import { ReplayPage } from './replay/ReplayPage'
 import { createRecordId, prependGame, readGames, saveRecord, writeGames } from './replay/records'
@@ -18,7 +19,10 @@ const NAV: readonly { page: Page; label: string }[] = [
 
 export function App() {
   const [page, navigate] = usePage()
-  const [match, setMatch] = useState(createMatch)
+  const [learning, setLearning] = useState(createLearningSession)
+  const [session, setSession] = useState(() => createPlaySession(Date.now()))
+  const [coaching, setCoaching] = useState(() => { try { return readCoaching(window.localStorage) } catch { return true } })
+  const [preferenceMessage, setPreferenceMessage] = useState<string | null>(null)
   const [games, setGames] = useState<SavedGame[]>(() => {
     try { return readGames(window.localStorage) } catch { return [] }
   })
@@ -34,8 +38,15 @@ export function App() {
     setStorageMessage(saved ? null : '棋谱未能保存到此浏览器。当前仍可复盘，刷新或关闭页面后本次棋谱会丢失。')
     setGames(next)
     setSelectedId(record.id)
-    setMatch(createMatch())
+    setSession(createPlaySession(Date.now()))
     navigate('replay')
+  }
+
+  function changeCoaching(enabled: boolean) {
+    setCoaching(enabled)
+    let saved = false
+    try { saved = writeCoaching(window.localStorage, enabled) } catch { /* 禁止访问 Storage 时保留内存设置。 */ }
+    setPreferenceMessage(saved ? null : '本次设置已生效，刷新后可能恢复默认。')
   }
 
   return (
@@ -57,8 +68,8 @@ export function App() {
         </nav>
       </header>
       <main>
-        {page === 'lessons' && <LessonPage lessons={LESSONS} onFinish={() => navigate('play')} />}
-        {page === 'play' && <PlayPage match={match} onChange={setMatch} onFinish={finish} />}
+        {page === 'lessons' && <LearningPage session={learning} onChange={setLearning} onPlay={() => navigate('play')} />}
+        {page === 'play' && <PlayPage session={session} onChange={setSession} onFinish={finish} coaching={coaching} onCoachingChange={changeCoaching} preferenceMessage={preferenceMessage} />}
         {page === 'replay' && <ReplayPage games={games} selectedId={selectedId} onSelect={setSelectedId} onPlay={() => navigate('play')} storageMessage={storageMessage} />}
       </main>
     </>

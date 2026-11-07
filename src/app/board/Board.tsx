@@ -90,6 +90,14 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
         const cx = at(mark.point.x)
         const cy = at(mark.point.y)
         if (mark.kind.endsWith('-area')) return null
+        if (mark.kind === 'label') return <g key={key} data-mark="label" aria-label={`标记 ${mark.text}`}>
+          <circle cx={cx} cy={cy} r={7} className="board__label-bg" />
+          <text x={cx} y={cy + 0.5} className="board__label">{mark.text}</text>
+        </g>
+        if (mark.kind === 'target' || mark.kind === 'liberty' || mark.kind === 'preview') {
+          return <circle key={key} className={`board__${mark.kind}`} data-mark={mark.kind} cx={cx} cy={cy}
+            r={mark.kind === 'preview' ? STONE_RADIUS + 1 : mark.kind === 'target' ? STONE_RADIUS - 3 : 5} />
+        }
         if (mark.kind === 'dead') {
           return <path key={key} className="board__dead" data-mark="dead"
             d={`M${cx - 6},${cy - 6}l12,12 M${cx + 6},${cy - 6}l-12,12`} />

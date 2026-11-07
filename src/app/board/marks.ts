@@ -2,10 +2,10 @@ import { getCell } from '../../engine'
 import type { Board, Point } from '../../engine'
 
 /** ring 叫吃/教学，dot/selected 空点提示，dead 死子，captured 提子位置，area 数子归属。 */
-export interface BoardMark {
+export type BoardMark = {
   readonly point: Point
-  readonly kind: 'ring' | 'dot' | 'selected' | 'dead' | 'captured' | 'black-area' | 'white-area'
-}
+  readonly kind: 'ring' | 'dot' | 'selected' | 'dead' | 'captured' | 'black-area' | 'white-area' | 'target' | 'liberty' | 'preview'
+} | { readonly point: Point; readonly kind: 'label'; readonly text: string }
 
 /** 给一组点生成标记:点上有棋子用 ring,空点用 emptyKind。 */
 export function marksForPoints(

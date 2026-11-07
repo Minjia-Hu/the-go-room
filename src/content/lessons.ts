@@ -108,7 +108,7 @@ export const LESSONS: readonly Lesson[] = [
         goal: '在别处下一手。',
         accept: 'any-legal',
         fallbackHint: '请点一个空的交叉点。',
-        success: '这一手叫"找劫材"。对方如果不理,你下一手就可以提回劫了。教学到此结束,去和电脑下一盘吧。',
+        success: '你先在别处下了一手。能否回提仍要看之后的盘面是否重复。认识规则之后，接着练习怎样保住自己的棋，也可以直接开始陪练。',
       },
     ],
   },
