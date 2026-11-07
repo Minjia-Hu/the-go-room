@@ -3,8 +3,8 @@ import { Board } from '../board/Board'
 import { answerTerritory, answerWinner, confirmEnding, countHint, countQuestion, endgameView, endingDemo, endingTurn, lessonScore, selectEndgame, startEndgame, submitCount } from './endgameRunner'
 import type { EndgameRun } from './endgameRunner'
 
-interface Props { readonly run: EndgameRun; readonly onChange: (run: EndgameRun) => void; readonly onNext: () => void; readonly isLast: boolean }
-export function EndgamePage({ run, onChange, onNext, isLast }: Props) {
+interface Props { readonly run: EndgameRun; readonly onChange: (run: EndgameRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onStrategy?: () => void }
+export function EndgamePage({ run, onChange, onNext, isLast, onStrategy }: Props) {
   const { lesson, done } = run
   const view = endgameView(run)
   const result = lessonScore(run)
@@ -52,7 +52,7 @@ export function EndgamePage({ run, onChange, onNext, isLast }: Props) {
         <p>{showKomi ? `白方最终：${score.white} + ${score.komi} = ${score.white + score.komi} 分` : lesson.id === 'count' ? '这里先看盘面分。下一课再加上白方的贴目。' : `白方另加 ${score.komi} 分贴目；棋盘上不用增加棋子。`}</p>
         {done && showKomi && <p className="turn">{score.winner === 'black' ? '黑' : '白'}方胜，领先 {score.margin} 分。</p>}
       </div>}
-      {done && <><p className="small">{run.assisted ? '借助提示完成。可以重来一次，自己数数。' : '本课完成。再看一眼棋盘，把原因和结果连起来。'}</p><button className="button next-lesson" onClick={onNext}>{isLast ? '开始一盘陪练' : '继续下一课'}</button></>}
+      {done && <><p className="small">{run.assisted ? '借助提示完成。可以重来一次，自己数数。' : '本课完成。再看一眼棋盘，把原因和结果连起来。'}</p><div className="actions next-lesson">{isLast && onStrategy && <button className="button" onClick={onStrategy}>学习九路策略</button>}<button className={isLast && onStrategy ? 'button button--ghost' : 'button'} onClick={onNext}>{isLast ? '开始一盘陪练' : '继续下一课'}</button></div></>}
       <div className="restart"><button className="text-button" onClick={() => onChange(startEndgame(lesson))}>重来本课</button></div>
     </div>
   </section>

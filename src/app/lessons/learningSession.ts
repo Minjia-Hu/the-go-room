@@ -8,17 +8,21 @@ import { startRuleSequence } from './ruleSequence'
 import type { RuleSequenceRun } from './ruleSequence'
 import { createEndgameRuns } from './endgameRunner'
 import type { EndgameRun } from './endgameRunner'
+import { createStrategyRuns } from './strategyRunner'
+import type { StrategyRun } from './strategyRunner'
 
 export interface RuleProgress { readonly index: number; readonly run: LessonRun }
 export interface LearningSession {
-  readonly page: 'home' | 'rules' | 'survival' | 'rule-sequence' | 'endgame'
+  readonly page: 'home' | 'rules' | 'survival' | 'rule-sequence' | 'endgame' | 'strategy'
   readonly rules: RuleProgress
   readonly sceneIndex: number
   readonly runs: readonly SurvivalRun[]
   readonly sequence: RuleSequenceRun
   readonly endgameIndex: number
   readonly endgameRuns: readonly EndgameRun[]
+  readonly strategyIndex: number
+  readonly strategyRuns: readonly StrategyRun[]
 }
 export function createLearningSession(): LearningSession {
-  return { page: 'home', rules: { index: 0, run: startLesson(LESSONS[0]) }, sceneIndex: 0, runs: SURVIVAL_SCENES.map(startSurvival), sequence: startRuleSequence(), endgameIndex: 0, endgameRuns: createEndgameRuns() }
+  return { page: 'home', rules: { index: 0, run: startLesson(LESSONS[0]) }, sceneIndex: 0, runs: SURVIVAL_SCENES.map(startSurvival), sequence: startRuleSequence(), endgameIndex: 0, endgameRuns: createEndgameRuns(), strategyIndex: 0, strategyRuns: createStrategyRuns() }
 }
