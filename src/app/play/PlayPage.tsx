@@ -94,7 +94,11 @@ export function PlayPage({ session, onChange, onFinish, coaching, onCoachingChan
     } else {
       marks.push(...groupMarks(group))
       if (a?.ok && a.point && view === 'after') marks.push({ point: a.point, kind: 'preview' })
-      if (!preview && suggestion) marks.push({ point: suggestion.point, kind: 'label', text: '试' })
+      if (!preview && suggestion) {
+        // 建议点可能正是最后一气 A；保留文案引用的 A，用虚线强调候选。
+        if (marks.some((m) => m.kind === 'label' && samePoint(m.point, suggestion.point))) marks.push({ point: suggestion.point, kind: 'preview' })
+        else marks.push({ point: suggestion.point, kind: 'label', text: '试' })
+      }
       const shownLast = shown.history.at(-1)
       if (shownLast?.kind === 'play' && shown !== game) shownLast.captured.forEach((point) => marks.push({ point, kind: 'captured' }))
       if (view === 'reply' && previewThreat?.capture) marks.push({ point: previewThreat.capture.point, kind: 'label', text: 'A' })

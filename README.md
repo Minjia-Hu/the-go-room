@@ -16,7 +16,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 最近 10 盘已完成棋谱保存在此浏览器的 localStorage 中。切换页面保留课程进度与正式对局，未确认的对局预览会清除；刷新回到课程入口，且不保留进行中的对局。历史格式错误或存储不可用不影响下棋，保存失败时会提示并保留当前内存中的复盘。
 
-目前 185 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。Chromium 已实际走完原五关与新增八场景，以及一盘 93 手对局、3 次提子对照、数子、刷新复盘；另检查手机触屏、键盘、重试、关闭陪练及禁止存储。工程验收完成，教学效果待项目负责人体验，见[验收与试用清单](docs/qa/beginner-coaching/README.md)。
+目前 186 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。Chromium 已实际走完原五关与新增八场景，以及一盘 93 手对局、3 次提子对照、数子、刷新复盘；另检查手机触屏、键盘、重试、关闭陪练及禁止存储。工程验收完成，教学效果待项目负责人体验，见[验收与试用清单](docs/qa/beginner-coaching/README.md)。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)（Private）。
 

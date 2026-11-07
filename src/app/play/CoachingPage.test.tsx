@@ -99,4 +99,13 @@ describe('陪练交互', () => {
     expect(container.querySelector('[data-stone="black"][data-x="5"][data-y="4"]')).toBeNull()
     expect(screen.getByText('已下 0 手')).toBeTruthy()
   })
+  it('建议点与最后一气重合时保留 A 标签，避免重复或文案指错', () => {
+    const base = createPlaySession(42)
+    const initial = { ...base, match: { ...base.match, game: createGame({ board: parseBoard(['.....', '..O..', '.OXO.', '.....', '.....']) }) } }
+    const { container } = render(<Harness initial={initial} />)
+    click('给我一点提示'); click('看一个可尝试的点')
+    expect(container.querySelectorAll('[data-mark="label"]')).toHaveLength(1)
+    expect(screen.getByLabelText('标记 A')).toBeTruthy()
+    expect(container.querySelectorAll('[data-mark="preview"]')).toHaveLength(1)
+  })
 })

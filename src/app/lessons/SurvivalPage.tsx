@@ -12,7 +12,7 @@ export function SurvivalPage({ run, onChange, onNext, isLast }: Props) {
   const reveal = run.hint >= 2 || run.stage === 'done' || run.stage === 'liberty' || run.stage === 'reason' || run.preview?.ok
   const target = analyzePosition(shown).find((g) => g.stones.some((p) => p.x === scene.target.x && p.y === scene.target.y))
   const marks: BoardMark[] = reveal ? groupMarks(target) : []
-  if (scene.kind === 'eyes' && (reveal || scene.guided)) scene.eyes!.forEach((point, index) => marks.push({ point, kind: 'label', text: index === 0 ? 'A' : 'B' }))
+  if (scene.kind === 'eyes' && !run.view.startsWith('contrast') && (reveal || scene.guided)) scene.eyes!.forEach((point, index) => marks.push({ point, kind: 'label', text: index === 0 ? 'A' : 'B' }))
   run.selected.forEach((point) => { if (shown.board.cells[point.y * 9 + point.x] === null) marks.push({ point, kind: 'selected' }) })
   if (run.preview?.ok && run.preview.point && run.view === 'after') marks.push({ point: run.preview.point, kind: 'preview' })
   const last = shown.history.at(-1)
