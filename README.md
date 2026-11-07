@@ -6,9 +6,11 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 ## 当前状态
 
-当前完整路径：5 关规则教学 → 4 课、8 个生存练习场景 → 9 路新手陪练 → 标记死子与数子 → 带规则事件的复盘。规则引擎在 `src/engine/`，简单电脑对手在 `src/ai/`，教学数据在 `src/content/`，界面、讲解与棋谱存储在 `src/app/`。
+当前完整路径：5 关规则教学与规则慢镜头 → 4 课、8 个生存练习场景 → 4 课围地与终局教学 → 9 路新手陪练 → 标记死子与数子 → 带规则事件的复盘。规则引擎在 `src/engine/`，简单电脑对手在 `src/ai/`，教学数据在 `src/content/`，界面、讲解与棋谱存储在 `src/app/`。
 
 生存练习覆盖认险、延伸或提子解围、连接与两只眼。例题可对照不同走法，检验题默认不标答案，提示逐级展开；使用演示后明确标记“跟着演示完成”。
+
+规则慢镜头用一眼、两眼两个例子拆解“暂放白子 → 先提对方 → 检查自己”，中间画面明确标注尚未判定合法。禁入点和两眼课提供直达入口。围地与终局四课依次练习空区归属、活子加空点、白方加 7.5、双方连续停手与死子确认；错误回答会解释原因，数子提示会标记辅助完成。教学计分由实际规则引擎计算，预设局面不保存为正式棋谱。
 
 用户执黑、电脑执白。新手陪练默认开启，每次落子或停一手先预览、再确认；点棋子查看整块棋及其气，提示只解释经引擎核验的局部后果。白棋提子后可对照“被吃前／被吃后”，也可退回最近一回合重试；恢复随机状态后，相同选择会遇到相同应手。可关闭陪练恢复直接落子，偏好单独保存。
 
@@ -16,7 +18,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 最近 10 盘已完成棋谱保存在此浏览器的 localStorage 中。切换页面保留课程进度与正式对局，未确认的对局预览会清除；刷新回到课程入口，且不保留进行中的对局。历史格式错误或存储不可用不影响下棋，保存失败时会提示并保留当前内存中的复盘。
 
-目前 186 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。Chromium 已实际走完原五关与新增八场景，以及一盘 93 手对局、3 次提子对照、数子、刷新复盘；另检查手机触屏、键盘、重试、关闭陪练及禁止存储。工程验收完成，教学效果待项目负责人体验，见[验收与试用清单](docs/qa/beginner-coaching/README.md)。
+目前 201 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。本次 Chromium 实际走完两个慢镜头例子、四课终局教学，并回归原五关、八个生存场景与陪练预览和重试；另检查桌面、手机触屏、键盘、切页保留进度和刷新重置，见[规则与终局验收](docs/qa/rules-and-scoring/README.md)。早前完整对局、数子、刷新复盘及存储异常检查见[陪练验收与试用清单](docs/qa/beginner-coaching/README.md)。教学效果仍待项目负责人实际体验。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)（Private）。
 
@@ -27,6 +29,8 @@ GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room
 第一版做 5 关互动教学、与简单电脑对手的 9 路引导对局,以及带规则事件标注的复盘。范围、规则口径与技术方案见 [第一版设计](docs/superpowers/specs/2026-11-01-v1-design.md)。
 
 生存练习与陪练的新增范围见[已确认设计](docs/superpowers/specs/2026-11-07-beginner-coaching-design.md)与[实施计划及记录](docs/superpowers/plans/2026-11-07-beginner-coaching-plan.md)。功能全部本地运行，无需账号或付费服务。
+
+规则慢镜头与围地终局课程见[实施计划](docs/superpowers/plans/2026-11-07-rules-and-scoring-plan.md)。
 
 完整背景与待决定事项见 [项目愿景](docs/vision.md)。
 
@@ -52,4 +56,4 @@ npm run lint
 
 ## 后续工作
 
-请项目负责人按试用清单检查是否能解释“为什么这样下”，再依据具体困惑修订棋形和讲解。围地与终局专项教学尚未纳入本次范围。第一版第四阶段的记录见[计划四](docs/superpowers/plans/2026-11-01-v1-plan-4-play-replay.md)。
+请项目负责人按试用清单检查是否能解释“为什么这样下”，再依据具体困惑修订棋形和讲解。下一步可考虑九路策略与更多迁移练习，尚未实现。第一版第四阶段的记录见[计划四](docs/superpowers/plans/2026-11-01-v1-plan-4-play-replay.md)。

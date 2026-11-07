@@ -30,17 +30,28 @@ function reject(reason: RejectReason): PlayResult {
   return { ok: false, reason }
 }
 
+/** 规则检查的中间盘面仅用于解释，不能作为正式棋局继续落子。 */
+export interface PlayInspection {
+  readonly placed: Board | null
+  readonly afterCaptures: Board | null
+  readonly captured: readonly Point[]
+  readonly ownLiberties: readonly Point[]
+  readonly result: PlayResult
+}
+
 /**
  * 当前行棋方在 point 落子。
  * 顺序:检查空点 → 提掉无气的对方棋块 → 检查自杀 → 检查全局同形。
  */
-export function play(state: GameState, point: Point): PlayResult {
-  if (state.phase !== 'playing') return reject('game-over')
-  if (!isOnBoard(state.board, point)) return reject('off-board')
-  if (getCell(state.board, point) !== null) return reject('occupied')
+export function inspectPlay(state: GameState, point: Point): PlayInspection {
+  const invalid = (reason: RejectReason): PlayInspection => ({ placed: null, afterCaptures: null, captured: [], ownLiberties: [], result: reject(reason) })
+  if (state.phase !== 'playing') return invalid('game-over')
+  if (!isOnBoard(state.board, point)) return invalid('off-board')
+  if (getCell(state.board, point) !== null) return invalid('occupied')
 
   const color = state.toPlay
   let board = setCell(state.board, point, color)
+  const placed = board
 
   const captured: Point[] = []
   for (const n of neighbors(board, point)) {
@@ -53,25 +64,34 @@ export function play(state: GameState, point: Point): PlayResult {
   }
 
   const own = getGroup(board, point)!
-  if (own.liberties.length === 0) return reject('suicide')
+  const inspection = { placed, afterCaptures: board, captured, ownLiberties: own.liberties }
+  if (own.liberties.length === 0) return { ...inspection, result: reject('suicide') }
 
   const key = boardKey(board)
-  if (state.positionKeys.includes(key)) return reject('repeated-position')
+  if (state.positionKeys.includes(key)) return { ...inspection, result: reject('repeated-position') }
 
   const isKo = captured.length === 1 && own.stones.length === 1 && own.liberties.length === 1
   const record: MoveRecord = { kind: 'play', color, point, captured, isKo }
 
   return {
-    ok: true,
-    state: {
-      ...state,
-      board,
-      toPlay: opponent(color),
-      consecutivePasses: 0,
-      history: [...state.history, record],
-      positionKeys: [...state.positionKeys, key],
+    ...inspection,
+    result: {
+      ok: true,
+      state: {
+        ...state,
+        board,
+        toPlay: opponent(color),
+        consecutivePasses: 0,
+        history: [...state.history, record],
+        positionKeys: [...state.positionKeys, key],
+      },
     },
   }
+}
+
+/** 正式落子与教学解释始终共用同一套检查。 */
+export function play(state: GameState, point: Point): PlayResult {
+  return inspectPlay(state, point).result
 }
 
 /** 当前行棋方停一手。双方连续停一手后进入终局(数子)阶段。 */

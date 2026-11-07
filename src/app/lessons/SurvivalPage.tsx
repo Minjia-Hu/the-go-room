@@ -5,8 +5,8 @@ import { groupMarks } from '../coaching/explanations'
 import { choosePracticePoint, chooseReason, confirmPractice, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
 import type { SurvivalRun } from './survivalRunner'
 
-interface Props { readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean }
-export function SurvivalPage({ run, onChange, onNext, isLast }: Props) {
+interface Props { readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onScoring?: () => void }
+export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onScoring }: Props) {
   const { scene } = run
   const shown = practiceBoard(run)
   const reveal = run.hint >= 2 || run.stage === 'done' || run.stage === 'liberty' || run.stage === 'reason' || run.preview?.ok
@@ -35,6 +35,7 @@ export function SurvivalPage({ run, onChange, onNext, isLast }: Props) {
     <div className="panel">
       <p className="eyebrow">保住自己的棋 / 第 {scene.course} 课 · {scene.guided ? '一起练习' : '自己试试'}</p>
       <h2>{scene.title}</h2><p className="muted">{scene.intro}</p>
+      {scene.kind === 'eyes' && onRuleSequence && <button className="text-button" onClick={onRuleSequence}>分步看：为什么不算自杀？</button>}
       <p className="turn">{goals[run.stage]}</p>
       {run.message && <p className="message message--hint" role="status">{run.message}</p>}
       {reveal && target && <p className="small">目标棋块：{target.stones.length} 颗棋，{target.liberties.length} 口气。</p>}
@@ -56,7 +57,7 @@ export function SurvivalPage({ run, onChange, onNext, isLast }: Props) {
         <button className="button button--ghost" onClick={() => onChange(chooseReason(run, true))}>白棋一次只能填一个，另一个还在</button>
       </div>}
       {run.stage !== 'done' && run.hint < 3 && <button className="text-button hint-button" onClick={() => onChange(practiceHint(run))}>{['提醒我看哪里', '标出相关棋块和气', '演示一种做法'][run.hint]}</button>}
-      {run.stage === 'done' && <button className="button next-lesson" onClick={onNext}>{isLast ? '开始我的陪练' : scene.guided ? '换个局面自己试试' : '下一课'}</button>}
+      {run.stage === 'done' && <div className="actions next-lesson">{isLast && onScoring && <button className="button" onClick={onScoring}>学习围地与终局</button>}<button className={isLast && onScoring ? 'button button--ghost' : 'button'} onClick={onNext}>{isLast ? '开始我的陪练' : scene.guided ? '换个局面自己试试' : '下一课'}</button></div>}
       <div className="restart"><button className="text-button" onClick={() => onChange(startSurvival(scene))}>重来这一题</button></div>
       {scene.kind === 'escape' && scene.guided && run.solved.length > 0 && run.stage !== 'done' && <p className="small">已比较 {run.solved.length} 种办法。再试另一种：伸出或提子。</p>}
     </div>

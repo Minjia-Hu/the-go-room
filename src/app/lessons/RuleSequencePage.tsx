@@ -1,0 +1,38 @@
+import { RULE_SEQUENCE_SCENES } from '../../content/endgame'
+import { Board } from '../board/Board'
+import { answerSequence, sequenceScene, sequenceStep, sequenceView, startRuleSequence } from './ruleSequence'
+import type { RuleSequenceRun } from './ruleSequence'
+
+interface Props { readonly run: RuleSequenceRun; readonly onChange: (run: RuleSequenceRun) => void; readonly onScoring: () => void }
+export function RuleSequencePage({ run, onChange, onScoring }: Props) {
+  const view = sequenceView(run)
+  const intermediate = run.step === 1 || run.step === 2
+  return <section className="page page--with-board">
+    <div>
+      <p className="figure-number">规则慢镜头 / {run.sceneIndex + 1} · 2</p>
+      <Board board={view.board} marks={view.marks} disabled />
+      <p className={`board-caption${intermediate ? ' board-caption--notice' : ''}`}>{intermediate ? '规则演示中间画面 · 尚未判定合法，不是正式落子' : run.step === 0 ? '原始棋形 · 白棋准备下在 A' : view.legal ? '判定结果：白棋有气，这一手合法' : '判定结果：禁止落子，恢复原来的棋盘'}</p>
+      <p className="board-caption">橙圈：目标黑棋 · 小空心圈：气 · 虚线小圈：被提走的位置</p>
+    </div>
+    <div className="panel">
+      <p className="eyebrow">认识规则 / 落子后先提谁</p>
+      <h2>{view.scene.title}</h2>
+      <p className="muted">别急着判断白棋会不会被吃。把一手棋拆开，亲眼看看判断的先后顺序。</p>
+      <div className="actions">{RULE_SEQUENCE_SCENES.map((scene, index) => <button key={scene.id} className="button button--ghost" aria-pressed={run.sceneIndex === index} onClick={() => onChange(sequenceScene(run, index))}>{index === 0 ? '比较一只眼' : '比较两只眼'}{run.solved.includes(index) ? ' · 已理解' : ''}</button>)}</div>
+      <ol className="study-steps" aria-label="规则演示步骤">{['原图', '暂放白子', '先提对方', '检查自己'].map((label, index) => <li key={label}><button aria-current={run.step === index ? 'step' : undefined} onClick={() => onChange(sequenceStep(run, index))}><span>{index}</span>{label}</button></li>)}</ol>
+      <h3>{view.title}</h3>
+      <p className="message message--hint" aria-live="polite">{view.text}</p>
+      <div className="actions">
+        <button className="button button--ghost" disabled={run.step === 0} onClick={() => onChange(sequenceStep(run, run.step - 1))}>上一步</button>
+        <button className="button" disabled={run.step === 3} onClick={() => onChange(sequenceStep(run, run.step + 1))}>下一步</button>
+      </div>
+      {run.step === 3 && <div className="study-question"><h3>为什么是这个结果？</h3><div className="reason-choices">
+        <button className="button button--ghost" onClick={() => onChange(answerSequence(run, false))}>只要周围都是黑棋，白棋就会被吃</button>
+        <button className="button button--ghost" onClick={() => onChange(answerSequence(run, true))}>先提对方没气的棋，再检查自己的气</button>
+      </div></div>}
+      {run.message && <p className="message" role="status">{run.message}</p>}
+      {run.solved.includes(run.sceneIndex) && (run.solved.length === 2 ? <button className="button next-lesson" onClick={onScoring}>学习围地与终局</button> : <button className="button next-lesson" onClick={() => onChange(sequenceScene(run, 1 - run.sceneIndex))}>再比较另一种棋形</button>)}
+      <div className="restart"><button className="text-button" onClick={() => onChange(startRuleSequence())}>重新观察这两个例子</button></div>
+    </div>
+  </section>
+}

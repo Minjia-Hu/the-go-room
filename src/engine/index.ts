@@ -12,6 +12,6 @@ export {
   toPoint,
 } from './board'
 export { getGroup } from './groups'
-export { createGame, pass, play } from './game'
-export type { GameOptions } from './game'
+export { createGame, inspectPlay, pass, play } from './game'
+export type { GameOptions, PlayInspection } from './game'
 export { scoreGame, toggleDeadGroup } from './scoring'

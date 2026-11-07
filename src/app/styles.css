@@ -276,3 +276,20 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }
 }
+
+/* 入门手记：手动慢镜头与终局练习，沿用纸面目录的排版。 */
+.chapter-supplement { margin-top: 20px; }
+.board-caption--notice { color: var(--text); border-block: 1px solid var(--border); padding: 12px 0; }
+.study-steps { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 0; margin: 28px 0; }
+.study-steps button { width: 100%; border: 0; border-bottom: 2px solid var(--border); padding: 12px 2px; background: transparent; color: var(--text-muted); font: inherit; font-size: .72rem; cursor: pointer; }
+.study-steps button span { display: block; font-size: 1.2rem; }
+.study-steps button[aria-current="step"] { border-color: var(--accent); color: var(--text); background: var(--surface); }
+.study-question { border-top: 1px solid var(--border); padding-top: 22px; margin-top: 26px; }
+.study-input-label { display: block; font-size: 1.15rem; }
+.study-input-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.study-input-row input { width: 110px; min-width: 0; padding: 10px 12px; border: 1px solid var(--accent); background: var(--surface); color: var(--text); font: inherit; }
+.study-score { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; border-block: 1px solid var(--border); padding: 22px 0; margin-top: 28px; }
+.study-score > div { display: flex; flex-direction: column; }
+.study-score strong { font-size: 2rem; font-weight: 400; line-height: 1.5; }
+.study-score small { font-size: .72rem; color: var(--text-muted); }
+.study-score > p { grid-column: 1 / -1; margin: 0; }

@@ -11,9 +11,10 @@ export interface LessonPageProps {
   readonly progress?: RuleProgress
   readonly onProgress?: (progress: RuleProgress) => void
   readonly onSurvival?: () => void
+  readonly onRuleSequence?: () => void
 }
 
-export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival }: LessonPageProps) {
+export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival, onRuleSequence }: LessonPageProps) {
   const [local, setLocal] = useState<RuleProgress>(() => ({ index: 0, run: startLesson(lessons[0]) }))
   const { index, run } = progress ?? local
   const update = onProgress ?? setLocal
@@ -55,6 +56,7 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
         </ol>
         <h2>{lesson.title}</h2>
         <p className="muted">{lesson.intro}</p>
+        {lesson.id === 'suicide' && onRuleSequence && <button className="text-button" onClick={onRuleSequence}>分步看：为什么不算自杀？</button>}
         {step && <p>{step.goal}</p>}
         {run.message && (
           <p className={`message message--${run.message.kind}`} role="status">

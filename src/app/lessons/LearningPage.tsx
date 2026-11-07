@@ -5,10 +5,15 @@ import { startLesson } from './lessonRunner'
 import { LessonPage } from './LessonPage'
 import { SurvivalPage } from './SurvivalPage'
 import { RoomIllustration } from './RoomIllustration'
+import { ENDGAME_LESSONS } from '../../content/endgame'
+import { EndgamePage } from './EndgamePage'
+import { RuleSequencePage } from './RuleSequencePage'
 
 interface Props { readonly session: LearningSession; readonly onChange: (next: LearningSession) => void; readonly onPlay: () => void }
 export function LearningPage({ session, onChange, onPlay }: Props) {
   const openScene = (sceneIndex: number) => onChange({ ...session, page: 'survival', sceneIndex })
+  const openSequence = () => onChange({ ...session, page: 'rule-sequence' })
+  const openEndgame = (endgameIndex: number) => onChange({ ...session, page: 'endgame', endgameIndex })
   if (session.page === 'home') return <section className="learning-home">
     <div className="edition-line"><span>入门手记 · 第一册</span><span lang="en">OBSERVE / TRY / UNDERSTAND</span><span>从一口气开始</span></div>
     <div className="learning-hero">
@@ -27,13 +32,18 @@ export function LearningPage({ session, onChange, onPlay }: Props) {
         <article className="chapter">
           <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">壹</span><div><h3>认识规则</h3><p>落子、气、提子、禁入点和劫。</p></div><span className="chapter-count">五关</span></header>
           <div className="lesson-list">{LESSONS.map((lesson, index) => <button key={lesson.id} className="lesson-link" onClick={() => onChange({ ...session, page: 'rules', rules: session.rules.index === index ? session.rules : { index, run: startLesson(lesson) } })}>{lesson.title}<span aria-hidden="true">↗</span></button>)}</div>
+          <button className="text-button chapter-supplement" onClick={openSequence}>规则慢镜头：落子后先提谁？</button>
         </article>
         <article className="chapter">
           <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">贰</span><div><h3>保住自己的棋</h3><p>四课八个局面。观察、试下、比较原因。</p></div><span className="chapter-count">四课</span></header>
           <div className="lesson-list">{SURVIVAL_SCENES.filter((s) => s.guided).map((scene, index) => <button key={scene.id} className="lesson-link" onClick={() => openScene(index * 2)}>{scene.course}. {scene.title}<span aria-hidden="true">↗</span></button>)}</div>
         </article>
+        <article className="chapter">
+          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">叁</span><div><h3>围地与终局</h3><p>判断空点归属，自己数分，再走完终局。</p></div><span className="chapter-count">四课</span></header>
+          <div className="lesson-list">{ENDGAME_LESSONS.map((lesson, index) => <button key={lesson.id} className="lesson-link" onClick={() => openEndgame(index)}>{index + 1}. {lesson.title}<span aria-hidden="true">↗</span></button>)}</div>
+        </article>
         <article className="chapter practice-invitation">
-          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">叁</span><div><h3>有提示的陪练</h3><p>每手先试下，看懂提示后再确认；也可以退回重试。</p></div><span className="chapter-count">一盘</span></header>
+          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">肆</span><div><h3>有提示的陪练</h3><p>每手先试下，看懂提示后再确认；也可以退回重试。</p></div><span className="chapter-count">一盘</span></header>
           <button className="button button--ghost" onClick={onPlay}>直接开始陪练<span aria-hidden="true">↗</span></button>
         </article>
       </div>
@@ -43,8 +53,11 @@ export function LearningPage({ session, onChange, onPlay }: Props) {
   </section>
   return <>
     <div className="learning-toolbar"><button className="text-button" onClick={() => onChange({ ...session, page: 'home' })}>返回章节</button><button className="text-button" onClick={onPlay}>直接开始陪练</button></div>
-    {session.page === 'rules' ? <LessonPage lessons={LESSONS} progress={session.rules} onProgress={(rules) => onChange({ ...session, rules })} onFinish={onPlay} onSurvival={() => openScene(0)} />
-      : <><SurvivalPage run={session.runs[session.sceneIndex]} onChange={(run) => onChange({ ...session, runs: session.runs.map((r, i) => i === session.sceneIndex ? run : r) })}
+    {session.page === 'rules' && <LessonPage lessons={LESSONS} progress={session.rules} onProgress={(rules) => onChange({ ...session, rules })} onFinish={onPlay} onSurvival={() => openScene(0)} onRuleSequence={openSequence} />}
+    {session.page === 'rule-sequence' && <RuleSequencePage run={session.sequence} onChange={(sequence) => onChange({ ...session, sequence })} onScoring={() => openEndgame(0)} />}
+    {session.page === 'endgame' && <><EndgamePage run={session.endgameRuns[session.endgameIndex]} onChange={(run) => onChange({ ...session, endgameRuns: session.endgameRuns.map((old, index) => index === session.endgameIndex ? run : old) })} isLast={session.endgameIndex === ENDGAME_LESSONS.length - 1} onNext={() => session.endgameIndex === ENDGAME_LESSONS.length - 1 ? onPlay() : openEndgame(session.endgameIndex + 1)} />
+      <div className="learning-toolbar archive-note">{session.endgameIndex > 0 && <button className="text-button" onClick={() => openEndgame(session.endgameIndex - 1)}>回看上一课</button>}<button className="text-button" onClick={() => session.endgameIndex === ENDGAME_LESSONS.length - 1 ? onPlay() : openEndgame(session.endgameIndex + 1)}>先跳过这一课</button></div></>}
+    {session.page === 'survival' && <><SurvivalPage run={session.runs[session.sceneIndex]} onChange={(run) => onChange({ ...session, runs: session.runs.map((r, i) => i === session.sceneIndex ? run : r) })} onRuleSequence={openSequence} onScoring={() => openEndgame(0)}
         isLast={session.sceneIndex === 7} onNext={() => session.sceneIndex === 7 ? onPlay() : openScene(session.sceneIndex + 1)} />
       <div className="learning-toolbar archive-note">
         {session.sceneIndex > 0 && <button className="text-button" onClick={() => openScene(session.sceneIndex - 1)}>回看上一题</button>}
