@@ -1,8 +1,10 @@
 # The Go Room 项目愿景与交接
 
-记录日期：2026-10-25
+记录日期：2026-10-25（历史愿景）
 
-The Go Room 是独立的围棋学习与对弈项目，目录为 `the-go-room`，与 retro-arcade 分开。项目以 README 和愿景文档建立本地 Git 版本记录，尚无实现代码。项目名称后续可以调整。
+> 本文保留项目起步时的讨论，不代表当前待办。已确定采用 Vite + React + TypeScript 的纯前端架构、中国规则数子、白贴 7.5、全局同形禁止与简单电脑对手；视觉采用 B「棋谱编辑部」。当前功能见[项目介绍](../README.md)与[详细状态](status.md)，已确认范围见[第一版设计](superpowers/specs/2026-11-01-v1-design.md)。
+
+The Go Room 是独立的围棋学习与对弈项目，目录为仓库根目录。项目以 README 和愿景文档建立本地 Git 版本记录，尚无实现代码。项目名称后续可以调整。
 
 ## 项目目标
 
@@ -12,7 +14,7 @@ The Go Room 是独立的围棋学习与对弈项目，目录为 `the-go-room`，
 
 ## 已讨论并认可的总体方向
 
-- 独立开发围棋项目，未来可以在 retro-arcade 中添加入口链接。
+- 独立开发围棋学习项目。
 - 将学习、对弈和复盘结合起来，让用户在实际落子中理解规则。
 - 长期目标可以高阶，开发从小而完整的体验开始。
 - 使用安静、清晰、让人愿意专注下棋的体验作为设计方向；具体视觉方案尚未确定。
@@ -58,10 +60,10 @@ The Go Room 是独立的围棋学习与对弈项目，目录为 `the-go-room`，
 
 ## 仓库起点与后续步骤
 
-本地仓库的首次提交保存 `README.md` 与 `docs/vision.md`，提交说明为 `docs: capture The Go Room vision`。GitHub 远程仓库为 `https://github.com/Minjia-Hu/the-go-room`，可见性为 Private，本地 `main` 已关联 `origin/main`。
+本地仓库的首次提交保存 `README.md` 与 `docs/vision.md`，提交说明为 `docs: capture The Go Room vision`。GitHub 远程仓库为 `https://github.com/Minjia-Hu/the-go-room`，当时为私有仓库，本地 `main` 已关联 `origin/main`。
 
 后续先细化第一版范围与验收标准，再确定规则体系和技术方案。后续提交可推送至该私有仓库备份。
 
 ## 下次对话可以直接使用的提示
 
-> 请先阅读 `docs/vision.md`，再继续推进独立项目 The Go Room。长期目标是高阶围棋学习与对弈应用，起步路线是互动教学、9 路引导对局和易懂复盘。请区分已确定方向与候选功能。项目目录为 `the-go-room`。请先阅读 README 和检查仓库状态，再细化第一版范围、验收标准与技术方案。
+> 请先阅读 `docs/vision.md`，再继续推进独立项目 The Go Room。长期目标是高阶围棋学习与对弈应用，起步路线是互动教学、9 路引导对局和易懂复盘。请区分已确定方向与候选功能。请在仓库根目录操作。请先阅读 README 和检查仓库状态，再细化第一版范围、验收标准与技术方案。

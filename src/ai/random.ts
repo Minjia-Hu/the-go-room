@@ -1,3 +1,4 @@
+// Mulberry32 algorithm reference and attribution: THIRD_PARTY_NOTICES.md.
 /** 返回 [0, 1) 之间随机数的函数,接口同 Math.random。 */
 export type Rng = () => number
 

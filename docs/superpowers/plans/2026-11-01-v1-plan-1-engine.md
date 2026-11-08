@@ -64,7 +64,7 @@ Expected:输出 `Scaffolding project in /private/tmp/the-go-room...` 和 `Done.`
 - [ ] **Step 2:复制到仓库,保留现有 README**
 
 ```bash
-cd the-go-room
+cd /path/to/the-go-room
 rsync -a --exclude README.md /tmp/the-go-room/ ./
 rm -rf /tmp/the-go-room
 ```
