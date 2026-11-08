@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { LearningPage } from './lessons/LearningPage'
 import { createLearningSession, restoreLearningSession } from './lessons/learningSession'
 import type { LearningSession } from './lessons/learningSession'
@@ -22,6 +22,7 @@ const NAV: readonly { page: Page; label: string }[] = [
 
 export function App() {
   const [page, navigate] = usePage()
+  useLayoutEffect(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0 }, [page])
   const [loadedLearning] = useState(() => {
     try { return readLearningProgress(window.localStorage) }
     catch { return { progress: emptyLearningProgress(), message: '无法读取此浏览器的学习记录，本次仍可正常学习。' } }

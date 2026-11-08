@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import type { Lesson } from '../../content/lessons'
 import { Board } from '../board/Board'
+import { BoardLayout } from '../board/BoardLayout'
 import { clickPoint, currentStep, isLessonDone, lessonMarks, startLesson } from './lessonRunner'
 import type { RuleProgress } from './learningSession'
-
 export interface LessonPageProps {
   readonly lessons: readonly Lesson[]
   /** 最后一关完成后用户点"去对局"时调用。 */
@@ -14,24 +14,21 @@ export interface LessonPageProps {
   readonly onRuleSequence?: () => void
   readonly completedIds?: readonly string[]
 }
-
 export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival, onRuleSequence, completedIds }: LessonPageProps) {
   const [local, setLocal] = useState<RuleProgress>(() => ({ index: 0, run: startLesson(lessons[0]) }))
   const { index, run } = progress ?? local
   const update = onProgress ?? setLocal
-
   const lesson = lessons[index]
   const step = currentStep(run)
   const done = isLessonDone(run)
   const isLast = index === lessons.length - 1
-
   function goTo(next: number) {
     update({ index: next, run: startLesson(lessons[next]) })
   }
-
   return (
-    <section className="page page--with-board">
-      <div>
+    <BoardLayout
+      heading={<><h2>{lesson.title}</h2><p className="turn">{step?.goal ?? "这一关完成了，看看原因再继续。"}</p></>}
+      board={<>
         <p className="figure-number">图 {String(index + 1).padStart(2, '0')} / 认识规则</p>
         <Board
           board={run.game.board}
@@ -42,8 +39,8 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
           onPointClick={(p) => update({ index, run: clickPoint(run, p) })}
         />
         <p className="board-caption">9 路棋盘 · 从一个小局面开始</p>
-      </div>
-      <div className="panel">
+      </>}
+    >
         <ol className="progress" aria-label="教学进度">
           {lessons.map((l, i) => (
             <li
@@ -55,10 +52,8 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
             />
           ))}
         </ol>
-        <h2>{lesson.title}</h2>
         <p className="muted">{lesson.intro}</p>
         {lesson.id === 'suicide' && onRuleSequence && <button className="text-button" onClick={onRuleSequence}>分步看：为什么不算自杀？</button>}
-        {step && <p>{step.goal}</p>}
         {run.message && (
           <p className={`message message--${run.message.kind}`} role="status">
             {run.message.text}
@@ -82,7 +77,6 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
             重来这一关
           </button>
         </p>
-      </div>
-    </section>
+      </BoardLayout>
   )
 }

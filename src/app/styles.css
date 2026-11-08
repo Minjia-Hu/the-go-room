@@ -319,3 +319,57 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .walk-chapters, .independent-index { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
 .walk-chapters .button, .independent-index .button { padding: 9px 12px; }
 .walk-chapters [aria-pressed="true"], .independent-index [aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+
+/* 棋盘交互：先看任务，再试下，主要操作紧贴棋盘，不覆盖交叉点。 */
+.board-flow { grid-template-areas: 'task' 'board' 'primary' 'detail'; gap: 12px; }
+.board-flow > .board-task { grid-area: task; position: static; min-width: 0; }
+.board-flow > .board-frame { grid-area: board; min-width: 0; }
+.board-flow > .board-primary { grid-area: primary; min-width: 0; }
+.board-flow > .board-detail { grid-area: detail; }
+.board-task h2 { margin: 0 0 12px; font: 400 1.9rem/1.45 var(--serif); }
+.board-task p { margin: 0 0 8px; }
+.board-primary p { margin: 0 0 10px; }
+.board-primary .actions { margin: 10px 0; }
+.board-primary .coach-card { border: 0; padding: 0; margin: 0; }
+.board-primary .coach-card h3 { font-weight: 400; margin: 0 0 12px; }
+.board-primary .board-brief { border-left: 2px solid var(--accent); padding-left: 12px; line-height: 1.6; }
+.board-compare { column-gap: 24px; }
+.coach-explanation { margin: 12px 0; }
+.coach-explanation summary { cursor: pointer; color: var(--accent); font-size: .8rem; padding: 8px 0; }
+.coach-explanation p { margin-top: 12px; }
+@media (min-width: 840px) {
+  .board-flow { grid-template-areas: 'board task' 'board primary' 'board detail'; column-gap: 60px; row-gap: 0; }
+  .board-flow > .board-frame { position: sticky; top: 24px; align-self: start; }
+  .board-flow > .board-task, .board-flow > .board-primary { padding: 10px 0 12px 32px; border-left: 1px solid var(--border); }
+  .board-flow > .board-detail { padding-top: 12px; }
+}
+@media (max-width: 839px) {
+  .board-flow { gap: 8px; }
+  #root:has(.board-flow) { padding-inline: 16px; }
+  #root:has(.board-flow) .topbar { padding-block: 6px; margin-bottom: 4px; flex-wrap: nowrap; gap: 8px; }
+  #root:has(.board-flow) .topbar__title { font-size: 1.1rem; }
+  #root:has(.board-flow) .brand { gap: 6px; }
+  #root:has(.board-flow) .brand__mark { width: 17px; height: 17px; }
+  #root:has(.board-flow) .topbar__nav { gap: 2px; }
+  #root:has(.board-flow) .topbar__link { padding-inline: 6px; }
+  #root:has(.board-flow) .learning-toolbar { align-items: center; margin-bottom: 4px; }
+  #root:has(.board-flow) .text-button { min-height: 44px; }
+  .board-task h2 { font-size: 1.2rem; line-height: 1.3; margin: 0 0 3px; }
+  .board-task .eyebrow { font-size: .63rem; line-height: 1.4; margin-bottom: 0; }
+  .board-task .turn { font-size: .86rem; line-height: 1.5; margin-bottom: 0; font-weight: 500; }
+  .board-frame .figure-number { display: none; }
+  .board-frame .board { border-width: 3px; box-shadow: 0 0 0 1px #d3c9b5, 3px 3px 0 #e3dccd; }
+  .board-frame .board-caption { margin-top: 6px; font-size: .65rem; line-height: 1.4; }
+  .board-frame .board-caption + .board-caption { margin-top: 3px; font-size: .61rem; }
+  .board-frame .board-caption--notice { padding: 4px 0; }
+  .board-primary .board-brief { font-size: .86rem; line-height: 1.5; margin-bottom: 8px; padding-left: 10px; }
+  .board-primary .actions { margin: 6px 0 0; gap: 8px 16px; }
+  .board-primary .button { padding: 9px 14px; }
+  .board-primary .coach-card h3 { display: none; }
+  .board-primary .coach-explanation { margin-top: 6px; }
+  .board-flow > .board-detail { padding-top: 18px; }
+  .board-primary .board-compare { margin-top: 2px; }
+}
+.board-primary .study-question { margin: 0; padding: 0; border: 0; }
+.board-primary .strategy-choices { margin: 8px 0; }
+.board-primary .study-input-label { font-size: .85rem; }

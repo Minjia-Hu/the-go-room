@@ -1,4 +1,6 @@
 import { Board } from '../board/Board'
+import { briefExplanation } from '../coaching/briefExplanation'
+import { BoardLayout } from '../board/BoardLayout'
 import type { BoardMark } from '../board/marks'
 import { analyzeAction, analyzePosition } from '../coaching/analysis'
 import { groupMarks } from '../coaching/explanations'
@@ -23,29 +25,27 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
     onChange({ ...run, preview: analyzeAction(run.game, p), view: which === 'ignore' ? 'reply' : 'after',
       message: which === 'ignore' ? '去远处落子没有增加目标黑棋的气。白棋占住最后的 A，整块就被提走。' : '把棋接向空处后，再数一数整块的气。眼前的危险暂时解除了。' })
   }
-  return <section className="page page--with-board">
-    <div>
+  return <BoardLayout
+      heading={<><p className="eyebrow">保住自己的棋 / 第 {scene.course} 课 · {scene.guided ? "一起练习" : "自己试试"}</p><h2>{scene.title}</h2><p className="turn">{goals[run.stage]}</p></>}
+      board={<>
       <p className="figure-number">第 {scene.course} 课 / {scene.guided ? '一起练习' : '自己试试'}</p>
       <Board board={shown.board} marks={marks} lastMove={last?.kind === 'play' ? last.point : null}
         disabled={run.view === 'reply' || run.view.startsWith('contrast') || run.stage === 'done' || run.stage === 'reason'}
         ghostColor={run.stage === 'move' ? 'black' : null} onPointClick={(p) => onChange(choosePracticePoint(run, p))} />
       <p className="board-caption">{run.view === 'reply' ? '演示：白棋可能这样应对' : run.view === 'contrast-before' ? '对照：这块棋只剩一个眼，没有外气' : run.view === 'contrast' ? '对照：白棋填最后一气，黑棋被提走' : run.preview?.ok && run.view === 'after' ? '试下中 · 从题目起点观察后果' : scene.kind === 'eyes' ? '这一步暂时替白棋试下' : '9 路练习 · 你执黑'}</p>
       <p className="board-caption">棋子上的圈：目标棋块 · 空心圈：气 · 虚线：试下</p>
-    </div>
-    <div className="panel">
-      <p className="eyebrow">保住自己的棋 / 第 {scene.course} 课 · {scene.guided ? '一起练习' : '自己试试'}</p>
-      <h2>{scene.title}</h2><p className="muted">{scene.intro}</p>
-      {scene.kind === 'eyes' && onRuleSequence && <button className="text-button" onClick={onRuleSequence}>分步看：为什么不算自杀？</button>}
-      <p className="turn">{goals[run.stage]}</p>
-      {run.message && <p className="message message--hint" role="status">{run.message}</p>}
-      {reveal && target && <p className="small">目标棋块：{target.stones.length} 颗棋，{target.liberties.length} 口气。</p>}
-      {run.preview?.ok && <div className="actions">
+    </>}
+      primary={run.preview && <><p className="board-brief">{run.view === "reply" ? "演示：白棋能占住最后一气，提走危险黑棋。" : briefExplanation(run.preview)}</p>{run.preview.ok && <div className="actions">{run.stage === 'move' && run.view !== 'reply' && <button className="button" onClick={() => onChange(confirmPractice(run))}>确认这一步</button>}
         <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'before' })}>下之前</button>
         <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'after' })}>下之后</button>
         {run.preview.dangers.length > 0 && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'reply' })}>看白棋怎样提</button>}
-        {run.stage === 'move' && run.view !== 'reply' && <button className="button" onClick={() => onChange(confirmPractice(run))}>确认这一步</button>}
         {run.stage === 'move' && <button className="text-button" onClick={() => onChange({ ...run, preview: null, view: 'before', message: null })}>重新选点</button>}
-      </div>}
+      </div>}</>}
+    >
+      <p className="muted">{scene.intro}</p>
+      {scene.kind === 'eyes' && onRuleSequence && <button className="text-button" onClick={onRuleSequence}>分步看：为什么不算自杀？</button>}
+      {run.message && <p className="message message--hint" role="status">{run.message}</p>}
+      {reveal && target && <p className="small">目标棋块：{target.stones.length} 颗棋，{target.liberties.length} 口气。</p>}
       {scene.kind === 'danger' && run.stage === 'done' && <div className="actions"><button className="button button--ghost" onClick={() => demo('ignore')}>如果去远处下</button><button className="button button--ghost" onClick={() => demo('escape')}>如果接向空处</button></div>}
       {scene.contrastRows && (run.stage === 'reason' || run.stage === 'done') && <div className="actions">
         <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'contrast-before' })}>只剩一个眼时</button>
@@ -60,6 +60,5 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
       {run.stage === 'done' && <div className="actions next-lesson">{isLast && onScoring && <button className="button" onClick={onScoring}>学习围地与终局</button>}<button className={isLast && onScoring ? 'button button--ghost' : 'button'} onClick={onNext}>{isLast ? '开始我的陪练' : scene.guided ? '换个局面自己试试' : '下一课'}</button></div>}
       <div className="restart"><button className="text-button" onClick={() => onChange(startSurvival(scene))}>重来这一题</button></div>
       {scene.kind === 'escape' && scene.guided && run.solved.length > 0 && run.stage !== 'done' && <p className="small">已比较 {run.solved.length} 种办法。再试另一种：伸出或提子。</p>}
-    </div>
-  </section>
+    </BoardLayout>
 }

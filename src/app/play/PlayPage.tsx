@@ -3,6 +3,8 @@ import type { Dispatch, SetStateAction } from 'react'
 import { getGroup, samePoint } from '../../engine'
 import type { GameState, MoveRecord, Point } from '../../engine'
 import { Board } from '../board/Board'
+import { BoardLayout } from '../board/BoardLayout'
+import { briefExplanation } from '../coaching/briefExplanation'
 import type { BoardMark } from '../board/marks'
 import { moveDescription } from '../replay/records'
 import { analyzePosition, transitionText } from '../coaching/analysis'
@@ -111,37 +113,45 @@ export function PlayPage({ session, onChange, onFinish, coaching, onCoachingChan
   }
   const shownLast = shown.history.at(-1)
   const inDemo = !!preview && view === 'reply'
-  return <section className="page page--with-board">
-    <div>
+  return <BoardLayout
+    heading={<>
+      <p className="eyebrow">你执黑 · 电脑执白</p><h2>对局</h2>
+      <p className="turn" role="status">{scoring ? '终局 · 标记死子' : thinking ? '电脑正在思考…' : review ? '看懂这次提子，再继续。' : coaching ? '轮到你了，先试下看看。' : '轮到你了，下一颗黑子。'}</p>
+    </>}
+    board={<>
       <p className="figure-number">对局棋盘 / 九路</p>
       <Board board={shown.board} marks={marks} lastMove={shownLast?.kind === 'play' ? shownLast.point : null}
         ghostColor={scoring || review || inDemo || confirming ? null : 'black'} disabled={thinking || confirming || !!review || inDemo}
         onPointClick={select} />
-      <p className="board-caption">{review ? `回看 · ${reviewBefore ? '被吃前' : '被吃后'}` : inDemo ? '演示：白棋可能这样应对' : preview?.analysis.ok ? '试下中，尚未落子' : '9 路 · 中国规则 · 黑先 · 白贴 7.5'}</p>
+      <p className="board-caption">{review ? `回看 · ${reviewBefore ? '被吃前' : '被吃后'}` : inDemo ? '演示：白棋可能这样应对' : preview?.analysis.ok ? view === 'before' ? '对照：落子前的盘面' : '试下中，尚未落子' : '9 路 · 中国规则 · 黑先 · 白贴 7.5'}</p>
       {coaching && <p className="board-caption">棋子上的圈：目标棋块 · 空心圈：气 · 虚线：试下</p>}
-    </div>
-    <div className="panel">
-      <p className="eyebrow">你执黑 · 电脑执白</p><h2>对局</h2>
-      <p className="turn" role="status">{scoring ? '终局 · 标记死子' : thinking ? '电脑正在思考…' : review ? '看懂这次提子，再继续。' : coaching ? '轮到你了，先试下看看。' : '轮到你了，下一颗黑子。'}</p>
+    </>}
+    primary={review ? <CaptureReview review={review} before={reviewBefore} onBefore={setReviewBefore} onContinue={() => { onChange((current) => ({ ...current, captureReview: null })); setReviewBefore(false) }} onRetry={retry} /> : !scoring && !confirmScoring && <>
+      {coaching && preview && <p className="board-brief" role="status">{inDemo ? '演示：白棋在 A 提走危险棋块，并未真正落子。返回试下后才能确认。' : briefExplanation(preview.analysis)}</p>}
+      <div className="actions board-confirm">
+        {preview ? <>
+          {a?.ok && (inDemo ? <button type="button" className="button" disabled={confirming} onClick={() => setView('after')}>返回试下</button> : <button type="button" className="button" disabled={confirming || thinking} onClick={confirm}>{preview.point === null ? '确认停一手' : '下在这里'}</button>)}
+          <button type="button" className="button button--ghost" disabled={confirming} onClick={clearTransient}>重新选点</button>
+        </> : <button type="button" className="button button--ghost" disabled={thinking || confirming} onClick={() => select(null)}>停一手</button>}
+      </div>
+      {a?.ok && <div className="actions board-compare">
+        {preview?.point !== null && <><button type="button" className="text-button" disabled={confirming} onClick={() => setView('before')}>下之前</button><button type="button" className="text-button" disabled={confirming} onClick={() => setView('after')}>下之后</button></>}
+        {a.dangers.length > 0 && <button type="button" className="text-button" disabled={confirming} onClick={() => setView('reply')}>看白棋怎样提</button>}
+      </div>}
+    </>}
+  >
       <p className="muted">已下 {game.history.length} 手</p>
       <label className="check-control"><input type="checkbox" checked={coaching} disabled={thinking || confirming} onChange={(e) => {
         clearTransient(); onChange((current) => ({ ...current, captureReview: null })); onCoachingChange(e.target.checked)
       }} />新手陪练 · 先试下，再确认</label>
       {preferenceMessage && <p className="muted small" role="status">{preferenceMessage}</p>}
-      {review ? <CaptureReview review={review} before={reviewBefore} onBefore={setReviewBefore} onContinue={() => { onChange((current) => ({ ...current, captureReview: null })); setReviewBefore(false) }} onRetry={retry} />
-        : coaching && !scoring && !thinking && !confirmScoring && <>
+
+      {coaching && !review && !scoring && !thinking && !confirmScoring && <>
           {session.lastBefore && last?.color === 'white' && !preview && <p className="move-event">{transitionText(session.lastBefore, game)}</p>}
           <CoachingPanel preview={preview} group={group} dangers={a?.ok ? a.dangers : dangers} hintLevel={hintLevel} suggestion={suggestion}
             onHint={() => setHelp({ game, level: hintLevel + 1 })} onSuggest={() => { if (suggestion) select(suggestion.point) }}
             onInspect={(g) => { setInspection({ game, point: g.stones[0] }); setHelp(null) }} />
-          {a?.ok && <div className="preview-actions">
-            <div className="actions">
-              {preview?.point !== null && <><button type="button" className="button button--ghost" onClick={() => setView('before')}>下之前</button><button type="button" className="button button--ghost" onClick={() => setView('after')}>下之后</button></>}
-              {a.dangers.length > 0 && <button type="button" className="button button--ghost" onClick={() => setView('reply')}>看白棋怎样提</button>}
-            </div>
-            {inDemo ? <button type="button" className="button" onClick={() => setView('after')}>返回试下</button> : <button type="button" className="button" onClick={confirm}>{preview?.point === null ? '确认停一手' : '下在这里'}</button>}{' '}
-            <button type="button" className="text-button" onClick={clearTransient}>重新选点</button>
-          </div>}
+
         </>}
       {!coaching && last && <p className="move-event">{moveDescription(last)}</p>}
       {!scoring && last?.kind === 'play' && last.color === 'white' && game.history.at(-2)?.kind === 'pass'
@@ -160,7 +170,6 @@ export function PlayPage({ session, onChange, onFinish, coaching, onCoachingChan
         {!coaching && <label className="check-control"><input type="checkbox" checked={showAtari} onChange={(event) => setShowAtari(event.target.checked)} />显示只剩一口气的棋块</label>}
         <p className="muted small">不想继续落子时，可以停一手；电脑可能继续下。</p>
         <div className="actions">
-          <button type="button" className="button button--ghost" disabled={thinking || confirming || !!review || inDemo} onClick={() => select(null)}>停一手</button>
           <button type="button" className="button button--ghost" disabled={thinking || confirming || !!review || inDemo} onClick={() => { clearTransient(); setConfirmScoring(true) }}>提出结束并数子</button>
         </div>
         {confirmScoring && <div className="coach-card" role="group" aria-label="确认双方同意数子">
@@ -178,6 +187,5 @@ export function PlayPage({ session, onChange, onFinish, coaching, onCoachingChan
         <div className="actions"><button type="button" className="button" onClick={() => { onChange(createPlaySession(Date.now())); clearTransient(); setConfirmRestart(false) }}>确认重新开始</button>
           <button type="button" className="button button--ghost" onClick={() => setConfirmRestart(false)}>继续这盘</button></div>
       </div> : <button type="button" className="text-button" disabled={confirmScoring} onClick={() => setConfirmRestart(true)}>重新开始</button>}</div>
-    </div>
-  </section>
+  </BoardLayout>
 }

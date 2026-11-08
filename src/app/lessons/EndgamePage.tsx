@@ -1,5 +1,6 @@
 import { ENDGAME_LESSONS, TERRITORY_QUESTIONS } from '../../content/endgame'
 import { Board } from '../board/Board'
+import { BoardLayout } from '../board/BoardLayout'
 import { answerTerritory, answerWinner, confirmEnding, countHint, countQuestion, endgameView, endingDemo, endingTurn, lessonScore, selectEndgame, startEndgame, submitCount } from './endgameRunner'
 import type { EndgameRun } from './endgameRunner'
 
@@ -15,18 +16,15 @@ export function EndgamePage({ run, onChange, onNext, isLast, onStrategy }: Props
   const showKomi = (lesson.id === 'komi' && run.step > 0) || (lesson.id === 'ending' && done)
   const numberQuestion = !done && (lesson.id === 'count' || (lesson.id === 'komi' && run.step === 0))
   const inputLabel = lesson.id === 'count' ? `${countQuestion(run).label}有多少？` : '白方加上贴目后是多少分？'
-  return <section className="page page--with-board">
-    <div>
+  return <BoardLayout
+      heading={<><p className="eyebrow">围地与终局 / 第 {course} 课，共四课</p><h2>{lesson.title}</h2><p className="turn">{done ? "本课完成，再看看计分的原因。" : lesson.id === "territory" ? `先点 ${TERRITORY_QUESTIONS[run.step].label} 所在的空区，再判断归属` : numberQuestion ? inputLabel : lesson.id === "komi" ? "比较贴目后的分数，选出胜方。" : run.game.phase === "playing" ? `轮到${run.game.toPlay === "black" ? "黑" : "白"}棋，试着停一手。` : "点圈出的白棋标记死子，再确认数子。"}</p></>}
+      board={<>
       <p className="figure-number">围地与终局 / 第 {course} 课</p>
       <Board board={view.board} marks={view.marks} disabled={!canPick} onPointClick={(point) => onChange(selectEndgame(run, point))} />
       <p className={`board-caption${run.demo ? ' board-caption--notice' : ''}`}>{run.demo ? '独立提子演示 · 不改变本题的停手记录和死子标记' : lesson.id === 'ending' ? done ? '已移除约定的死子 · 按剩余棋子与空点数子' : '教学局面 · 圈出的白子待双方确认，其余棋子已确认活着' : '已确认活棋的教学终局 · 中盘不能照颜色直接判定归属'}</p>
       <p className="board-caption">{lesson.id === 'count' && !done ? '棋子上的圈：本次要数的活子 · 空心小圈：本次要数的空点' : lesson.id === 'ending' && !done ? '橙圈：本题死子 · 叉号：已标记移除 · 虚线小圈：演示中被提的位置' : '深色底：黑方归属 · 浅色底：白方归属 · 字母：当前观察的空区'}</p>
-    </div>
-    <div className="panel">
-      <p className="eyebrow">围地与终局 / 第 {course} 课，共四课</p>
-      <h2>{lesson.title}</h2><p className="muted">{lesson.intro}</p>
-      {lesson.id === 'territory' && !done && <div className="study-question">
-        <h3>先点 {TERRITORY_QUESTIONS[run.step].label} 所在的空区，再判断归属</h3>
+    </>}
+      primary={<>      {lesson.id === 'territory' && !done && <div className="study-question">
         <p className="small">选中后会标出整片相连的空点。只看这片空区的边界，不看谁的棋更多。</p>
         <div className="actions">{(['black', 'white', null] as const).map((owner) => <button key={owner ?? 'neutral'} className="button button--ghost" disabled={!run.picked} onClick={() => onChange(answerTerritory(run, owner))}>{owner === 'black' ? '归黑方' : owner === 'white' ? '归白方' : '双方都不算'}</button>)}</div>
       </div>}
@@ -45,6 +43,9 @@ export function EndgamePage({ run, onChange, onNext, isLast, onStrategy }: Props
           <div className="actions"><button className="button button--ghost" aria-pressed={run.demo} onClick={() => onChange(endingDemo(run))}>{run.demo ? '回到标记死子' : '为什么这颗白棋是死子？'}</button><button className="button" disabled={run.demo} onClick={() => onChange(confirmEnding(run))}>确认死子并数子</button></div>
         </>}
       </div>}
+      </>}
+    >
+      <p className="muted">{lesson.intro}</p>
       {run.message && <p className="message message--hint" role="status">{run.message}</p>}
       {showTotal && <div className="study-score" aria-label="计分明细">
         <div><span>黑方盘面</span><strong>{score.black}</strong><small>{result.blackStones.length} 颗活子 + {result.blackEmpty.length} 个空点</small></div>
@@ -54,6 +55,5 @@ export function EndgamePage({ run, onChange, onNext, isLast, onStrategy }: Props
       </div>}
       {done && <><p className="small">{run.assisted ? '借助提示完成。可以重来一次，自己数数。' : '本课完成。再看一眼棋盘，把原因和结果连起来。'}</p><div className="actions next-lesson">{isLast && onStrategy && <button className="button" onClick={onStrategy}>学习九路策略</button>}<button className={isLast && onStrategy ? 'button button--ghost' : 'button'} onClick={onNext}>{isLast ? '开始一盘陪练' : '继续下一课'}</button></div></>}
       <div className="restart"><button className="text-button" onClick={() => onChange(startEndgame(lesson))}>重来本课</button></div>
-    </div>
-  </section>
+    </BoardLayout>
 }

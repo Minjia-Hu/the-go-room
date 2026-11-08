@@ -20,6 +20,8 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 用户执黑、电脑执白。新手陪练默认开启，每次落子或停一手先预览、再确认；点棋子查看整块棋及其气，提示只解释经引擎核验的局部后果。白棋提子后可对照“被吃前／被吃后”，也可退回最近一回合重试；恢复随机状态后，相同选择会遇到相同应手。可关闭陪练恢复直接落子，偏好单独保存。
 
+手机课程先展示标题和当前任务，再展示完整棋盘。陪练试下后，一句关键理由与确认、重新选点紧接棋盘；长分析可展开。375 × 667 默认字号视口已验证核心试下确认无需滚动，桌面保留左右布局；真机 Safari 与手指点位仍需实际试用，见[手机棋盘操作验收](docs/qa/mobile-board-flow/README.md)。
+
 双方连续停一手后可按整块标记死子；也可以在轮到自己时点击“提出结束并数子”，确认后电脑按陪练约定接受。棋谱会记录按约定停手，复盘也会注明结束方式。未确认试下不计入。保存前可“返回继续下”，恢复数子前的盘面、行棋历史、随机状态和重试机会，清除本次死子标记。确认保存后进入复盘末尾，旧棋谱不能改写。
 
 电脑不自动判断棋是否下完，也不核验死活：数子结果依据用户确认的死子标记计算。若标错或漏标，结果也会受影响。玩家停手而电脑实际继续落子时，页面会提示可以提出数子。随机落子已排除“未提子且自己只剩一口气”的候选，提子、救子、叫吃的战术优先级不变；这不等于具备完整死活判断。
@@ -30,7 +32,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 最近 10 盘已完成棋谱单独保存在此浏览器中。切换页面保留当前课程题内状态与正式对局，未确认的对局预览会清除；刷新仍不保留进行中的正式对局。棋谱格式错误或存储不可用不影响下棋，保存失败时会提示并保留当前内存中的复盘。
 
-目前 253 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。本次检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](docs/qa/learning-progress/README.md)。此前检查见[陪练数子验收](docs/qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](docs/qa/full-game-and-practice/README.md)、[九路策略验收](docs/qa/nine-line-strategy/README.md)、[规则与终局验收](docs/qa/rules-and-scoring/README.md)、[陪练验收与试用清单](docs/qa/beginner-coaching/README.md)。教学效果仍待项目负责人实际体验。
+目前 257 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。本次检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](docs/qa/learning-progress/README.md)。此前检查见[陪练数子验收](docs/qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](docs/qa/full-game-and-practice/README.md)、[九路策略验收](docs/qa/nine-line-strategy/README.md)、[规则与终局验收](docs/qa/rules-and-scoring/README.md)、[陪练验收与试用清单](docs/qa/beginner-coaching/README.md)。教学效果仍待项目负责人实际体验。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)（Private）。
 
@@ -51,6 +53,8 @@ GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room
 陪练结束与数子体验见[实施记录](docs/superpowers/plans/2026-11-08-friendly-scoring-plan.md)。
 
 学习记录保存见[实施记录](docs/superpowers/plans/2026-11-08-learning-progress-plan.md)。
+
+手机棋盘布局见[实施记录](docs/superpowers/plans/2026-11-08-mobile-board-flow-plan.md)。
 
 完整背景与待决定事项见 [项目愿景](docs/vision.md)。
 
