@@ -1,3 +1,4 @@
+import { LessonFeedback } from './LessonFeedback'
 import { RULE_SEQUENCE_SCENES } from '../../content/endgame'
 import { Board } from '../board/Board'
 import { BoardLayout } from '../board/BoardLayout'
@@ -10,12 +11,13 @@ export function RuleSequencePage({ run, onChange, onScoring, completedSceneIds =
   const completed = (index: number) => run.solved.includes(index) || completedSceneIds.includes(RULE_SEQUENCE_SCENES[index].id)
   const intermediate = run.step === 1 || run.step === 2
   return <BoardLayout
+      legend={<p className="small">橙圈：目标黑棋 · 小空心圈：气 · 虚线小圈：被提走的位置</p>}
+      feedback={run.message && <LessonFeedback message={run.message} />}
       heading={<><p className="eyebrow">认识规则 / 落子后先提谁</p><h2>{view.scene.title}</h2><p className="turn">{view.title}</p></>}
       board={<>
       <p className="figure-number">规则慢镜头 / {run.sceneIndex + 1} · 2</p>
       <Board board={view.board} marks={view.marks} disabled />
       <p className={`board-caption${intermediate ? ' board-caption--notice' : ''}`}>{intermediate ? '规则演示中间画面 · 尚未判定合法，不是正式落子' : run.step === 0 ? '原始棋形 · 白棋准备下在 A' : view.legal ? '判定结果：白棋有气，这一手合法' : '判定结果：禁止落子，恢复原来的棋盘'}</p>
-      <p className="board-caption">橙圈：目标黑棋 · 小空心圈：气 · 虚线小圈：被提走的位置</p>
     </>}
       primary={<><p className="board-brief">{run.step === 0 ? "先看黑棋有几口气，再按下一步拆开这手棋。" : run.step === 1 ? "A 的白子暂时没有气，但要先检查黑棋能不能被提走。" : run.step === 2 ? view.legal ? `黑棋没有气，先提走这 ${view.inspection.captured.length} 颗黑子。` : "黑棋还有 B 这口气，不能提走。" : view.legal ? "提走黑棋后，白棋有气，所以这一手合法。" : "黑棋不能提，白棋也没有气，所以是禁入点。"}</p>
         <div className="actions">
@@ -32,7 +34,6 @@ export function RuleSequencePage({ run, onChange, onScoring, completedSceneIds =
         <button className="button button--ghost" onClick={() => onChange(answerSequence(run, false))}>只要周围都是黑棋，白棋就会被吃</button>
         <button className="button button--ghost" onClick={() => onChange(answerSequence(run, true))}>先提对方没气的棋，再检查自己的气</button>
       </div></div>}
-      {run.message && <p className="message" role="status">{run.message}</p>}
       {run.solved.includes(run.sceneIndex) && (RULE_SEQUENCE_SCENES.every((_, index) => completed(index)) ? <button className="button next-lesson" onClick={onScoring}>学习围地与终局</button> : <button className="button next-lesson" onClick={() => onChange(sequenceScene(run, 1 - run.sceneIndex))}>再比较另一种棋形</button>)}
       <div className="restart"><button className="text-button" onClick={() => onChange(startRuleSequence())}>重新观察这两个例子</button></div>
     </BoardLayout>

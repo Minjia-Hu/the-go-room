@@ -1,3 +1,4 @@
+import { ResponsiveExplanation } from '../board/ResponsiveExplanation'
 import type { GroupFact } from '../coaching/analysis'
 import type { Suggestion } from '../coaching/suggestions'
 import { explainAction } from '../coaching/explanations'
@@ -16,7 +17,7 @@ interface Props {
 export function CoachingPanel({ preview, group, dangers, hintLevel, suggestion, onHint, onSuggest, onInspect }: Props) {
   return <aside className="coach-card" aria-label="陪练提示">
     <p className="eyebrow">先看一看 · 再作决定</p>
-    {preview ? <details className="coach-explanation"><summary>展开这手的详细分析</summary><p>{explainAction(preview.analysis)}</p></details> : group ? <p>
+    {preview ? <ResponsiveExplanation summary="这手的详细分析"><p>{explainAction(preview.analysis)}</p></ResponsiveExplanation> : group ? <p>
       圈出的这块{group.color === 'black' ? '黑' : '白'}棋有 {group.stones.length} 颗棋，{group.liberties.length} 口气。
       {group.capture ? '只剩 A 这一口气。如果不处理，对方能在这里直接提走整块。' : group.liberties.length === 1 ? '虽然只剩一口气，但对方当前不能合法地直接提走它。' : '点空点试下，看看这块棋的气会怎样变化。'}
     </p> : <p>先看看自己的棋能否互相照应。点棋子可以查看气；点一个空点试下，确认之前都可以重新选择。</p>}

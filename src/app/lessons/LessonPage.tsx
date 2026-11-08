@@ -1,3 +1,4 @@
+import { LessonFeedback } from './LessonFeedback'
 import { useState } from 'react'
 import type { Lesson } from '../../content/lessons'
 import { Board } from '../board/Board'
@@ -27,6 +28,7 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
   }
   return (
     <BoardLayout
+      feedback={run.message && <LessonFeedback message={run.message?.text ?? null} kind={run.message?.kind} />}
       heading={<><h2>{lesson.title}</h2><p className="turn">{step?.goal ?? "这一关完成了，看看原因再继续。"}</p></>}
       board={<>
         <p className="figure-number">图 {String(index + 1).padStart(2, '0')} / 认识规则</p>
@@ -54,11 +56,7 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
         </ol>
         <p className="muted">{lesson.intro}</p>
         {lesson.id === 'suicide' && onRuleSequence && <button className="text-button" onClick={onRuleSequence}>分步看：为什么不算自杀？</button>}
-        {run.message && (
-          <p className={`message message--${run.message.kind}`} role="status">
-            {run.message.text}
-          </p>
-        )}
+
         <p>
           {done && !isLast && (
             <button type="button" className="button" onClick={() => goTo(index + 1)}>

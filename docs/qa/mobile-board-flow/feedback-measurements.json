@@ -1,0 +1,49 @@
+{
+  "feedback-rules": {
+    "top": 564.5,
+    "bottom": 608.4,
+    "scroll": 0,
+    "text": "这个点不是这块棋的气。气是紧挨着棋子上下左右的空点,斜着的和被对方占住的都不算。"
+  },
+  "feedback-survival": {
+    "top": 559.7,
+    "bottom": 603.6,
+    "scroll": 0,
+    "text": "再看看哪块黑棋只剩一个上下左右紧挨着的空点。请点那块棋。"
+  },
+  "feedback-endgame": {
+    "top": 559.7,
+    "bottom": 603.6,
+    "scroll": 0,
+    "text": "先点字母标出的空点，或与它相连的同一片空区。棋子本身不是空点。"
+  },
+  "feedback-strategy": {
+    "top": 559.7,
+    "bottom": 603.6,
+    "scroll": 0,
+    "text": "这道练习只比较标出的候选点。请点字母，或用右侧按钮选择。"
+  },
+  "feedback-independent": {
+    "top": 559.7,
+    "bottom": 603.6,
+    "scroll": 0,
+    "text": "先选一块黑棋，不是空点或白棋。点同一块里的任意一颗都可以。"
+  },
+  "feedback-sequence": {
+    "top": 11.7,
+    "bottom": 77.5,
+    "scroll": 548,
+    "text": "再按顺序看一次：先看对方有没有没气的棋被提走，然后才看刚下的棋有没有气。周围是黑棋，并不直接决定白棋能不能下。"
+  },
+  "feedback-walkthrough": {
+    "top": 11.7,
+    "bottom": 55.6,
+    "scroll": 548,
+    "text": "再想一想。先观察角边和发展方向。现在还没有白棋可追；以后每手也要留意实际危险。"
+  },
+  "smallTextPixels": [
+    12.24,
+    12.24
+  ],
+  "errors": []
+}

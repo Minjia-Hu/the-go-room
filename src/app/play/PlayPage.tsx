@@ -124,8 +124,8 @@ export function PlayPage({ session, onChange, onFinish, coaching, onCoachingChan
         ghostColor={scoring || review || inDemo || confirming ? null : 'black'} disabled={thinking || confirming || !!review || inDemo}
         onPointClick={select} />
       <p className="board-caption">{review ? `回看 · ${reviewBefore ? '被吃前' : '被吃后'}` : inDemo ? '演示：白棋可能这样应对' : preview?.analysis.ok ? view === 'before' ? '对照：落子前的盘面' : '试下中，尚未落子' : '9 路 · 中国规则 · 黑先 · 白贴 7.5'}</p>
-      {coaching && <p className="board-caption">棋子上的圈：目标棋块 · 空心圈：气 · 虚线：试下</p>}
     </>}
+    legend={coaching && <p className="small">棋子上的圈：目标棋块 · 空心圈：气 · 虚线：试下</p>}
     primary={review ? <CaptureReview review={review} before={reviewBefore} onBefore={setReviewBefore} onContinue={() => { onChange((current) => ({ ...current, captureReview: null })); setReviewBefore(false) }} onRetry={retry} /> : !scoring && !confirmScoring && <>
       {coaching && preview && <p className="board-brief" role="status">{inDemo ? '演示：白棋在 A 提走危险棋块，并未真正落子。返回试下后才能确认。' : briefExplanation(preview.analysis)}</p>}
       <div className="actions board-confirm">

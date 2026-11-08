@@ -39,9 +39,9 @@ describe('LessonPage', () => {
   it('下错时显示提示,可以重来这一关', () => {
     render(<LessonPage lessons={[LESSONS[2]]} onFinish={() => {}} />)
     click(0, 0)
-    expect(screen.getByRole('status').className).toContain('message--hint')
+    expect(screen.getByRole('status').textContent).toContain('找一找白子紧挨着的空点')
     click(5, 4)
-    expect(screen.getByRole('status').className).toContain('message--success')
+    expect(screen.getByRole('status').textContent).toContain('白子的最后一口气没了,被提走了')
     fireEvent.click(screen.getByRole('button', { name: '重来这一关' }))
     expect(screen.queryByRole('status')).toBeNull()
   })
