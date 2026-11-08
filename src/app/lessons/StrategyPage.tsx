@@ -3,8 +3,8 @@ import { Board } from '../board/Board'
 import { answerStrategy, chooseStrategy, startStrategy, strategyPoint, strategyStep, strategyView } from './strategyRunner'
 import type { StrategyRun } from './strategyRunner'
 
-interface Props { readonly run: StrategyRun; readonly onChange: (run: StrategyRun) => void; readonly onNext: () => void; readonly isLast: boolean }
-export function StrategyPage({ run, onChange, onNext, isLast }: Props) {
+interface Props { readonly run: StrategyRun; readonly onChange: (run: StrategyRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onWalk?: () => void }
+export function StrategyPage({ run, onChange, onNext, isLast, onWalk }: Props) {
   const { lesson } = run
   const view = strategyView(run)
   const course = STRATEGY_LESSONS.findIndex((entry) => entry.id === lesson.id) + 1
@@ -36,7 +36,7 @@ export function StrategyPage({ run, onChange, onNext, isLast }: Props) {
       <p className="small strategy-progress">已看完 {run.seen.length} / {lesson.choices.length} 种结果。{!allSeen && '每种走法都看到最后，再比较原因。'}</p>
       {allSeen && !run.done && <div className="study-question"><h3>比较之后，哪句话解释了原因？</h3><div className="reason-choices">{lesson.reasons.map((reason, index) => <button key={reason.text} className="button button--ghost" onClick={() => onChange(answerStrategy(run, index))}>{reason.text}</button>)}</div></div>}
       {run.message && <p className="message" role="status">{run.message}</p>}
-      {run.done && <div className="study-question"><h3>这一课带走什么</h3><p>{lesson.takeaway}</p><button className="button next-lesson" onClick={onNext}>{isLast ? '带着这三点去陪练' : '继续下一课'}</button></div>}
+      {run.done && <div className="study-question"><h3>这一课带走什么</h3><p>{lesson.takeaway}</p><div className="actions next-lesson">{isLast && onWalk && <button className="button" onClick={onWalk}>看一盘完整九路讲解</button>}<button className={isLast && onWalk ? 'button button--ghost' : 'button'} onClick={onNext}>{isLast ? '带着这三点去陪练' : '继续下一课'}</button></div></div>}
       <p className="small strategy-footnote">这里演示一种可能的回应，不是唯一走法，也不代表最佳手。比较的是当前变化的具体后果。</p>
       <div className="restart"><button className="text-button" onClick={() => onChange(startStrategy(lesson))}>重来本课</button></div>
     </div>

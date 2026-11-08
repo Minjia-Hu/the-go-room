@@ -302,3 +302,6 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .strategy-observation { border-block: 1px solid var(--border); padding: 20px 0 4px; margin: 22px 0 18px; }
 .strategy-progress { margin-top: 20px !important; color: var(--accent); }
 .strategy-footnote { margin-top: 24px !important; color: var(--text-muted); }
+.walk-chapters, .independent-index { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.walk-chapters .button, .independent-index .button { padding: 9px 12px; }
+.walk-chapters [aria-pressed="true"], .independent-index [aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }

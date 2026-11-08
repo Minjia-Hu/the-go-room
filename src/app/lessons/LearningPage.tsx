@@ -10,6 +10,8 @@ import { EndgamePage } from './EndgamePage'
 import { RuleSequencePage } from './RuleSequencePage'
 import { STRATEGY_LESSONS } from '../../content/strategy'
 import { StrategyPage } from './StrategyPage'
+import { WalkthroughPage } from './WalkthroughPage'
+import { IndependentPage } from './IndependentPage'
 
 interface Props { readonly session: LearningSession; readonly onChange: (next: LearningSession) => void; readonly onPlay: () => void }
 export function LearningPage({ session, onChange, onPlay }: Props) {
@@ -17,6 +19,9 @@ export function LearningPage({ session, onChange, onPlay }: Props) {
   const openSequence = () => onChange({ ...session, page: 'rule-sequence' })
   const openEndgame = (endgameIndex: number) => onChange({ ...session, page: 'endgame', endgameIndex })
   const openStrategy = (strategyIndex: number) => onChange({ ...session, page: 'strategy', strategyIndex })
+  const openWalk = () => onChange({ ...session, page: 'walkthrough' })
+  const openIndependent = (independentIndex: number) => onChange({ ...session, page: 'independent', independentIndex })
+  const allIndependentDone = session.independentRuns.every((run) => run.stage === 'done')
   if (session.page === 'home') return <section className="learning-home">
     <div className="edition-line"><span>入门手记 · 第一册</span><span lang="en">OBSERVE / TRY / UNDERSTAND</span><span>从一口气开始</span></div>
     <div className="learning-hero">
@@ -49,8 +54,12 @@ export function LearningPage({ session, onChange, onPlay }: Props) {
           <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">肆</span><div><h3>九路策略入门</h3><p>先顾危险，再想围地；比较走法，理解取舍。</p></div><span className="chapter-count">三课</span></header>
           <div className="lesson-list">{STRATEGY_LESSONS.map((lesson, index) => <button key={lesson.id} className="lesson-link" onClick={() => openStrategy(index)}>{index + 1}. {lesson.title}<span aria-hidden="true">↗</span></button>)}</div>
         </article>
+        <article className="chapter">
+          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">伍</span><div><h3>从看懂到自己下</h3><p>走完一盘九路，再换没有标记的棋形自己判断。</p></div><span className="chapter-count">一盘 · 六题</span></header>
+          <div className="lesson-list"><button className="lesson-link" onClick={openWalk}>一盘九路，从头到尾<span aria-hidden="true">↗</span></button><button className="lesson-link" onClick={() => openIndependent(session.independentIndex)}>换个棋形，自己判断<span aria-hidden="true">↗</span></button></div>
+        </article>
         <article className="chapter practice-invitation">
-          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">伍</span><div><h3>有提示的陪练</h3><p>每手先试下，看懂提示后再确认；也可以退回重试。</p></div><span className="chapter-count">一盘</span></header>
+          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">陆</span><div><h3>有提示的陪练</h3><p>每手先试下，看懂提示后再确认；也可以退回重试。</p></div><span className="chapter-count">一盘</span></header>
           <button className="button button--ghost" onClick={onPlay}>直接开始陪练<span aria-hidden="true">↗</span></button>
         </article>
       </div>
@@ -64,8 +73,10 @@ export function LearningPage({ session, onChange, onPlay }: Props) {
     {session.page === 'rule-sequence' && <RuleSequencePage run={session.sequence} onChange={(sequence) => onChange({ ...session, sequence })} onScoring={() => openEndgame(0)} />}
     {session.page === 'endgame' && <><EndgamePage run={session.endgameRuns[session.endgameIndex]} onChange={(run) => onChange({ ...session, endgameRuns: session.endgameRuns.map((old, index) => index === session.endgameIndex ? run : old) })} isLast={session.endgameIndex === ENDGAME_LESSONS.length - 1} onNext={() => session.endgameIndex === ENDGAME_LESSONS.length - 1 ? onPlay() : openEndgame(session.endgameIndex + 1)} onStrategy={() => openStrategy(0)} />
       <div className="learning-toolbar archive-note">{session.endgameIndex > 0 && <button className="text-button" onClick={() => openEndgame(session.endgameIndex - 1)}>回看上一课</button>}<button className="text-button" onClick={() => session.endgameIndex === ENDGAME_LESSONS.length - 1 ? onPlay() : openEndgame(session.endgameIndex + 1)}>先跳过这一课</button></div></>}
-    {session.page === 'strategy' && <><StrategyPage run={session.strategyRuns[session.strategyIndex]} onChange={(run) => onChange({ ...session, strategyRuns: session.strategyRuns.map((old, index) => index === session.strategyIndex ? run : old) })} isLast={session.strategyIndex === STRATEGY_LESSONS.length - 1} onNext={() => session.strategyIndex === STRATEGY_LESSONS.length - 1 ? onPlay() : openStrategy(session.strategyIndex + 1)} />
+    {session.page === 'strategy' && <><StrategyPage run={session.strategyRuns[session.strategyIndex]} onChange={(run) => onChange({ ...session, strategyRuns: session.strategyRuns.map((old, index) => index === session.strategyIndex ? run : old) })} isLast={session.strategyIndex === STRATEGY_LESSONS.length - 1} onNext={() => session.strategyIndex === STRATEGY_LESSONS.length - 1 ? onPlay() : openStrategy(session.strategyIndex + 1)} onWalk={openWalk} />
       <div className="learning-toolbar archive-note">{session.strategyIndex > 0 && <button className="text-button" onClick={() => openStrategy(session.strategyIndex - 1)}>回看上一课</button>}<button className="text-button" onClick={() => session.strategyIndex === STRATEGY_LESSONS.length - 1 ? onPlay() : openStrategy(session.strategyIndex + 1)}>先跳过这一课</button></div></>}
+    {session.page === 'walkthrough' && <WalkthroughPage run={session.walk} onChange={(walk) => onChange({ ...session, walk })} onPractice={() => openIndependent(0)} />}
+    {session.page === 'independent' && <><div className="independent-index" aria-label="独立练习题目">{session.independentRuns.map((run, index) => <button key={run.scene.id} className="button button--ghost" aria-pressed={index === session.independentIndex} onClick={() => openIndependent(index)}>第 {index + 1} 题{run.stage === 'done' ? run.help > 0 ? ' · 用过提示' : ' · 已完成' : ''}</button>)}</div><IndependentPage run={session.independentRuns[session.independentIndex]} index={session.independentIndex} allDone={allIndependentDone} onChange={(run) => onChange({ ...session, independentRuns: session.independentRuns.map((old, index) => index === session.independentIndex ? run : old) })} onNext={() => allIndependentDone ? onPlay() : openIndependent(session.independentIndex < 5 ? session.independentIndex + 1 : session.independentRuns.findIndex((run) => run.stage !== 'done'))} /></>}
     {session.page === 'survival' && <><SurvivalPage run={session.runs[session.sceneIndex]} onChange={(run) => onChange({ ...session, runs: session.runs.map((r, i) => i === session.sceneIndex ? run : r) })} onRuleSequence={openSequence} onScoring={() => openEndgame(0)}
         isLast={session.sceneIndex === 7} onNext={() => session.sceneIndex === 7 ? onPlay() : openScene(session.sceneIndex + 1)} />
       <div className="learning-toolbar archive-note">
