@@ -280,6 +280,20 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 
 /* 入门手记：手动慢镜头与终局练习，沿用纸面目录的排版。 */
 .chapter-supplement { margin-top: 20px; }
+.learning-record { border-top: 1px solid var(--text); border-bottom: 1px solid var(--border); padding: 28px 0; margin: 0 0 48px; }
+.learning-record h3 { margin: 8px 0 16px; font-weight: 400; }
+.learning-record .small { max-width: 760px; }
+.continue-learning { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin: 24px 0; }
+.continue-learning p { margin: 0; font-size: .85rem; }
+.learning-record__reset { margin-top: 22px; }
+.learning-record__reset > .text-button { font-size: .72rem; }
+.learning-record__reset [role="group"] { max-width: 720px; border-left: 2px solid var(--accent); padding-left: 20px; }
+.learning-entry { min-width: 0; }
+.completion-note { font: .7rem/1.7 var(--sans); color: var(--accent); margin: 7px 0 13px; }
+.learning-recorded { border-left: 2px solid var(--accent); padding-left: 12px; margin-bottom: 24px; }
+.lesson-details { margin-top: 20px; font-size: .8rem; }
+.lesson-details summary { cursor: pointer; color: var(--accent); padding: 8px 0; }
+.lesson-details .lesson-list { margin-left: 0; }
 .board-caption--notice { color: var(--text); border-block: 1px solid var(--border); padding: 12px 0; }
 .study-steps { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 0; margin: 28px 0; }
 .study-steps button { width: 100%; border: 0; border-bottom: 2px solid var(--border); padding: 12px 2px; background: transparent; color: var(--text-muted); font: inherit; font-size: .72rem; cursor: pointer; }

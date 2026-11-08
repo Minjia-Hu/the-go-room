@@ -14,9 +14,12 @@ import { startWalk } from './walkthroughRunner'
 import type { WalkRun } from './walkthroughRunner'
 import { createIndependentRuns } from './independentRunner'
 import type { IndependentRun } from './independentRunner'
+import { continueLearningUnit, emptyLearningProgress } from './learningProgress'
+import type { LearningProgress, LearningUnit } from './learningProgress'
 
 export interface RuleProgress { readonly index: number; readonly run: LessonRun }
 export interface LearningSession {
+  readonly progress: LearningProgress
   readonly page: 'home' | 'rules' | 'survival' | 'rule-sequence' | 'endgame' | 'strategy' | 'walkthrough' | 'independent'
   readonly rules: RuleProgress
   readonly sceneIndex: number
@@ -31,5 +34,22 @@ export interface LearningSession {
   readonly independentRuns: readonly IndependentRun[]
 }
 export function createLearningSession(): LearningSession {
-  return { page: 'home', rules: { index: 0, run: startLesson(LESSONS[0]) }, sceneIndex: 0, runs: SURVIVAL_SCENES.map(startSurvival), sequence: startRuleSequence(), endgameIndex: 0, endgameRuns: createEndgameRuns(), strategyIndex: 0, strategyRuns: createStrategyRuns(), walk: startWalk(), independentIndex: 0, independentRuns: createIndependentRuns() }
+  return { progress: emptyLearningProgress(), page: 'home', rules: { index: 0, run: startLesson(LESSONS[0]) }, sceneIndex: 0, runs: SURVIVAL_SCENES.map(startSurvival), sequence: startRuleSequence(), endgameIndex: 0, endgameRuns: createEndgameRuns(), strategyIndex: 0, strategyRuns: createStrategyRuns(), walk: startWalk(), independentIndex: 0, independentRuns: createIndependentRuns() }
+}
+
+export function openLearningUnit(session: LearningSession, unit: LearningUnit): LearningSession {
+  switch (unit.page) {
+    case 'rules': return { ...session, page: unit.page, rules: session.rules.index === unit.index ? session.rules : { index: unit.index, run: startLesson(LESSONS[unit.index]) } }
+    case 'survival': return { ...session, page: unit.page, sceneIndex: unit.index }
+    case 'rule-sequence': return { ...session, page: unit.page, sequence: session.sequence.sceneIndex === unit.index ? session.sequence : { ...session.sequence, sceneIndex: unit.index, step: 0, message: null } }
+    case 'endgame': return { ...session, page: unit.page, endgameIndex: unit.index }
+    case 'strategy': return { ...session, page: unit.page, strategyIndex: unit.index }
+    case 'independent': return { ...session, page: unit.page, independentIndex: unit.index }
+    case 'walkthrough': return { ...session, page: unit.page }
+  }
+}
+export function restoreLearningSession(progress: LearningProgress): LearningSession {
+  const session = { ...createLearningSession(), progress }
+  const unit = continueLearningUnit(progress)
+  return unit ? openLearningUnit(session, unit) : session
 }

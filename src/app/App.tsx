@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { LearningPage } from './lessons/LearningPage'
-import { createLearningSession } from './lessons/learningSession'
+import { createLearningSession, restoreLearningSession } from './lessons/learningSession'
+import type { LearningSession } from './lessons/learningSession'
+import { emptyLearningProgress, readLearningProgress, recordLearningProgress, writeLearningProgress } from './lessons/learningProgress'
+import type { LearningProgress } from './lessons/learningProgress'
 import { PlayPage } from './play/PlayPage'
 import { createPlaySession } from './play/session'
 import { readCoaching, writeCoaching } from './play/preferences'
@@ -19,7 +22,12 @@ const NAV: readonly { page: Page; label: string }[] = [
 
 export function App() {
   const [page, navigate] = usePage()
-  const [learning, setLearning] = useState(createLearningSession)
+  const [loadedLearning] = useState(() => {
+    try { return readLearningProgress(window.localStorage) }
+    catch { return { progress: emptyLearningProgress(), message: '无法读取此浏览器的学习记录，本次仍可正常学习。' } }
+  })
+  const [learning, setLearning] = useState(() => restoreLearningSession(loadedLearning.progress))
+  const [learningMessage, setLearningMessage] = useState<string | null>(loadedLearning.message)
   const [session, setSession] = useState(() => createPlaySession(Date.now()))
   const [coaching, setCoaching] = useState(() => { try { return readCoaching(window.localStorage) } catch { return true } })
   const [preferenceMessage, setPreferenceMessage] = useState<string | null>(null)
@@ -28,6 +36,24 @@ export function App() {
   })
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [storageMessage, setStorageMessage] = useState<string | null>(null)
+
+  function saveLearning(progress: LearningProgress) {
+    // 只在学习动作或明确清除时写入；首次读取失败不覆盖原始数据。
+    let saved = false
+    try { saved = writeLearningProgress(window.localStorage, progress) } catch { /* 本次内存记录仍然有效。 */ }
+    setLearningMessage(saved ? null : '学习记录未能保存到此浏览器。本次操作仍有效，刷新后可能丢失新进度或恢复旧记录。')
+  }
+
+  function changeLearning(next: LearningSession) {
+    const progress = recordLearningProgress(learning.progress, next)
+    if (progress !== learning.progress) saveLearning(progress)
+    setLearning({ ...next, progress })
+  }
+  function clearLearning() {
+    const next = createLearningSession()
+    saveLearning(next.progress)
+    setLearning(next)
+  }
 
   function finish(completed: Match) {
     if (completed.game.phase !== 'scoring') return
@@ -78,7 +104,8 @@ export function App() {
         <p className="topbar__note">属于你的围棋教室</p>
       </header>
       <main>
-        {page === 'lessons' && <LearningPage session={learning} onChange={setLearning} onPlay={() => navigate('play')} />}
+        {page === 'lessons' && <LearningPage session={learning} onChange={changeLearning} onPlay={() => navigate('play')}
+          storageMessage={learningMessage} onClear={clearLearning} />}
         {page === 'play' && <PlayPage session={session} onChange={setSession} onFinish={finish} coaching={coaching} onCoachingChange={changeCoaching} preferenceMessage={preferenceMessage} />}
         {page === 'replay' && <ReplayPage games={games} selectedId={selectedId} onSelect={setSelectedId} onPlay={() => navigate('play')} storageMessage={storageMessage} />}
       </main>

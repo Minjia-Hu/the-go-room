@@ -12,9 +12,10 @@ export interface LessonPageProps {
   readonly onProgress?: (progress: RuleProgress) => void
   readonly onSurvival?: () => void
   readonly onRuleSequence?: () => void
+  readonly completedIds?: readonly string[]
 }
 
-export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival, onRuleSequence }: LessonPageProps) {
+export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival, onRuleSequence, completedIds }: LessonPageProps) {
   const [local, setLocal] = useState<RuleProgress>(() => ({ index: 0, run: startLesson(lessons[0]) }))
   const { index, run } = progress ?? local
   const update = onProgress ?? setLocal
@@ -48,7 +49,7 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
             <li
               key={l.id}
               className={
-                i < index ? 'progress__step progress__step--done' : i === index ? 'progress__step progress__step--current' : 'progress__step'
+                i === index ? 'progress__step progress__step--current' : (completedIds ? completedIds.includes(l.id) : i < index) ? 'progress__step progress__step--done' : 'progress__step'
               }
               aria-current={i === index ? 'step' : undefined}
             />

@@ -3,9 +3,10 @@ import { Board } from '../board/Board'
 import { answerSequence, sequenceScene, sequenceStep, sequenceView, startRuleSequence } from './ruleSequence'
 import type { RuleSequenceRun } from './ruleSequence'
 
-interface Props { readonly run: RuleSequenceRun; readonly onChange: (run: RuleSequenceRun) => void; readonly onScoring: () => void }
-export function RuleSequencePage({ run, onChange, onScoring }: Props) {
+interface Props { readonly run: RuleSequenceRun; readonly onChange: (run: RuleSequenceRun) => void; readonly onScoring: () => void; readonly completedSceneIds?: readonly string[] }
+export function RuleSequencePage({ run, onChange, onScoring, completedSceneIds = [] }: Props) {
   const view = sequenceView(run)
+  const completed = (index: number) => run.solved.includes(index) || completedSceneIds.includes(RULE_SEQUENCE_SCENES[index].id)
   const intermediate = run.step === 1 || run.step === 2
   return <section className="page page--with-board">
     <div>
@@ -18,7 +19,7 @@ export function RuleSequencePage({ run, onChange, onScoring }: Props) {
       <p className="eyebrow">认识规则 / 落子后先提谁</p>
       <h2>{view.scene.title}</h2>
       <p className="muted">别急着判断白棋会不会被吃。把一手棋拆开，亲眼看看判断的先后顺序。</p>
-      <div className="actions">{RULE_SEQUENCE_SCENES.map((scene, index) => <button key={scene.id} className="button button--ghost" aria-pressed={run.sceneIndex === index} onClick={() => onChange(sequenceScene(run, index))}>{index === 0 ? '比较一只眼' : '比较两只眼'}{run.solved.includes(index) ? ' · 已理解' : ''}</button>)}</div>
+      <div className="actions">{RULE_SEQUENCE_SCENES.map((scene, index) => <button key={scene.id} className="button button--ghost" aria-pressed={run.sceneIndex === index} onClick={() => onChange(sequenceScene(run, index))}>{index === 0 ? '比较一只眼' : '比较两只眼'}{completed(index) ? ' · 已完成' : ''}</button>)}</div>
       <ol className="study-steps" aria-label="规则演示步骤">{['原图', '暂放白子', '先提对方', '检查自己'].map((label, index) => <li key={label}><button aria-current={run.step === index ? 'step' : undefined} onClick={() => onChange(sequenceStep(run, index))}><span>{index}</span>{label}</button></li>)}</ol>
       <h3>{view.title}</h3>
       <p className="message message--hint" aria-live="polite">{view.text}</p>
@@ -31,7 +32,7 @@ export function RuleSequencePage({ run, onChange, onScoring }: Props) {
         <button className="button button--ghost" onClick={() => onChange(answerSequence(run, true))}>先提对方没气的棋，再检查自己的气</button>
       </div></div>}
       {run.message && <p className="message" role="status">{run.message}</p>}
-      {run.solved.includes(run.sceneIndex) && (run.solved.length === 2 ? <button className="button next-lesson" onClick={onScoring}>学习围地与终局</button> : <button className="button next-lesson" onClick={() => onChange(sequenceScene(run, 1 - run.sceneIndex))}>再比较另一种棋形</button>)}
+      {run.solved.includes(run.sceneIndex) && (RULE_SEQUENCE_SCENES.every((_, index) => completed(index)) ? <button className="button next-lesson" onClick={onScoring}>学习围地与终局</button> : <button className="button next-lesson" onClick={() => onChange(sequenceScene(run, 1 - run.sceneIndex))}>再比较另一种棋形</button>)}
       <div className="restart"><button className="text-button" onClick={() => onChange(startRuleSequence())}>重新观察这两个例子</button></div>
     </div>
   </section>
