@@ -40,7 +40,7 @@ npm run preview   # 本地预览构建结果
 
 技术栈：Vite、React、TypeScript、Vitest。没有后端，也不需要 API 密钥。
 
-[在线体验](https://example.invalid/removed-private-preview-1)已部署，目前仅所有者登录后可访问，公开访问待确认。GitHub 源码仓库仍为私有；克隆仓库需要访问权限。最新状态与静态部署方式见[发布说明](docs/release.md)。
+公开在线体验链接尚未发布。静态部署方式与检查记录见[发布说明](docs/release.md)。
 
 ## 使用前了解
 

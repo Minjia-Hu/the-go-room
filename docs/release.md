@@ -3,21 +3,14 @@
 ## 当前发布状态（2026-11-08）
 
 - 当前已提供互动课程、九路陪练和复盘，持续完善中，欢迎试用和反馈。教学效果仍待更多实际使用反馈，实体手机体验尚未验证。电脑提示只解释局部后果，死子由使用者确认。
-- GitHub 源码仓库仍为私有；已合并版本 `1731119` 的[远程 CI](https://github.com/Minjia-Hu/the-go-room/actions/runs/42458561572)已通过安装、263 个测试、lint 和构建。
-- [在线体验](https://example.invalid/removed-private-preview-1)已部署，当前仅所有者登录后可访问，公开访问待确认。原[个人预览](https://example.invalid/removed-private-preview-2)仍保持私有。
-- GitHub Pages 创建请求因当前套餐不支持该私有仓库而被拒绝，尚未部署。已有 Pages 工作流保留为后续选项。
+- 已合并版本 `1731119` 的[远程 CI](https://github.com/Minjia-Hu/the-go-room/actions/runs/42458561572)已通过安装、263 个测试、lint 和构建。
+- 公开在线体验链接尚未发布。GitHub Pages 工作流已准备，尚未部署。
 
-## 独立托管演示
+## 独立静态托管
 
-演示与 GitHub 源码仓库独立：只上传 `dist/` 中 `index.html` 引用的资源，以及项目许可和第三方声明，不上传 TypeScript 源码、测试、设计文档或 Git 历史。浏览器仍会下载运行所需的 HTML、CSS 与压缩 JavaScript；这不是源码保密或防复制机制。
+演示与源码仓库可以独立部署：只上传 `dist/` 中 `index.html` 引用的资源，以及项目许可和第三方声明。浏览器会下载运行所需的 HTML、CSS 与压缩 JavaScript；构建压缩不是源码保密或防复制机制。
 
-本次网页对应 GitHub 提交 `1731119`，部署成功；当前访问权限仍为仅所有者，尚未验证匿名访问。托管平台默认允许复制改编，因此演示使用独立的构建产物副本；原个人预览不改变访问范围。
-
-- 站点 ID：`REMOVED_PRIVATE_SITE_ID`
-- 托管发布提交：`REMOVED_PRIVATE_HOSTING_COMMIT`
-- 托管版本：`REMOVED_PRIVATE_SITE_ID~REMOVED_PRIVATE_VERSION_ID`
-
-以后更新演示时，先构建已验证的应用版本，再只同步发布资源；不要把完整源码仓库直接同步到这个演示站点。公开访问成功后，用未登录的浏览器验证课程、陪练与刷新，再更新本页和 README 的访问状态。
+更新网站时，先构建已验证的应用版本，再同步发布资源。公开访问后，用未登录的浏览器验证课程、陪练与刷新，再把实际可访问的链接加入 README。
 
 ## 本地构建
 
@@ -48,7 +41,7 @@ npm run preview
 
 ## GitHub Pages（仅手动发布）
 
-仓库公开与网站上线是两个独立操作。独立托管预览已上线；本节的 GitHub Pages 仅准备了配置，不自动修改仓库可见性或启用 Pages。
+仓库公开与网站上线是两个独立操作。现有工作流仅在手动触发时部署，不会自动修改仓库可见性或启用 Pages。
 
 维护者决定上线后：
 
@@ -58,7 +51,7 @@ npm run preview
 4. 工作流重新执行全部检查，再上传构建产物并部署。它只接受 `main`；普通推送不会触发部署。
 5. 以部署任务输出的网址为准，验证首页、课程、陪练、刷新和许可文件，再把实际地址加入 README。
 
-如果仍使用当前仓库名、没有自定义域名，预期地址为 `https://minjia-hu.github.io/the-go-room/`。这只是地址预期，不代表站点已上线。
+未配置自定义域名时，项目站点通常位于 `https://<owner>.github.io/<repository>/`。以实际部署输出为准，不要将预期地址当作已上线链接。
 
 工作流遵循 [GitHub Pages 自定义工作流文档](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)。首次部署可能需要仓库维护者配置 Pages 或环境权限；请通过 GitHub 设置处理，不要把访问令牌写入源码。
 
