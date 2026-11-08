@@ -2,9 +2,9 @@
 
 ## 当前发布状态（2026-11-08）
 
-- 当前定位为早期体验版，教学效果与实体手机体验尚未验证。电脑提示只解释局部后果，死子由使用者确认。
+- 当前已提供互动课程、九路陪练和复盘，持续完善中，欢迎试用和反馈。教学效果仍待更多实际使用反馈，实体手机体验尚未验证。电脑提示只解释局部后果，死子由使用者确认。
 - GitHub 源码仓库仍为私有；已合并版本 `1731119` 的[远程 CI](https://github.com/Minjia-Hu/the-go-room/actions/runs/42458561572)已通过安装、263 个测试、lint 和构建。
-- [早期体验版演示](https://example.invalid/removed-private-preview-1)已部署，当前仅所有者登录后可访问，公开访问待确认。原[个人预览](https://example.invalid/removed-private-preview-2)仍保持私有。
+- [在线体验](https://example.invalid/removed-private-preview-1)已部署，当前仅所有者登录后可访问，公开访问待确认。原[个人预览](https://example.invalid/removed-private-preview-2)仍保持私有。
 - GitHub Pages 创建请求因当前套餐不支持该私有仓库而被拒绝，尚未部署。已有 Pages 工作流保留为后续选项。
 
 ## 独立托管演示
