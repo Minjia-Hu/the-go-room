@@ -1,8 +1,10 @@
 # The Go Room
 
+> **早期体验版**：电脑棋力有限，数子需手动标记死子；教学效果和实体手机体验尚未验证。欢迎指出看不懂的讲解和操作问题。
+
 一个面向零基础学习者的围棋网页：亲手落子，看懂为什么，再试着下完一盘棋。
 
-无需账号，无需付费服务。课程、简单电脑对手和复盘都在浏览器本地运行。
+课程、简单电脑对手和复盘都在浏览器本地运行，不需要 API 密钥或付费围棋服务。
 
 ![九路陪练：棋盘与一步棋的解释](docs/qa/mobile-board-flow/expanded-play-desktop.png)
 
@@ -38,7 +40,7 @@ npm run preview   # 本地预览构建结果
 
 技术栈：Vite、React、TypeScript、Vitest。没有后端，也不需要 API 密钥。
 
-在线演示尚未发布；静态部署与 GitHub Pages 的操作见[发布说明](docs/release.md)。
+[早期体验版演示](https://example.invalid/removed-private-preview-1)已部署，目前仅所有者登录后可访问，公开访问待确认。GitHub 源码仓库仍为私有；克隆仓库需要访问权限。最新状态与静态部署方式见[发布说明](docs/release.md)。
 
 ## 使用前了解
 

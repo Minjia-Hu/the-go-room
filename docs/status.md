@@ -34,7 +34,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 最近 10 盘已完成棋谱单独保存在此浏览器中。切换页面保留当前课程题内状态与正式对局，未确认的对局预览会清除；刷新仍不保留进行中的正式对局。棋谱格式错误或存储不可用不影响下棋，保存失败时会提示并保留当前内存中的复盘。
 
-目前 263 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。本次检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。教学效果仍待项目负责人实际体验。
+目前 263 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。本次检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。教学效果和实体手机体验尚未验证，当前以早期体验版收集反馈。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)。
 
@@ -85,4 +85,4 @@ npm run lint
 
 ## 后续工作
 
-请项目负责人完整试学，检查能否在提示出现前找出危险并解释选择，再记录实战中仍不明白的时刻。学习进度保存与开源准备已完成；仓库公开和部署上线仍需单独确认，操作方式见[发布说明](release.md)。更后的功能可考虑从自己的对局提取关键片段。第一版第四阶段的记录见[计划四](superpowers/plans/2026-11-01-v1-plan-4-play-replay.md)。
+请项目负责人完整试学，检查能否在提示出现前找出危险并解释选择，再记录实战中仍不明白的时刻。学习进度保存与开源准备已完成；个人在线预览已发布，公开演示与仓库公开尚未完成，最新状态见[发布说明](release.md)。更后的功能可考虑从自己的对局提取关键片段。第一版第四阶段的记录见[计划四](superpowers/plans/2026-11-01-v1-plan-4-play-replay.md)。

@@ -1,5 +1,24 @@
 # 构建与发布
 
+## 当前发布状态（2026-11-08）
+
+- 当前定位为早期体验版，教学效果与实体手机体验尚未验证。电脑提示只解释局部后果，死子由使用者确认。
+- GitHub 源码仓库仍为私有；已合并版本 `1731119` 的[远程 CI](https://github.com/Minjia-Hu/the-go-room/actions/runs/42458561572)已通过安装、263 个测试、lint 和构建。
+- [早期体验版演示](https://example.invalid/removed-private-preview-1)已部署，当前仅所有者登录后可访问，公开访问待确认。原[个人预览](https://example.invalid/removed-private-preview-2)仍保持私有。
+- GitHub Pages 创建请求因当前套餐不支持该私有仓库而被拒绝，尚未部署。已有 Pages 工作流保留为后续选项。
+
+## 独立托管演示
+
+演示与 GitHub 源码仓库独立：只上传 `dist/` 中 `index.html` 引用的资源，以及项目许可和第三方声明，不上传 TypeScript 源码、测试、设计文档或 Git 历史。浏览器仍会下载运行所需的 HTML、CSS 与压缩 JavaScript；这不是源码保密或防复制机制。
+
+本次网页对应 GitHub 提交 `1731119`，部署成功；当前访问权限仍为仅所有者，尚未验证匿名访问。托管平台默认允许复制改编，因此演示使用独立的构建产物副本；原个人预览不改变访问范围。
+
+- 站点 ID：`REMOVED_PRIVATE_SITE_ID`
+- 托管发布提交：`REMOVED_PRIVATE_HOSTING_COMMIT`
+- 托管版本：`REMOVED_PRIVATE_SITE_ID~REMOVED_PRIVATE_VERSION_ID`
+
+以后更新演示时，先构建已验证的应用版本，再只同步发布资源；不要把完整源码仓库直接同步到这个演示站点。公开访问成功后，用未登录的浏览器验证课程、陪练与刷新，再更新本页和 README 的访问状态。
+
 ## 本地构建
 
 使用 Node.js 24.x（`.nvmrc`），运行：
@@ -29,7 +48,7 @@ npm run preview
 
 ## GitHub Pages（仅手动发布）
 
-仓库公开与网站上线是两个独立操作。当前只准备配置，不自动修改仓库可见性或启用 Pages。
+仓库公开与网站上线是两个独立操作。独立托管预览已上线；本节的 GitHub Pages 仅准备了配置，不自动修改仓库可见性或启用 Pages。
 
 维护者决定上线后：
 
@@ -59,4 +78,4 @@ npm run preview
 - Node.js 24.22.2 下执行 `npm ci`、263 个测试、lint 和构建，全部通过。
 - 检查构建产物的相对资源路径、许可文件完整性与 JavaScript 许可指引；未使用的模板图标不再出现在发布包。
 - Chromium 实际操作开发页、静态根目录及 `/the-go-room/` 子目录：课程落子、陪练试下与确认、hash 路由刷新、Logo 返回首页均通过，无页面异常或失败的 HTTP 请求。子目录另使用 375 × 667 视口检查。
-- Markdown 本地链接、工作流 YAML 语法和 Git 空白检查通过。GitHub Actions 与 Pages 尚未在远程执行；没有进行实体手机验证。
+- Markdown 本地链接、工作流 YAML 语法和 Git 空白检查通过。本地验收之后，GitHub Actions CI 已在提交 `1731119` 上通过；Pages 尚未部署，没有进行实体手机验证。
