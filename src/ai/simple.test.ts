@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createGame, parseBoard, pass, play } from '../engine'
+import { createGame, getGroup, parseBoard, pass, play } from '../engine'
 import type { GameState } from '../engine'
 import { createRng } from './random'
 import { chooseMove, findAtari, findCapture, findEscape, sensibleMoves } from './simple'
@@ -113,5 +113,36 @@ describe('chooseMove', () => {
       if (result.ok) state = result.state
     }
     expect(state.phase).toBe('scoring')
+  })
+})
+
+
+describe('随机候选的自叫吃过滤', () => {
+  it('排除合法但未提子且只剩一气的点，保留有两气的点', () => {
+    const state = position(['.O...', '.....', '.....', '.....', '.....'])
+    const point = { x: 0, y: 0 }
+    const result = play(state, point)
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('fixture must be legal')
+    expect(getGroup(result.state.board, point)?.liberties).toHaveLength(1)
+    expect(sensibleMoves(state)).not.toContainEqual(point)
+    expect(sensibleMoves(state)).toContainEqual({ x: 4, y: 4 })
+  })
+  it('提子后仅剩一气仍保留，战术分支仍会选择该提子', () => {
+    const state = position(['.XO..', 'XO.O.', '.XO..', '.....', '.....'])
+    const point = { x: 2, y: 1 }
+    const result = play(state, point)
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('fixture must be legal')
+    const last = result.state.history.at(-1)!
+    expect(last.kind === 'play' && last.captured.length).toBe(1)
+    expect(getGroup(result.state.board, point)?.liberties).toHaveLength(1)
+    expect(sensibleMoves(state)).toContainEqual(point)
+    expect(chooseMove(state, createRng(7))).toEqual({ kind: 'play', point })
+  })
+  it('玩家停手不触发自动跟停，空盘仍正常落子', () => {
+    const result = pass(createGame())
+    if (!result.ok) throw new Error('pass must be legal')
+    expect(chooseMove(result.state, createRng(7)).kind).toBe('play')
   })
 })

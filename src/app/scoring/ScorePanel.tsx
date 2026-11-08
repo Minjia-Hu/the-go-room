@@ -13,6 +13,7 @@ export function ScorePanel({ view, selected, onSelect, deadCount }: ScorePanelPr
   const stones = (color: 'black' | 'white') => regions.filter((region) => region.color === color).reduce((sum, region) => sum + region.stones, 0)
   return <section className="score" aria-label="数子结果">
     <h3>{resultText(score.winner, score.margin)}</h3>
+    <p className="muted small">结果依据你确认的死子标记计算；电脑接受标记，不自动核验死活。</p>
     <p className="muted small">已移除 {deadCount} 颗死子。得分 = 活子 + 围住的空点，双方都接触的空点不计。</p>
     <dl className="score-totals">
       <div><dt>黑方</dt><dd>{stones('black')} 子 + {score.black - stones('black')} 空 = <strong>{score.black}</strong></dd></div>

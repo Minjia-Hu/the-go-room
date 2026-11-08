@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createGame, pass, play } from '../../engine'
 import type { Point } from '../../engine'
+import { agreeToScore, commitHuman, createPlaySession, takeComputerTurn } from '../play/session'
 import { createMatch } from '../play/match'
 import { MAX_GAMES, moveDescription, prependGame, readGames, replayRecord, saveRecord, STORAGE_KEY, writeGames } from './records'
 import type { GameStorage } from './records'
@@ -76,5 +77,30 @@ describe('本地棋谱存储', () => {
     const storage = { getItem: () => { throw new Error('blocked') }, setItem: () => { throw new Error('full') } }
     expect(readGames(storage)).toEqual([])
     expect(writeGames(storage, [capture()])).toBe(false)
+  })
+})
+
+
+describe('约定结束的棋谱兼容', () => {
+  it('保存并重放两种约定结束，读取后保留来源；旧棋谱不增加字段', () => {
+    const initial = createPlaySession(9)
+    const whitePassed = takeComputerTurn(commitHuman(initial, { x: 4, y: 4 }), () => ({ kind: 'pass' })).session
+    for (const session of [initial, whitePassed]) {
+      const ended = agreeToScore(session)
+      const record = saveRecord(ended.match, 'agreed', '2026-11-08T12:00:00Z')
+      const restored = readGames({ getItem: () => JSON.stringify({ version: 1, games: [record] }), setItem: () => {} })
+      expect(restored).toEqual([record])
+      expect(restored[0].agreedPasses).toBe(ended.match.agreedPasses)
+      expect(replayRecord(restored[0])?.frames.at(-1)).toEqual(ended.match.game)
+    }
+    expect(replayRecord(capture())?.record).toEqual(capture())
+    expect(capture()).not.toHaveProperty('agreedPasses')
+  })
+  it('拒绝无效约定标记，不能把普通落子伪装成约定停手', () => {
+    const record = capture() // 末尾是白停、黑停，只有最后黑停可来自提议。
+    expect(replayRecord({ ...record, agreedPasses: 1 })).not.toBeNull()
+    for (const agreedPasses of [0, 2, 3, '1', null]) {
+      expect(replayRecord({ ...record, agreedPasses })).toBeNull()
+    }
   })
 })

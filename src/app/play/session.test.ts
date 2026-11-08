@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createRng, nextRandom } from '../../ai'
 import { createGame, parseBoard } from '../../engine'
-import { commitHuman, createPlaySession, retryRound, takeComputerTurn } from './session'
+import { agreeToScore, commitHuman, createPlaySession, resumeAfterScoring, retryRound, takeComputerTurn } from './session'
 import { confirmPreview, previewMove } from './preview'
 
 describe('陪练回合', () => {
@@ -53,5 +53,49 @@ describe('陪练回合', () => {
     const failed = takeComputerTurn(pending, (_game, rng) => { rng(); throw new Error('failure') })
     expect(failed.error).toBe(true)
     expect(failed.session.rngState).toBe(5)
+  })
+})
+
+
+describe('约定数子与返回', () => {
+  it('用合法停手结束，保留原局面、随机状态和重试机会；死子标记不会带回', () => {
+    const initial = takeComputerTurn(commitHuman(createPlaySession(42), { x: 4, y: 4 })).session
+    const ended = agreeToScore(initial)
+    expect(ended.match.game.phase).toBe('scoring')
+    expect(ended.match.agreedPasses).toBe(2)
+    expect(ended.match.game.history.slice(-2).map((move) => move.kind)).toEqual(['pass', 'pass'])
+    expect(ended.rngState).toBe(initial.rngState)
+    expect(agreeToScore(ended)).toBe(ended)
+    expect(takeComputerTurn(ended).session).toBe(ended)
+    const marked = { ...ended, match: { ...ended.match, dead: [{ x: 4, y: 4 }] } }
+    const restored = resumeAfterScoring(marked)
+    expect(restored).toEqual(initial)
+    expect(restored.match).toBe(initial.match)
+    expect(restored.match.game.positionKeys).toBe(initial.match.game.positionKeys)
+    expect(restored.undo).toBe(initial.undo)
+    expect(retryRound(restored).match.game.history).toHaveLength(0)
+    expect(agreeToScore(restored)).toEqual(ended)
+  })
+  it('白棋先停过时只补黑棋一手；返回后仍保留白棋原有停手', () => {
+    const initial = takeComputerTurn(commitHuman(createPlaySession(9), { x: 4, y: 4 }), () => ({ kind: 'pass' })).session
+    const ended = agreeToScore(initial)
+    expect(ended.match.agreedPasses).toBe(1)
+    expect(ended.match.game.history).toHaveLength(3)
+    expect(resumeAfterScoring(ended)).toEqual(initial)
+  })
+  it('不能在白棋回合提出数子，未数子时返回不改变状态', () => {
+    const initial = createPlaySession(9)
+    const waiting = commitHuman(initial, { x: 4, y: 4 })
+    expect(agreeToScore(waiting)).toBe(waiting)
+    expect(resumeAfterScoring(initial)).toBe(initial)
+  })
+  it('自然连续停手也可返回；电脑继续落子后旧的返回点不会残留', () => {
+    const initial = createPlaySession(9)
+    const passed = commitHuman(initial, null)
+    const ended = takeComputerTurn(passed, () => ({ kind: 'pass' })).session
+    expect(resumeAfterScoring(ended)).toEqual(initial)
+    const continued = takeComputerTurn(passed, () => ({ kind: 'play', point: { x: 4, y: 4 } })).session
+    expect(continued.scoringReturn).toBeNull()
+    expect(resumeAfterScoring(agreeToScore(continued))).toEqual(continued)
   })
 })

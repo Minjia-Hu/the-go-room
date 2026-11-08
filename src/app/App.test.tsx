@@ -48,6 +48,28 @@ describe('对局到复盘的完整路径', () => {
     fireEvent.click(screen.getByRole('button', { name: '确认数子，进入复盘' }))
   }
 
+  it('未确认试下不进入约定结束棋谱，保存刷新后仍说明约定与死子依据', () => {
+    window.localStorage.setItem(COACHING_KEY, JSON.stringify({ version: 1, enabled: true }))
+    const { unmount } = render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: '交叉点 4,4' }))
+    expect(screen.getByRole('button', { name: '下在这里' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '提出结束并数子' }))
+    expect(screen.queryByRole('button', { name: '下在这里' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '双方同意，开始数子' }))
+    fireEvent.click(screen.getByRole('button', { name: '确认数子，进入复盘' }))
+    const record = readGames(window.localStorage)[0]
+    expect(record.moves).toEqual([{ kind: 'pass' }, { kind: 'pass' }])
+    expect(record.agreedPasses).toBe(2)
+    expect(chooseMove).not.toHaveBeenCalled()
+    unmount(); render(<App />)
+    expect(screen.getByText(/本盘由双方同意数子结束/)).toBeTruthy()
+    expect(screen.getByText(/结果依据你确认的死子标记计算/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '上一步' }))
+    expect(screen.getByText('黑方按约定停一手，双方同意数子。')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '跳到开头' }))
+    expect(screen.getByText('开局：空棋盘，黑先。')).toBeTruthy()
+  })
+
   it('确认数子后自动进入复盘并保存，重新挂载仍可回看', () => {
     const { unmount } = render(<App />)
     finish()

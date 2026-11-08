@@ -88,11 +88,16 @@ export function findAtari(state: GameState): Point | null {
   return best
 }
 
-/** 所有合法且不填自己眼的落点。 */
+/** 随机候选：合法、不填自己眼，且不在未提子时把自己下成一口气。 */
 export function sensibleMoves(state: GameState): Point[] {
-  return emptyPoints(state).filter(
-    (p) => !isOwnEye(state.board, p, state.toPlay) && play(state, p).ok,
-  )
+  return emptyPoints(state).filter((p) => {
+    if (isOwnEye(state.board, p, state.toPlay)) return false
+    const result = play(state, p)
+    if (!result.ok) return false
+    const last = result.state.history.at(-1)!
+    return (last.kind === 'play' && last.captured.length > 0)
+      || getGroup(result.state.board, p)!.liberties.length > 1
+  })
 }
 
 /**

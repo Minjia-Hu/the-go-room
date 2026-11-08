@@ -6,6 +6,7 @@ export const STORAGE_KEY = 'the-go-room.games.v1'
 export const MAX_GAMES = 10
 type StoredMove = { readonly kind: 'play'; readonly point: Point } | { readonly kind: 'pass' }
 export interface SavedGame {
+  readonly agreedPasses?: 1 | 2
   readonly id: string
   readonly endedAt: string
   readonly moves: readonly StoredMove[]
@@ -36,6 +37,7 @@ export function saveRecord(match: Match, id: string, endedAt: string): SavedGame
     id, endedAt,
     moves: match.game.history.map((move) => move.kind === 'pass' ? { kind: 'pass' } : { kind: 'play', point: move.point }),
     dead: [...match.dead],
+    ...(match.agreedPasses ? { agreedPasses: match.agreedPasses } : {}),
   }
 }
 
@@ -68,6 +70,13 @@ export function replayRecord(value: unknown): GameReplay | null {
     moves.push(action)
   }
   if (game.phase !== 'scoring') return null
+  const agreedPasses = value.agreedPasses
+  if (agreedPasses !== undefined && (agreedPasses !== 1 && agreedPasses !== 2)) return null
+  if (agreedPasses !== undefined) {
+    const agreed = game.history.slice(-agreedPasses)
+    if (agreed.length !== agreedPasses || agreed[0]?.color !== 'black'
+      || agreed.some((move) => move.kind !== 'pass')) return null
+  }
   const dead: Point[] = []
   for (const item of value.dead) {
     if (!point(item) || getCell(game.board, item) === null || dead.some((p) => samePoint(p, item))) return null
@@ -76,7 +85,8 @@ export function replayRecord(value: unknown): GameReplay | null {
   for (const p of dead) {
     if (!getGroup(game.board, p)!.stones.every((stone) => dead.some((d) => samePoint(d, stone)))) return null
   }
-  return { record: { id: value.id, endedAt: value.endedAt, moves, dead }, frames }
+  return { record: { id: value.id, endedAt: value.endedAt, moves, dead,
+    ...(agreedPasses ? { agreedPasses } : {}) }, frames }
 }
 
 export function readGames(storage: GameStorage): SavedGame[] {

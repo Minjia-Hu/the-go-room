@@ -35,7 +35,8 @@ function ReplayBoard({ replay }: { readonly replay: GameReplay }) {
     </div>
     <div className="panel">
       <h3>第 {step} / {end} 手</h3>
-      <p className="move-event" role="status">{moveDescription(last)}</p>
+      <p className="move-event" role="status">{record.agreedPasses && step > end - record.agreedPasses
+        ? `${last?.color === 'black' ? '黑方' : '白方'}按约定停一手，双方同意数子。` : moveDescription(last)}</p>
       <div className="replay-controls" aria-label="回放控制">
         <button className="button button--ghost" type="button" disabled={step === 0} onClick={() => setStep(0)}>跳到开头</button>
         <button className="button button--ghost" type="button" disabled={step === 0} onClick={() => setStep(step - 1)}>上一步</button>
@@ -43,7 +44,10 @@ function ReplayBoard({ replay }: { readonly replay: GameReplay }) {
         <button className="button button--ghost" type="button" disabled={atEnd} onClick={() => setStep(end)}>跳到结尾</button>
       </div>
       <label className="replay-slider">回放进度<input type="range" min={0} max={end} value={step} onChange={(event) => setStep(Number(event.target.value))} /></label>
-      {atEnd && <ScorePanel view={view} selected={region} onSelect={setRegion} deadCount={record.dead.length} />}
+      {atEnd && <>
+        {record.agreedPasses && <p className="message message--hint">本盘由双方同意数子结束，电脑按约定接受，没有自动判断死活。</p>}
+        <ScorePanel view={view} selected={region} onSelect={setRegion} deadCount={record.dead.length} />
+      </>}
     </div>
   </div>
 }

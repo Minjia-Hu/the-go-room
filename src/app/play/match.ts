@@ -3,6 +3,8 @@ import type { GameState, Point, RejectReason } from '../../engine'
 import type { AiMove } from '../../ai'
 
 export interface Match {
+  /** 因双方约定而追加的末尾停手数；省略表示自然连续停手。 */
+  readonly agreedPasses?: 1 | 2
   readonly game: GameState
   readonly dead: readonly Point[]
   readonly message: string | null
