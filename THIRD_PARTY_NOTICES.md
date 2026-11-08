@@ -12,12 +12,11 @@
 
 `src/ai/random.ts` 使用 Mulberry32，拆分为可保存状态的单步函数，以支持陪练重试。JavaScript 算法参考 [bryc/code 的 Mulberry32 实现](https://github.com/bryc/code/blob/master/jshash/PRNGs.md#mulberry32)；该来源文件声明为 Public domain，并链接原始算法来源。它用于可复现的对手落子与测试，不用于密码学。
 
-## 教学与视觉参考
+## 教学参考与资源说明
 
-以下记录说明设计参考范围，不表示这些网站的内容由本项目授权，也不表示双方存在合作或背书。
+以下记录说明教学参考范围，不表示参考网站的内容由本项目授权，也不表示双方存在合作或背书。
 
 - [British Go Association — How to Play](https://britgo.org/intro/intro2.html)：气、直线连接与两眼的教学概念参考。项目设计记录说明新棋形与文案自行编写，不复制其题图；该网站的计分说明与本项目中国规则口径不同。
-- [FirstGo 学习页](https://firstgo.app/learn)：参考清晰的信息层级、留白与课程入口。项目设计记录说明布局、中文文案、标识、插图及配色重新设计，没有复制其代码或资产。
 
 棋盘、棋子、标识和页面插图由本仓库的 SVG/CSS 实现；页面使用系统字体，不分发字体文件。`docs/qa/` 和 `demos/` 中的截图记录本项目界面与设计样稿。整盘讲解为教学编排，不标榜为职业棋手棋谱或最佳手示范。
 
