@@ -50,7 +50,15 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
         <details className="lesson-details"><summary>两个慢镜头的学习记录</summary><div className="lesson-list">{LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence').map((unit) => <LearningLink key={unit.id} label={unit.title} mode={completed[unit.id]} current={isNext(unit.id)} onClick={() => onChange(openLearningUnit(session, unit))} />)}</div></details>
       </> },
       { number: '贰', title: '保住自己的棋', summary: '四课八个局面。观察、试下、比较原因。', count: '四课 · 八局', done: tally(['survival']), content:
-        <div className="lesson-list">{SURVIVAL_SCENES.map((scene, index) => <LearningLink key={scene.id} label={scene.guided ? `${scene.course}. ${scene.title}` : `自己试试：${scene.title}`} mode={completed[`survival/${scene.id}`]} current={isNext(`survival/${scene.id}`)} onClick={() => openScene(index)} />)}</div> },
+        <div className="survival-contents">{SURVIVAL_SCENES.filter((scene) => scene.guided).map((lesson) =>
+          <div className="course-pair" role="group" aria-label={`第 ${lesson.course} 课：${lesson.title}`} key={lesson.id}>
+            {SURVIVAL_SCENES.map((scene, index) => scene.course !== lesson.course ? null :
+              <div key={scene.id} className={scene.guided ? 'course-pair__lesson' : 'course-pair__practice'}>
+                <LearningLink label={scene.guided ? `${scene.course}. ${scene.title}` : `自己试试：${scene.title}`} mode={completed[`survival/${scene.id}`]} current={isNext(`survival/${scene.id}`)} onClick={() => openScene(index)}>
+                  {scene.guided ? undefined : <span className="course-pair__practice-label"><span className="course-pair__tag">自己试试</span><span>{scene.title}</span></span>}
+                </LearningLink>
+              </div>)}
+          </div>)}</div> },
       { number: '叁', title: '围地与终局', summary: '判断空点归属，自己数分，再走完终局。', count: '四课', done: tally(['endgame']), content:
         <div className="lesson-list">{ENDGAME_LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={`${index + 1}. ${lesson.title}`} mode={completed[`endgame/${lesson.id}`]} current={isNext(`endgame/${lesson.id}`)} onClick={() => openEndgame(index)} />)}</div> },
       { number: '肆', title: '九路策略入门', summary: '先顾危险，再想围地；比较走法，理解取舍。', count: '三课', done: tally(['strategy']), content:
