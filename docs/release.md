@@ -2,9 +2,10 @@
 
 ## 当前发布状态（2026-11-14）
 
-- 当前已提供互动课程、九路陪练和复盘，持续完善中，欢迎试用和反馈。教学效果仍待更多实际使用反馈，实体手机体验尚未验证。电脑提示只解释局部后果，死子由使用者确认。
-- 已合并版本 `d8dabdd` 的[远程 CI](https://github.com/Minjia-Hu/the-go-room/actions/runs/43584941929)已通过安装、287 个测试、lint 和构建；后续分支的本地检查与该远程结果分开记录。
-- 生存练习重试记录修复分支的本地验收为 296 个测试、lint 和构建通过，见[发布前修复验收](qa/release-readiness/README.md)；该结果不是远程 CI 结果。
+- 当前已提供 29 个课程与练习单元、22 题的专项练习入口、九路陪练和复盘。练习入口包含 10 道课程配套题与 12 道新增专项题，不改变课程顺序和续读位置；生存课程目录按“课程＋配套练习”分组。
+- 上述改动已合并到 `main`，应用版本为 `9cb50db`。Node.js 24.22.3 下本地验收为 45 个测试文件、330 个测试、lint 和构建通过，详见[练习扩充验收](qa/practice-expansion/README.md)、[课程目录分组验收](qa/grouped-course-contents/README.md)。此前重试记录修复的验收见[发布前修复验收](qa/release-readiness/README.md)。
+- 本地验收与远程检查分开记录：此前版本 `d8dabdd` 的[远程 CI](https://github.com/Minjia-Hu/the-go-room/actions/runs/43584941929)通过了安装、287 个测试、lint 和构建。后续推送以 [main 的 CI 运行记录](https://github.com/Minjia-Hu/the-go-room/actions/workflows/ci.yml?query=branch%3Amain)中对应提交的结果为准；公开或部署前确认待发布提交通过。
+- 新增 12 题已在浏览器逐题验证，并检查 1440、1000、375 三种宽度及 375 × 667 试下确认布局。教学效果仍待更多实际使用反馈，实体手机触控与 Safari 工具栏尚未验证；电脑提示只解释局部后果，死子由使用者确认。
 - 公开在线体验链接尚未发布。GitHub Pages 工作流已准备，尚未部署。
 
 ## 独立静态托管
