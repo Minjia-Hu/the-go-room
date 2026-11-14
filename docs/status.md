@@ -10,7 +10,9 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 当前完整路径：5 关规则教学与规则慢镜头 → 4 课、8 个生存练习场景 → 4 课围地与终局教学 → 3 课九路策略入门 → 一盘完整九路讲解与 6 道独立练习 → 9 路新手陪练 → 标记死子与数子 → 带规则事件的复盘。规则引擎在 `src/engine/`，简单电脑对手在 `src/ai/`，教学数据在 `src/content/`，界面、讲解与棋谱存储在 `src/app/`。
 
-导航现为「学 · 练 · 弈 · 复」。「练」页将现有四道生存检验题与六道独立练习按五种能力集中列出，不增加课程总数、不搬题、不改课程顺序。练习与卷目共用题内状态和最好完成记录，但不改变课程页面与最近学习位置；主动打开「相关讲解」时才切回课程并更新位置。已完成的尝试可重做，未完成的尝试继续；推荐与下一题跳过独立完成项，全部独立完成后可任选重做或去对局。刷新 `#/practice` 返回列表并保留完成记录，详见[练习页验收](qa/practice-hub/README.md)。
+导航现为「学 · 练 · 弈 · 复」。「练」页包含 22 道题，按认危险、找出路、提子、连接、两只眼、先后判断六种能力集中列出。原四道生存检验题与六道独立练习保留原位置，另加八道专项局面和四道先后判断；课程仍是 29 个单元，卷目与课程顺序不变。课程配套题与卷目共用题内状态和最好完成记录，新增专项题单独记录，但不改变课程页面与最近学习位置；主动打开「相关讲解」时才切回课程并更新位置。已完成的尝试可重做，未完成的尝试继续；推荐与下一题跳过独立完成项，全部独立完成后可任选重做或去对局。刷新 `#/practice` 返回列表并保留完成记录，详见[练习页验收](qa/practice-hub/README.md)。
+
+新增八道专项局面在认危险、找出路、提子、连接四组各加两题，改变方向、棋块大小或救法。四道先后判断比较救棋与吃子、救棋与追子、提子与延伸、连接与远处落子：先选择试下，再确认，看白棋实际回应，最后解释原因才算完成。比较从同一原图重放，只解释指定局部变化，不声称整盘最佳手或长期死活。专项记录可跨刷新保存，不进入课程计数或续读位置；详见[练习扩充验收](qa/practice-expansion/README.md)。
 
 生存练习覆盖认险、延伸或提子解围、连接与两只眼。例题可对照不同走法，检验题默认不标答案，提示逐级展开；使用演示后明确标记“跟着演示完成”。
 
@@ -38,7 +40,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 最近 10 盘已完成棋谱单独保存在此浏览器中。切换页面保留当前课程题内状态与正式对局，未确认的对局预览会清除；刷新仍不保留进行中的正式对局。棋谱格式错误或存储不可用不影响下棋，保存失败时会提示并保留当前内存中的复盘。
 
-目前 296 个测试。`npm test`、`npm run build`、`npm run lint` 均通过；生存练习重试记录新增 9 项回归测试，原有 287 项保持通过。最新检查见[发布前修复验收](qa/release-readiness/README.md)；练习页验收见[练习页验收](qa/practice-hub/README.md)。此前学习记录一轮检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。项目持续完善中，欢迎试用和反馈；教学效果仍待更多实际使用反馈，实体手机体验尚未验证。
+目前 330 个测试。`npm test`、`npm run build`、`npm run lint` 均通过；本轮新增 34 项测试，已有测试仅因练习目录数量与推荐顺序变化调整对应期望。最新检查见[练习扩充验收](qa/practice-expansion/README.md)；此前发布前检查见[发布前修复验收](qa/release-readiness/README.md)；练习页验收见[练习页验收](qa/practice-hub/README.md)。此前学习记录一轮检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。项目持续完善中，欢迎试用和反馈；教学效果仍待更多实际使用反馈，实体手机体验尚未验证。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)。
 
