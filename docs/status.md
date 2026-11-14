@@ -10,6 +10,8 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 当前完整路径：5 关规则教学与规则慢镜头 → 4 课、8 个生存练习场景 → 4 课围地与终局教学 → 3 课九路策略入门 → 一盘完整九路讲解与 6 道独立练习 → 9 路新手陪练 → 标记死子与数子 → 带规则事件的复盘。规则引擎在 `src/engine/`，简单电脑对手在 `src/ai/`，教学数据在 `src/content/`，界面、讲解与棋谱存储在 `src/app/`。
 
+导航现为「学 · 练 · 弈 · 复」。「练」页将现有四道生存检验题与六道独立练习按五种能力集中列出，不增加课程总数、不搬题、不改课程顺序。练习与卷目共用题内状态和最好完成记录，但不改变课程页面与最近学习位置；主动打开「相关讲解」时才切回课程并更新位置。已完成的尝试可重做，未完成的尝试继续；推荐与下一题跳过独立完成项，全部独立完成后可任选重做或去对局。刷新 `#/practice` 返回列表并保留完成记录，详见[练习页验收](qa/practice-hub/README.md)。
+
 生存练习覆盖认险、延伸或提子解围、连接与两只眼。例题可对照不同走法，检验题默认不标答案，提示逐级展开；使用演示后明确标记“跟着演示完成”。
 
 规则慢镜头用一眼、两眼两个例子拆解“暂放白子 → 先提对方 → 检查自己”，中间画面明确标注尚未判定合法。禁入点和两眼课提供直达入口。围地与终局四课依次练习空区归属、活子加空点、白方加 7.5、双方连续停手与死子确认；错误回答会解释原因，数子提示会标记辅助完成。教学计分由实际规则引擎计算，预设局面不保存为正式棋谱。
@@ -34,7 +36,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 最近 10 盘已完成棋谱单独保存在此浏览器中。切换页面保留当前课程题内状态与正式对局，未确认的对局预览会清除；刷新仍不保留进行中的正式对局。棋谱格式错误或存储不可用不影响下棋，保存失败时会提示并保留当前内存中的复盘。
 
-目前 263 个测试。`npm test`、`npm run build`、`npm run lint` 均通过。本次检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。项目持续完善中，欢迎试用和反馈；教学效果仍待更多实际使用反馈，实体手机体验尚未验证。
+目前 286 个测试。`npm test`、`npm run build`、`npm run lint` 均通过；练习页新增 13 项，原有 273 项未修改。最新浏览器检查见[练习页验收](qa/practice-hub/README.md)。此前学习记录一轮检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。项目持续完善中，欢迎试用和反馈；教学效果仍待更多实际使用反馈，实体手机体验尚未验证。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)。
 
@@ -57,6 +59,8 @@ GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room
 学习记录保存见[实施记录](superpowers/plans/2026-11-08-learning-progress-plan.md)。
 
 手机棋盘布局见[实施记录](superpowers/plans/2026-11-08-mobile-board-flow-plan.md)。
+
+独立练习入口见[实施计划](superpowers/plans/2026-11-14-practice-hub-plan.md)；实施调整记录在[验收文档](qa/practice-hub/README.md)。
 
 完整背景与待决定事项见 [项目愿景](vision.md)。
 
