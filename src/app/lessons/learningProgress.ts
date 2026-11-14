@@ -43,7 +43,7 @@ export function currentLearningUnit(session: LearningSession): LearningUnit | un
 const RANK: Record<Completion, number> = { demo: 0, hint: 1, guided: 2, retry: 2, independent: 3 }
 
 /** 只记录已达到课程完成条件的结果；跳过与重做都不会抹去以前的最好记录。 */
-export function recordLearningProgress(progress: LearningProgress, session: LearningSession): LearningProgress {
+export function recordLearningProgress(progress: LearningProgress, session: LearningSession, options: { readonly visit?: boolean } = {}): LearningProgress {
   let completed = progress.completed
   function record(id: string, mode: Completion) {
     if (completed[id] === undefined || RANK[mode] > RANK[completed[id]]) completed = { ...completed, [id]: mode }
@@ -60,7 +60,7 @@ export function recordLearningProgress(progress: LearningProgress, session: Lear
   session.independentRuns.forEach((run) => {
     if (run.stage === 'done') record(`independent/${run.scene.id}`, run.help > 0 ? 'hint' : run.mistakes > 0 ? 'retry' : 'independent')
   })
-  const lastVisited = currentLearningUnit(session)?.id ?? progress.lastVisited
+  const lastVisited = options.visit === false ? progress.lastVisited : currentLearningUnit(session)?.id ?? progress.lastVisited
   return completed === progress.completed && lastVisited === progress.lastVisited ? progress : { version: 1, completed, lastVisited }
 }
 
