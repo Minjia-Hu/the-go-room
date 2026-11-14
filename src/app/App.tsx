@@ -82,7 +82,7 @@ export function App() {
 
   return (
     <>
-      <header className="topbar practice-navigation">
+      <header className="topbar topbar--four-items">
         <a className="brand" href="#/lessons" aria-label="The Go Room 首页" onClick={(event) => {
           if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
           event.preventDefault()

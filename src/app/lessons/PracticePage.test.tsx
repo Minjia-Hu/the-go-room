@@ -35,6 +35,17 @@ describe('practice hub', () => {
     expect(screen.getByRole('button', { name: '练习' }).title).toBe('练习')
     expect(screen.getAllByRole('listitem')).toHaveLength(10)
   })
+  it('uses per-kind numbering consistently in the list and exercise, with short explanation titles', () => {
+    render(<App />)
+    for (const title of ['延伸 · 第 2 题', '提子 · 第 1 题', '提子 · 第 2 题', '连接 · 第 2 题']) {
+      click(title)
+      expect(screen.getByRole('heading', { name: title })).toBeTruthy()
+      expect(screen.queryByText(/共六题/)).toBeNull()
+      click('返回练习')
+    }
+    const entry = screen.getByRole('button', { name: '提子 · 第 1 题' }).closest('li')!
+    expect(within(entry).getByRole('button', { name: '相关讲解：给自己的棋找出路' })).toBeTruthy()
+  })
   it('records independent completion in the shared catalog without moving restored course position', () => {
     window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), completed: { 'rules/place': 'guided' }, lastVisited: 'rules/place' }))
     render(<App />)
@@ -99,7 +110,7 @@ describe('practice hub', () => {
   })
   it('opens the verified explanation in lessons and intentionally updates its position', () => {
     render(<App />)
-    const capture = screen.getByRole('button', { name: '提子 · 第 2 题' }).closest('li')!
+    const capture = screen.getByRole('button', { name: '提子 · 第 1 题' }).closest('li')!
     fireEvent.click(within(capture).getByRole('button', { name: /相关讲解/ }))
     expect(window.location.hash).toBe('#/lessons')
     expect(screen.getByRole('button', { name: '教学' }).getAttribute('aria-current')).toBe('page')

@@ -13,6 +13,7 @@ export interface PracticeItem {
   readonly source: 'survival' | 'independent'
   readonly index: number
   readonly title: string
+  readonly relatedTitle: string
   readonly related: LearningUnit
 }
 function related(id: string): LearningUnit {
@@ -23,19 +24,19 @@ function related(id: string): LearningUnit {
 const survivalGroups = { danger: '认危险', escape: '找出路', connect: '连接', eyes: '两只眼' } as const
 const independentGroups = { extend: '找出路', capture: '提子', connect: '连接' } as const
 const independentTitles = { extend: '延伸', capture: '提子', connect: '连接' } as const
-const items: PracticeItem[] = [
+const items: Omit<PracticeItem, 'relatedTitle'>[] = [
   ...SURVIVAL_SCENES.flatMap((scene, index) => scene.guided ? [] : [{
     id: `survival/${scene.id}`, group: survivalGroups[scene.kind], source: 'survival' as const,
     index, title: scene.title, related: related(scene.kind),
   }]),
   ...INDEPENDENT_SCENES.map((scene, index) => ({
     id: `independent/${scene.id}`, group: independentGroups[scene.kind], source: 'independent' as const,
-    index, title: `${independentTitles[scene.kind]} · 第 ${index + 1} 题`,
+    index, title: `${independentTitles[scene.kind]} · 第 ${INDEPENDENT_SCENES.slice(0, index + 1).filter((other) => other.kind === scene.kind).length} 题`,
     // 这两题练的是提子救棋；找出路一课实际比较了延伸与提子两种救法。
     related: related(scene.kind === 'connect' ? 'connect' : 'escape'),
   })),
 ]
-export const PRACTICE_ITEMS: readonly PracticeItem[] = PRACTICE_GROUPS.flatMap((group) => items.filter((item) => item.group === group))
+export const PRACTICE_ITEMS: readonly PracticeItem[] = PRACTICE_GROUPS.flatMap((group) => items.filter((item) => item.group === group).map((item) => ({ ...item, relatedTitle: SURVIVAL_SCENES[item.related.index].title })))
 
 /** 从当前题之后循环寻找；用过帮助的题仍值得再练。 */
 export function nextPracticeItem(progress: LearningProgress, afterId?: string): PracticeItem | undefined {

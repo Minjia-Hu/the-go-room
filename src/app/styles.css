@@ -409,7 +409,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .practice-list { list-style: none; margin: 0; padding: 0; }
 .practice-item { padding-bottom: 16px; }
 .practice-item--independent .lesson-link__dot { background: var(--text); box-shadow: none; }
-.practice-status { margin: 6px 0 0 24px; color: var(--text-muted); font: max(12px, .72rem)/1.6 var(--sans); }
+.practice-status { margin: 6px 0 0 24px; color: var(--text-muted); font: max(12px, .72rem)/1.6 var(--serif); }
 .practice-item--independent .practice-status { color: var(--text); }
 .practice-related { margin-left: 24px; max-width: calc(100% - 24px); text-align: left; font-size: max(12px, .75rem); }
 .practice-toolbar { justify-content: space-between; }
@@ -420,9 +420,9 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 }
 /* 四字导航仍保留 44px 点按区域，为窄屏腾出品牌文字的空间。 */
 @media (max-width: 600px) {
-  #root .practice-navigation { gap: 6px; }
-  #root .practice-navigation .brand { gap: 6px; }
-  #root .practice-navigation .ink-mark { width: 26px; height: 26px; }
-  #root .practice-navigation .topbar__title { font-size: .95rem; }
-  #root .practice-navigation .topbar__nav { gap: 0; }
+  #root .topbar--four-items { gap: 6px; }
+  #root .topbar--four-items .brand { gap: 6px; }
+  #root .topbar--four-items .ink-mark { width: 26px; height: 26px; }
+  #root .topbar--four-items .topbar__title { font-size: .95rem; }
+  #root .topbar--four-items .topbar__nav { gap: 0; }
 }

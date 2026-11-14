@@ -35,7 +35,7 @@ export function PracticePage({ session, onChange, onLesson, onPlay, storageMessa
       {active.source === 'survival'
         ? <SurvivalPage run={session.runs[active.index]} isLast={false} nextLabel={nextLabel} onNext={onNext}
             onChange={(run) => onChange({ ...session, runs: session.runs.map((old, index) => index === active.index ? run : old) })} />
-        : <IndependentPage run={session.independentRuns[active.index]} index={active.index} allDone={false} nextLabel={nextLabel} onNext={onNext}
+        : <IndependentPage run={session.independentRuns[active.index]} index={active.index} practiceTitle={active.title} allDone={false} nextLabel={nextLabel} onNext={onNext}
             onChange={(run) => onChange({ ...session, independentRuns: session.independentRuns.map((old, index) => index === active.index ? run : old) })} />}
       {mode && <p className="completion-note learning-recorded" aria-label="已记录的学习结果">已有记录：{COMPLETION_LABELS[mode]}。可以再练一次；保留最好的一次记录。</p>}
     </>
@@ -60,7 +60,7 @@ export function PracticePage({ session, onChange, onLesson, onPlay, storageMessa
         return <li className={`practice-item${mode === 'independent' ? ' practice-item--independent' : ''}`} key={item.id}>
           <button className="lesson-link" onClick={() => open(item)}><span className="lesson-link__dot" aria-hidden="true" />{item.title}<span className="lesson-link__go" aria-hidden="true">↗</span></button>
           <p className="practice-status">{mode ? COMPLETION_LABELS[mode] : '还没完成'}</p>
-          <button className="text-button practice-related" onClick={() => onLesson(item.related)}>相关讲解：{item.related.title}</button>
+          <button className="text-button practice-related" onClick={() => onLesson(item.related)}>相关讲解：{item.relatedTitle}</button>
         </li>
       })}</ul>
     </section>)}</div>
