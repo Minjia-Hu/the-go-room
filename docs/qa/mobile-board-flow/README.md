@@ -22,7 +22,7 @@
 
 量测：[feedback-measurements.json](feedback-measurements.json)。截图：[气的错误反馈](feedback-rules.png)、[生存课错误反馈](feedback-survival.png)、[围地](feedback-endgame.png)、[策略](feedback-strategy.png)、[独立练习](feedback-independent.png)、[慢镜头](feedback-sequence.png)、[整盘讲解](feedback-walkthrough.png)、[手机字号与确认](readable-play-mobile.png)、[桌面展开分析](expanded-play-desktop.png)。
 
-以下为首轮提交 `7e97dfe` 的验收记录，保留用于对照；当前反馈位置与字号以上表为准。
+以下为首轮提交 `cb84d3c` 的验收记录，保留用于对照；当前反馈位置与字号以上表为准。
 
 ## 375 × 667 默认字号
 
