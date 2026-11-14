@@ -10,7 +10,7 @@
 
 ## 前置条件
 
-- 在分支 `design/ink-and-stone` 的基础上开发（工作目录 `the-go-room-ink`）。先确认「墨与印」改版已经提交；没提交就先停下来问项目负责人，不要自己替它提交。
+- 在分支 `design/ink-and-stone` 的基础上开发（在对应的 Git worktree 中工作）。先确认「墨与印」改版已经提交；没提交就先停下来问项目负责人，不要自己替它提交。
 - 新开分支 `feature/practice-hub`。
 - 阅读 `CONTRIBUTING.md` 的代码约定：跨层只从 `src/engine/index.ts` 导入；类型导入用 `import type`；`.tsx` 只导出组件；需要 DOM 的测试第一行写 `// @vitest-environment jsdom`。
 - 提交说明用英文，不加 `Co-Authored-By` 之类的尾注；提交邮箱用 `264439153+Minjia-Hu@users.noreply.github.com`。
