@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 
-export type Page = 'lessons' | 'play' | 'replay'
+export type Page = 'lessons' | 'practice' | 'play' | 'replay'
 
-const PAGES: readonly Page[] = ['lessons', 'play', 'replay']
+const PAGES: readonly Page[] = ['lessons', 'practice', 'play', 'replay']
 
 /** 把地址栏的 hash(如 "#/play")转成页面名,认不出来时回到教学页。 */
 export function pageFromHash(hash: string): Page {

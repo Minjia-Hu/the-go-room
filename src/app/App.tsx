@@ -1,7 +1,8 @@
 import { useLayoutEffect, useState } from 'react'
 import { InkMark } from './InkMark'
+import { PracticePage } from './lessons/PracticePage'
 import { LearningPage } from './lessons/LearningPage'
-import { createLearningSession, restoreLearningSession } from './lessons/learningSession'
+import { createLearningSession, openLearningUnit, restoreLearningSession } from './lessons/learningSession'
 import type { LearningSession } from './lessons/learningSession'
 import { emptyLearningProgress, readLearningProgress, recordLearningProgress, writeLearningProgress } from './lessons/learningProgress'
 import type { LearningProgress } from './lessons/learningProgress'
@@ -18,6 +19,7 @@ import type { Page } from './router'
 // 导航用单字，完整名称作为无障碍名称和悬停提示。
 const NAV: readonly { page: Page; label: string; glyph: string }[] = [
   { page: 'lessons', label: '教学', glyph: '学' },
+  { page: 'practice', label: '练习', glyph: '练' },
   { page: 'play', label: '对局', glyph: '弈' },
   { page: 'replay', label: '复盘', glyph: '复' },
 ]
@@ -47,8 +49,8 @@ export function App() {
     setLearningMessage(saved ? null : '学习记录未能保存到此浏览器。本次操作仍有效，刷新后可能丢失新进度或恢复旧记录。')
   }
 
-  function changeLearning(next: LearningSession) {
-    const progress = recordLearningProgress(learning.progress, next)
+  function changeLearning(next: LearningSession, visit = true) {
+    const progress = recordLearningProgress(learning.progress, next, { visit })
     if (progress !== learning.progress) saveLearning(progress)
     setLearning({ ...next, progress })
   }
@@ -80,7 +82,7 @@ export function App() {
 
   return (
     <>
-      <header className="topbar">
+      <header className="topbar practice-navigation">
         <a className="brand" href="#/lessons" aria-label="The Go Room 首页" onClick={(event) => {
           if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
           event.preventDefault()
@@ -110,6 +112,9 @@ export function App() {
       <main>
         {page === 'lessons' && <LearningPage session={learning} onChange={changeLearning} onPlay={() => navigate('play')}
           storageMessage={learningMessage} onClear={clearLearning} />}
+        {page === 'practice' && <PracticePage session={learning} onChange={(next) => changeLearning(next, false)}
+          onLesson={(unit) => { changeLearning(openLearningUnit(learning, unit)); navigate('lessons') }}
+          onPlay={() => navigate('play')} storageMessage={learningMessage} />}
         {page === 'play' && <PlayPage session={session} onChange={setSession} onFinish={finish} coaching={coaching} onCoachingChange={changeCoaching} preferenceMessage={preferenceMessage} />}
         {page === 'replay' && <ReplayPage games={games} selectedId={selectedId} onSelect={setSelectedId} onPlay={() => navigate('play')} storageMessage={storageMessage} />}
       </main>

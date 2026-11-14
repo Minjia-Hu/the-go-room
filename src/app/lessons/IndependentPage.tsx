@@ -4,8 +4,8 @@ import { BoardLayout } from '../board/BoardLayout'
 import { answerIndependent, confirmIndependent, independentHint, independentPoint, independentReasons, independentView, startIndependent } from './independentRunner'
 import type { IndependentRun } from './independentRunner'
 
-interface Props { readonly run: IndependentRun; readonly index: number; readonly onChange: (run: IndependentRun) => void; readonly onNext: () => void; readonly allDone: boolean }
-export function IndependentPage({ run, index, onChange, onNext, allDone }: Props) {
+interface Props { readonly nextLabel?: string; readonly run: IndependentRun; readonly index: number; readonly onChange: (run: IndependentRun) => void; readonly onNext: () => void; readonly allDone: boolean }
+export function IndependentPage({ run, index, onChange, onNext, allDone, nextLabel }: Props) {
   const view = independentView(run)
   const goal = run.scene.kind === 'capture' ? '试着用提子帮助目标黑棋，让它至少有两口气。' : run.scene.kind === 'connect' ? '把目标黑棋直线连接到旁边另一块黑棋，让整块至少有两口气。' : '选一手让目标黑块至少有两口气，先处理眼前危险。'
   return <BoardLayout
@@ -28,7 +28,7 @@ export function IndependentPage({ run, index, onChange, onNext, allDone }: Props
       {run.stage === 'reason' && <div className="reason-choices">{independentReasons(run).map((reason, reasonIndex) => <button key={reason} className="button button--ghost" onClick={() => onChange(answerIndependent(run, reasonIndex))}>{reason}</button>)}</div>}
       {(run.stage === 'find' || run.stage === 'move') && run.help < 2 && <button className="text-button hint-button" onClick={() => onChange(independentHint(run))}>{run.help === 0 ? '给我一点思路' : '标出需要观察的棋块'}</button>}
       <p className="small strategy-progress">本次提示：{run.help} 次 · 需要重试的判断：{run.mistakes} 次。练习会保留这些记录，帮助区分自己判断和借助提示。</p>
-      {run.stage === 'done' && <div className="study-question"><p>{run.help > 0 ? '这次用过提示。下次可以换题，先自己找，再决定是否需要帮助。' : '这次完成了找危险、试下和解释。换一个方向或棋形，再看看能否自己判断。'}</p><button className="button" onClick={onNext}>{allDone ? '去陪练试试' : index === 5 ? '回到未完成的题' : '下一道独立练习'}</button></div>}
+      {run.stage === 'done' && <div className="study-question"><p>{run.help > 0 ? '这次用过提示。下次可以换题，先自己找，再决定是否需要帮助。' : '这次完成了找危险、试下和解释。换一个方向或棋形，再看看能否自己判断。'}</p><button className="button" onClick={onNext}>{nextLabel ?? (allDone ? '去陪练试试' : index === 5 ? '回到未完成的题' : '下一道独立练习')}</button></div>}
       <div className="restart"><button className="text-button" onClick={() => onChange(startIndependent(run.scene))}>重做这一题</button></div>
     </BoardLayout>
 }
