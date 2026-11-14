@@ -32,11 +32,13 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 学习记录覆盖 29 个课程与练习单元：五关规则、两个规则慢镜头、八个生存场景、四课终局、三课策略、一盘讲解与六道独立练习。首页显示完成情况，并提供“继续学习”。引导课程记为“跟着引导完成”，练习分别记录独立完成、重试后完成、借助提示或跟着演示完成；每题保留最好的一次记录，重做不抹掉旧记录，跳过不算完成。
 
+四道生存检验题与六道独立练习使用一致的完成等级：答错后完成记为重试，合法试下比较不算错误，确认未达目标的走法才算重试；非法落点也计入重试。使用提示或演示时优先记录对应辅助方式。旧记录没有错误次数，无法追溯重分类，因此保留原来的最好记录。
+
 学习完成记录和最近学习位置保存在此浏览器的 localStorage 中。刷新后恢复待继续的题目：当前题未完成就从该题开头重做，已完成则寻找下一道未完成题；不保存中途棋盘、试下或尚未完成的答题步骤。首页可确认清除学习记录，不影响棋谱、当前对局和陪练设置。损坏或不兼容的记录会提示并降级，保存失败时本次仍可学习，但刷新可能丢失新进度或恢复旧记录。
 
 最近 10 盘已完成棋谱单独保存在此浏览器中。切换页面保留当前课程题内状态与正式对局，未确认的对局预览会清除；刷新仍不保留进行中的正式对局。棋谱格式错误或存储不可用不影响下棋，保存失败时会提示并保留当前内存中的复盘。
 
-目前 287 个测试。`npm test`、`npm run build`、`npm run lint` 均通过；练习页新增 14 项，原有 273 项未修改。最新浏览器检查见[练习页验收](qa/practice-hub/README.md)。此前学习记录一轮检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。项目持续完善中，欢迎试用和反馈；教学效果仍待更多实际使用反馈，实体手机体验尚未验证。
+目前 296 个测试。`npm test`、`npm run build`、`npm run lint` 均通过；生存练习重试记录新增 9 项回归测试，原有 287 项保持通过。最新检查见[发布前修复验收](qa/release-readiness/README.md)；练习页验收见[练习页验收](qa/practice-hub/README.md)。此前学习记录一轮检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。项目持续完善中，欢迎试用和反馈；教学效果仍待更多实际使用反馈，实体手机体验尚未验证。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)。
 

@@ -136,3 +136,25 @@ describe('practice hub', () => {
     expect(screen.getByText('1 / 10')).toBeTruthy()
   })
 })
+
+
+it('生存题答错后保留重试记录和推荐资格，独立重做才升级，课程位置保持不变', () => {
+  window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), lastVisited: 'rules/ko',
+    // 其他题已独立完成，只留认危险题检验推荐行为。
+    completed: Object.fromEntries(Object.entries(allIndependent).filter(([id]) => id !== 'survival/danger-check')),
+  }))
+  render(<App />)
+  click('来一道还没独立完成的题'); point(8, 8)
+  click('返回练习'); click('换到边上，自己找一找')
+  point(0, 3); point(0, 5)
+  expect(stored().completed['survival/danger-check']).toBe('retry')
+  expect(stored().lastVisited).toBe('rules/ko')
+  click('返回练习')
+  expect(screen.getByText('重试后完成')).toBeTruthy()
+  click('来一道还没独立完成的题'); point(0, 3); point(0, 5)
+  expect(stored().completed['survival/danger-check']).toBe('independent')
+  expect(stored().lastVisited).toBe('rules/ko')
+  click('返回练习列表')
+  expect(screen.getByText('10 / 10')).toBeTruthy()
+  expect(screen.queryByRole('button', { name: '来一道还没独立完成的题' })).toBeNull()
+})

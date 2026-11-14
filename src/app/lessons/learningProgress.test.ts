@@ -8,7 +8,7 @@ import { WALK_MOVES, WALK_QUESTIONS } from '../../content/walkthrough'
 import { createLearningSession, openLearningUnit, restoreLearningSession } from './learningSession'
 import { continueLearningUnit, emptyLearningProgress, LEARNING_KEY, LEARNING_UNITS, parseLearningProgress, readLearningProgress, recordLearningProgress, writeLearningProgress } from './learningProgress'
 import { clickPoint, startLesson } from './lessonRunner'
-import { choosePracticePoint, confirmPractice, practiceHint, startSurvival } from './survivalRunner'
+import { choosePracticePoint, chooseReason, confirmPractice, practiceHint, startSurvival } from './survivalRunner'
 import { answerIndependent, confirmIndependent, independentHint, independentPoint, startIndependent } from './independentRunner'
 import type { IndependentRun } from './independentRunner'
 import { countHint, startEndgame, submitCount } from './endgameRunner'
@@ -127,5 +127,33 @@ describe('学习记录存储', () => {
     expect(readLearningProgress(blocked).message).toContain('无法读取')
     expect(writeLearningProgress(blocked, progress)).toBe(false)
     expect(readLearningProgress({ ...storage, getItem: () => '{bad' }).message).toContain('已损坏')
+  })
+})
+
+
+describe('生存检验题的完成等级', () => {
+  it.each(SURVIVAL_SCENES.filter((scene) => !scene.guided))('$id 错后完成记重试，提示优先，独立重做可升级', (scene) => {
+    const base = createLearningSession()
+    const initial = startSurvival(scene)
+    const solve = (run: typeof initial) => {
+      if (scene.kind === 'danger') return choosePracticePoint(choosePracticePoint(run, scene.target), scene.examples[0])
+      if (scene.kind === 'eyes') {
+        for (const point of scene.eyes!) run = choosePracticePoint(run, point)
+        return chooseReason(run, true)
+      }
+      return confirmPractice(choosePracticePoint(run, scene.examples[0]))
+    }
+    const failed = scene.kind === 'escape' || scene.kind === 'connect'
+      ? confirmPractice(choosePracticePoint(initial, scene.wrongMove!))
+      : choosePracticePoint(initial, { x: 8, y: 8 })
+    const id = `survival/${scene.id}`
+    const record = (run: typeof initial) => recordLearningProgress(base.progress, { ...base, runs: [solve(run)] })
+    const retry = record(failed)
+    expect(retry.completed[id]).toBe('retry')
+    expect(record(practiceHint(failed)).completed[id]).toBe('hint')
+    expect(record(practiceHint(practiceHint(practiceHint(failed)))).completed[id]).toBe('demo')
+    const independent = recordLearningProgress(retry, { ...base, runs: [solve(initial)] })
+    expect(independent.completed[id]).toBe('independent')
+    expect(recordLearningProgress(independent, { ...base, runs: [solve(failed)] })).toBe(independent)
   })
 })

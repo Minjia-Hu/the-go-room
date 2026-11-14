@@ -52,7 +52,7 @@ export function recordLearningProgress(progress: LearningProgress, session: Lear
   session.sequence.solved.forEach((index) => record(`rule-sequence/${RULE_SEQUENCE_SCENES[index].id}`, 'guided'))
   session.runs.forEach((run) => {
     if (run.stage === 'done') record(`survival/${run.scene.id}`, run.assisted ? 'demo'
-      : run.hint > (run.scene.guided ? 1 : 0) ? 'hint' : run.scene.guided ? 'guided' : 'independent')
+      : run.hint > (run.scene.guided ? 1 : 0) ? 'hint' : run.scene.guided ? 'guided' : run.mistakes > 0 ? 'retry' : 'independent')
   })
   session.endgameRuns.forEach((run) => { if (run.done) record(`endgame/${run.lesson.id}`, run.assisted ? 'hint' : 'guided') })
   session.strategyRuns.forEach((run) => { if (run.done) record(`strategy/${run.lesson.id}`, 'guided') })
