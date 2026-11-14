@@ -38,7 +38,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)。
 
-界面采用已选定的 B「棋谱编辑部」方案：纸色、墨色、宋体标题、细线目录和棋盘图注。首页展开完整课程，提供第一课和生存练习入口；桌面并排展示棋盘与讲解，手机改为上下布局。棋盘与棋子采用 SVG，不依赖外部图片或字体服务。页面截图与检查记录见[B 方案验收](qa/editorial-design/README.md)，三套独立样稿保留在 [demos/visual-directions](../demos/visual-directions/README.md)。
+界面采用「墨与印」方案：宣纸底、墨色楷体、朱砂标记，Logo 为「一子一气」。首页的棋盘可以直接下，结果就地解释；六章课程做成可展开的竖排卷轴。桌面并排展示棋盘与讲解，手机改为上下布局。棋盘与棋子采用 SVG，不依赖外部图片或字体服务。页面截图与检查记录见[墨与印验收](qa/ink-and-stone/README.md)；此前的 B「棋谱编辑部」记录见[B 方案验收](qa/editorial-design/README.md)，当时的三套样稿保留在 [demos/visual-directions](../demos/visual-directions/README.md)。
 
 ## 产品方向
 

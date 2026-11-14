@@ -6,7 +6,7 @@
 
 课程、简单电脑对手和复盘都在浏览器本地运行，不需要 API 密钥或付费围棋服务。
 
-![九路陪练：棋盘与一步棋的解释](docs/qa/mobile-board-flow/expanded-play-desktop.png)
+![首页：一子一气，棋盘可以直接下](docs/qa/ink-and-stone/home-try-a.png)
 
 ## 可以做什么
 

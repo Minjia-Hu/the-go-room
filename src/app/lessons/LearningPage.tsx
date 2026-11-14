@@ -3,12 +3,15 @@ import { LESSONS } from '../../content/lessons'
 import { SURVIVAL_SCENES } from '../../content/survival'
 import type { LearningSession } from './learningSession'
 import { openLearningUnit } from './learningSession'
-import { COMPLETION_LABELS, currentLearningUnit, LEARNING_UNITS } from './learningProgress'
+import { COMPLETION_LABELS, continueLearningUnit, currentLearningUnit, LEARNING_UNITS } from './learningProgress'
+import type { LearningUnit } from './learningProgress'
 import { LearningLink, LearningProgressPanel } from './LearningProgressPanel'
 import { startLesson } from './lessonRunner'
 import { LessonPage } from './LessonPage'
 import { SurvivalPage } from './SurvivalPage'
-import { RoomIllustration } from './RoomIllustration'
+import { HeroExercise } from './HeroExercise'
+import { ScrollContents } from './ScrollContents'
+import type { ScrollChapter } from './ScrollContents'
 import { ENDGAME_LESSONS } from '../../content/endgame'
 import { EndgamePage } from './EndgamePage'
 import { RuleSequencePage } from './RuleSequencePage'
@@ -31,56 +34,49 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
   const openIndependent = (independentIndex: number) => onChange({ ...session, page: 'independent', independentIndex })
   const independentDone = (index: number) => session.independentRuns[index].stage === 'done' || !!completed[`independent/${session.independentRuns[index].scene.id}`]
   const allIndependentDone = session.independentRuns.every((_, index) => independentDone(index))
-  if (session.page === 'home') return <>
-    {storageMessage && <p className="message message--hint" role="alert">{storageMessage}</p>}
-    <section className="learning-home">
-    <div className="edition-line"><span>入门手记 · 第一册</span><span lang="en">OBSERVE / TRY / UNDERSTAND</span><span>从一口气开始</span></div>
-    <div className="learning-hero">
-      <div className="learning-hero__copy">
-        <p className="eyebrow">写给第一次拿起棋子的你</p>
-        <h2>黑白之间，<br />慢慢<span>看懂。</span></h2>
-        <div className="hero-intro"><span className="vertical-note" aria-hidden="true">学棋，不必着急</span><p>一颗棋为什么会被吃？<br />哪一步可以救回它？<br />从一个小局面，读懂棋盘上的因果。</p></div>
-        <button className="button hero-button" onClick={() => onChange({ ...session, page: 'rules', rules: { index: 0, run: startLesson(LESSONS[0]) } })}>从第一课开始<span aria-hidden="true">↗</span></button>
-        <button className="text-button hero-practice" onClick={() => openScene(0)}>先试一道生存练习</button>
-      </div>
-      <RoomIllustration />
-    </div>
-    <LearningProgressPanel progress={session.progress} onContinue={(unit) => onChange(openLearningUnit(session, unit))} onClear={onClear} />
-    <div className="learning-contents">
-      <div className="contents-heading"><span className="eyebrow" lang="en">CONTENTS</span><h3>循序入门</h3><p>每一章，<br />解决一个小困惑。</p><span className="book-seal" aria-hidden="true">弈</span></div>
-      <div className="chapter-list">
-        <article className="chapter">
-          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">壹</span><div><h3>认识规则</h3><p>落子、气、提子、禁入点和劫。</p></div><span className="chapter-count">五关</span></header>
-          <div className="lesson-list">{LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={lesson.title} mode={completed[`rules/${lesson.id}`]} onClick={() => onChange({ ...session, page: 'rules', rules: session.rules.index === index ? session.rules : { index, run: startLesson(lesson) } })} />)}</div>
-          <button className="text-button chapter-supplement" onClick={openSequence}>规则慢镜头：落子后先提谁？</button>
-          <details className="lesson-details"><summary>两个慢镜头的学习记录</summary><div className="lesson-list">{LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence').map((unit) => <LearningLink key={unit.id} label={unit.title} mode={completed[unit.id]} onClick={() => onChange(openLearningUnit(session, unit))} />)}</div></details>
-        </article>
-        <article className="chapter">
-          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">贰</span><div><h3>保住自己的棋</h3><p>四课八个局面。观察、试下、比较原因。</p></div><span className="chapter-count">四课</span></header>
-          <div className="lesson-list">{SURVIVAL_SCENES.map((scene, index) => <LearningLink key={scene.id} label={scene.guided ? `${scene.course}. ${scene.title}` : `自己试试：${scene.title}`} mode={completed[`survival/${scene.id}`]} onClick={() => openScene(index)} />)}</div>
-        </article>
-        <article className="chapter">
-          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">叁</span><div><h3>围地与终局</h3><p>判断空点归属，自己数分，再走完终局。</p></div><span className="chapter-count">四课</span></header>
-          <div className="lesson-list">{ENDGAME_LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={`${index + 1}. ${lesson.title}`} mode={completed[`endgame/${lesson.id}`]} onClick={() => openEndgame(index)} />)}</div>
-        </article>
-        <article className="chapter">
-          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">肆</span><div><h3>九路策略入门</h3><p>先顾危险，再想围地；比较走法，理解取舍。</p></div><span className="chapter-count">三课</span></header>
-          <div className="lesson-list">{STRATEGY_LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={`${index + 1}. ${lesson.title}`} mode={completed[`strategy/${lesson.id}`]} onClick={() => openStrategy(index)} />)}</div>
-        </article>
-        <article className="chapter">
-          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">伍</span><div><h3>从看懂到自己下</h3><p>走完一盘九路，再换没有标记的棋形自己判断。</p></div><span className="chapter-count">一盘 · 六题</span></header>
-          <div className="lesson-list"><LearningLink label="一盘九路，从头到尾" mode={completed['walkthrough/full-game']} onClick={openWalk} /><LearningLink label="换个棋形，自己判断" onClick={() => openIndependent(session.independentIndex)} /></div>
-          <details className="lesson-details"><summary>六道独立练习 · 已完成 {session.independentRuns.filter((_, index) => independentDone(index)).length} / 6</summary><div className="lesson-list">{LEARNING_UNITS.filter((unit) => unit.page === 'independent').map((unit) => <LearningLink key={unit.id} label={unit.title} mode={completed[unit.id]} onClick={() => openIndependent(unit.index)} />)}</div></details>
-        </article>
-        <article className="chapter practice-invitation">
-          <header className="chapter-heading"><span className="chapter-number" aria-hidden="true">陆</span><div><h3>有提示的陪练</h3><p>每手先试下，看懂提示后再确认；也可以退回重试。</p></div><span className="chapter-count">一盘</span></header>
-          <button className="button button--ghost" onClick={onPlay}>直接开始陪练<span aria-hidden="true">↗</span></button>
-        </article>
-      </div>
-    </div>
-    <div className="learning-note"><p className="learning-quote">先理解一手棋，<br />再慢慢理解一盘棋。</p><p>最后比较活着的棋子和围住的空点，<br />吃子只是办法之一。</p></div>
-    <p className="muted small archive-note">切换页面保留当前练习和对局。课程完成记录与学习位置保存在此浏览器；刷新后题目从头开始，进行中的对局不保留，已完成棋谱仍可复盘。</p>
-  </section></>
+  if (session.page === 'home') {
+    const next = continueLearningUnit(session.progress)
+    const allDone = Object.keys(completed).length === LEARNING_UNITS.length
+    const isNext = (id: string) => !allDone && next?.id === id
+    const tally = (pages: readonly LearningUnit['page'][]): [number, number] => {
+      const units = LEARNING_UNITS.filter((unit) => pages.includes(unit.page))
+      return [units.filter((unit) => completed[unit.id]).length, units.length]
+    }
+    const startRules = () => onChange({ ...session, page: 'rules', rules: { index: 0, run: startLesson(LESSONS[0]) } })
+    const chapters: ScrollChapter[] = [
+      { number: '壹', title: '认识规则', summary: '落子、气、提子、禁入点和劫；再用两个慢镜头看清提子的先后。', count: '五关 · 两镜头', done: tally(['rules', 'rule-sequence']), content: <>
+        <div className="lesson-list">{LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={lesson.title} mode={completed[`rules/${lesson.id}`]} current={isNext(`rules/${lesson.id}`)} onClick={() => onChange({ ...session, page: 'rules', rules: session.rules.index === index ? session.rules : { index, run: startLesson(lesson) } })} />)}</div>
+        <button className="text-button chapter-supplement" onClick={openSequence}>规则慢镜头：落子后先提谁？</button>
+        <details className="lesson-details"><summary>两个慢镜头的学习记录</summary><div className="lesson-list">{LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence').map((unit) => <LearningLink key={unit.id} label={unit.title} mode={completed[unit.id]} current={isNext(unit.id)} onClick={() => onChange(openLearningUnit(session, unit))} />)}</div></details>
+      </> },
+      { number: '贰', title: '保住自己的棋', summary: '四课八个局面。观察、试下、比较原因。', count: '四课 · 八局', done: tally(['survival']), content:
+        <div className="lesson-list">{SURVIVAL_SCENES.map((scene, index) => <LearningLink key={scene.id} label={scene.guided ? `${scene.course}. ${scene.title}` : `自己试试：${scene.title}`} mode={completed[`survival/${scene.id}`]} current={isNext(`survival/${scene.id}`)} onClick={() => openScene(index)} />)}</div> },
+      { number: '叁', title: '围地与终局', summary: '判断空点归属，自己数分，再走完终局。', count: '四课', done: tally(['endgame']), content:
+        <div className="lesson-list">{ENDGAME_LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={`${index + 1}. ${lesson.title}`} mode={completed[`endgame/${lesson.id}`]} current={isNext(`endgame/${lesson.id}`)} onClick={() => openEndgame(index)} />)}</div> },
+      { number: '肆', title: '九路策略入门', summary: '先顾危险，再想围地；比较走法，理解取舍。', count: '三课', done: tally(['strategy']), content:
+        <div className="lesson-list">{STRATEGY_LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={`${index + 1}. ${lesson.title}`} mode={completed[`strategy/${lesson.id}`]} current={isNext(`strategy/${lesson.id}`)} onClick={() => openStrategy(index)} />)}</div> },
+      { number: '伍', title: '从看懂到自己下', summary: '走完一盘九路，再换没有标记的棋形自己判断。', count: '一盘 · 六题', done: tally(['walkthrough', 'independent']), content: <>
+        <div className="lesson-list"><LearningLink label="一盘九路，从头到尾" mode={completed['walkthrough/full-game']} current={isNext('walkthrough/full-game')} onClick={openWalk} /><LearningLink label="换个棋形，自己判断" current={next?.page === 'independent' && !allDone} onClick={() => openIndependent(session.independentIndex)} /></div>
+        <details className="lesson-details"><summary>六道独立练习 · 已完成 {session.independentRuns.filter((_, index) => independentDone(index)).length} / 6</summary><div className="lesson-list">{LEARNING_UNITS.filter((unit) => unit.page === 'independent').map((unit) => <LearningLink key={unit.id} label={unit.title} mode={completed[unit.id]} onClick={() => openIndependent(unit.index)} />)}</div></details>
+      </> },
+      { number: '陆', title: '有提示的陪练', summary: '每手先试下，看懂提示后再确认；也可以退回重试。不计入课程单元。', count: '一盘', content:
+        <button className="button" onClick={onPlay}>直接开始陪练<span aria-hidden="true"> →</span></button> },
+    ]
+    const chapterOf: Record<LearningUnit['page'], number> = { rules: 0, 'rule-sequence': 0, survival: 1, endgame: 2, strategy: 3, walkthrough: 4, independent: 4 }
+    const current = next ? chapterOf[next.page] : 0
+    return <>
+      {storageMessage && <p className="message message--hint" role="alert">{storageMessage}</p>}
+      <section className="learning-home">
+        <div className="ink-hero">
+          <div className="ink-hero__title"><h2>一子一气</h2><p>写给第一次拿起棋子的人</p></div>
+          <HeroExercise onStart={startRules} onSurvival={() => openScene(0)} />
+        </div>
+        <ScrollContents chapters={chapters.map((chapter, index) => index === current ? { ...chapter, live: true } : chapter)} initialOpen={current} />
+        <LearningProgressPanel progress={session.progress} onContinue={(unit) => onChange(openLearningUnit(session, unit))} onClear={onClear} />
+        <p className="muted small archive-note">切换页面保留当前练习和对局。课程完成记录与学习位置保存在此浏览器；刷新后题目从头开始，进行中的对局不保留，已完成棋谱仍可复盘。</p>
+      </section>
+    </>
+  }
   return <>
     {storageMessage && <p className="message message--hint" role="alert">{storageMessage}</p>}
     <div className="learning-toolbar"><button className="text-button" onClick={() => onChange({ ...session, page: 'home' })}>返回章节</button><button className="text-button" onClick={onPlay}>直接开始陪练</button></div>

@@ -49,13 +49,13 @@ export function Board({ board, lastMove, marks = [], ghostColor = null, disabled
     >
       <defs>
         <linearGradient id={`${surfaceId}-wood`} x2="1" y2="1">
-          <stop stopColor="#ecddbd" /><stop offset="1" stopColor="#e4cfa7" />
+          <stop stopColor="#fdfbf6" /><stop offset="1" stopColor="#f4efe3" />
         </linearGradient>
         <radialGradient id={`${surfaceId}-black`} cx=".32" cy=".26" r=".75">
-          <stop stopColor="#555a55" /><stop offset=".5" stopColor="#2a2e2a" /><stop offset="1" stopColor="#171b18" />
+          <stop stopColor="#4a4640" /><stop offset=".6" stopColor="#1e1c19" /><stop offset="1" stopColor="#0c0b0a" />
         </radialGradient>
         <radialGradient id={`${surfaceId}-white`} cx=".32" cy=".26" r=".8">
-          <stop stopColor="#ffffff" /><stop offset=".6" stopColor="#f9f7f0" /><stop offset="1" stopColor="#d8d5ca" />
+          <stop stopColor="#fffdf8" /><stop offset=".7" stopColor="#f3eee2" /><stop offset="1" stopColor="#d9d2c2" />
         </radialGradient>
       </defs>
       <rect className="board__wood" fill={`url(#${surfaceId}-wood)`} x={-MARGIN} y={-MARGIN} width={total} height={total} />

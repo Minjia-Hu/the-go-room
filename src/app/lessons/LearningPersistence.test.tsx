@@ -17,13 +17,15 @@ afterAll(() => vi.unstubAllGlobals())
 beforeEach(() => { window.localStorage.clear(); window.location.hash = '#/lessons'; vi.useFakeTimers() })
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.useRealTimers() })
 const click = (name: string) => fireEvent.click(screen.getByRole('button', { name }))
+// 首页卷目一次只展开一卷：先点开书脊，再点其中的课程。
+const chapter = (title: string) => fireEvent.click(screen.getByRole('button', { name: new RegExp(`卷：${title}$`) }))
 const point = (x: number, y: number) => click(`交叉点 ${x},${y}`)
 const stored = () => JSON.parse(window.localStorage.getItem(LEARNING_KEY)!)
 
 describe('学习进度跨刷新', () => {
   it('两个慢镜头可跨刷新分别完成，最后仍能进入下一章', () => {
     let view = render(<App />)
-    click('规则慢镜头：落子后先提谁？')
+    chapter('认识规则'); click('规则慢镜头：落子后先提谁？')
     for (let i = 0; i < 3; i++) click('下一步')
     click('先提对方没气的棋，再检查自己的气')
     view.unmount(); view = render(<App />)
@@ -55,7 +57,7 @@ describe('学习进度跨刷新', () => {
     const { container } = render(<App />)
     click('第 5 关:劫')
     expect(container.querySelectorAll('.progress__step--done')).toHaveLength(0)
-    click('返回章节'); click('自己试试：竖着也能连接')
+    click('返回章节'); chapter('保住自己的棋'); click('自己试试：竖着也能连接')
     click('提醒我看哪里'); click('标出相关棋块和气'); click('演示一种做法')
     expect(stored().completed['survival/connect-check']).toBe('demo')
     click('重来这一题')
@@ -67,7 +69,7 @@ describe('学习进度跨刷新', () => {
   })
   it('六道独立题跨多次刷新累积完成，提示和重试不会被冒充为独立完成', () => {
     let view = render(<App />)
-    click('换个棋形，自己判断')
+    chapter('从看懂到自己下'); click('换个棋形，自己判断')
     for (const [index, scene] of INDEPENDENT_SCENES.entries()) {
       if (index === 0) click('给我一点思路')
       if (index === 1) point(8, 8)
@@ -85,6 +87,8 @@ describe('学习进度跨刷新', () => {
     expect(screen.getByRole('button', { name: '去陪练试试' })).toBeTruthy()
     click('返回章节')
     expect(screen.getByRole('heading', { name: '已完成 6 / 29 个课程与练习' })).toBeTruthy()
+    // 回到首页时展开的是下一课所在的卷，这里手动展开第伍卷查看记录。
+    chapter('从看懂到自己下')
     fireEvent.click(screen.getByText('六道独立练习 · 已完成 6 / 6'))
     expect(screen.getByText('借助提示完成')).toBeTruthy()
     expect(screen.getByText('重试后完成')).toBeTruthy()
@@ -145,5 +149,15 @@ describe('清除与存储降级', () => {
     click('从第一课开始'); point(4, 4)
     expect(screen.getByRole('button', { name: '下一关' })).toBeTruthy()
     expect(screen.getByRole('alert').textContent).toContain('未能保存')
+  })
+})
+
+describe('首页卷目跟随学习位置', () => {
+  it('完成一课后回到首页：展开下一课所在的卷，标出已读与续读', () => {
+    const { container } = render(<App />)
+    click('第 1 关:落子'); point(4, 4); click('返回章节')
+    expect(screen.getByRole('button', { name: '第壹卷：认识规则' }).getAttribute('aria-expanded')).toBe('true')
+    expect(container.querySelector('[aria-current="step"]')?.textContent).toContain('第 2 关:气')
+    expect(container.querySelector('.learning-entry--done')?.textContent).toContain('第 1 关:落子')
   })
 })

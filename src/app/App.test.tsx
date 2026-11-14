@@ -151,7 +151,7 @@ describe('App', () => {
   it('默认显示教学页和三个导航按钮', () => {
     render(<App />)
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('The Go Room')
-    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('黑白之间，慢慢看懂。')
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('一子一气')
     expect(screen.getByRole('button', { name: '教学' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: '对局' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '复盘' })).toBeTruthy()
@@ -175,6 +175,8 @@ describe('默认陪练的应用闭环', () => {
   })
   afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.useRealTimers() })
   const click = (name: string) => fireEvent.click(screen.getByRole('button', { name }))
+  // 首页卷目一次只展开一卷：先点开书脊，再点其中的课程。
+  const chapter = (title: string) => fireEvent.click(screen.getByRole('button', { name: new RegExp(`卷：${title}$`) }))
   const tick = () => act(() => { vi.advanceTimersByTime(350) })
   it('预览换页不提交，确认后切页保留并继续 AI；课程状态也保留', () => {
     render(<App />)
@@ -183,7 +185,7 @@ describe('默认陪练的应用闭环', () => {
     expect(screen.queryByRole('button', { name: '下在这里' })).toBeNull()
     click('交叉点 4,4'); click('下在这里'); click('教学'); tick()
     expect(chooseMove).not.toHaveBeenCalled()
-    click('1. 认出哪块棋危险'); click('交叉点 4,4')
+    chapter('保住自己的棋'); click('1. 认出哪块棋危险'); click('交叉点 4,4')
     click('对局'); tick()
     expect(screen.getByText('已下 2 手')).toBeTruthy()
     click('教学')

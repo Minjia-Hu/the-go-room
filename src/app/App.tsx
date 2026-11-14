@@ -1,4 +1,5 @@
 import { useLayoutEffect, useState } from 'react'
+import { InkMark } from './InkMark'
 import { LearningPage } from './lessons/LearningPage'
 import { createLearningSession, restoreLearningSession } from './lessons/learningSession'
 import type { LearningSession } from './lessons/learningSession'
@@ -14,10 +15,11 @@ import type { SavedGame } from './replay/records'
 import { usePage } from './router'
 import type { Page } from './router'
 
-const NAV: readonly { page: Page; label: string }[] = [
-  { page: 'lessons', label: '教学' },
-  { page: 'play', label: '对局' },
-  { page: 'replay', label: '复盘' },
+// 导航用单字，完整名称作为无障碍名称和悬停提示。
+const NAV: readonly { page: Page; label: string; glyph: string }[] = [
+  { page: 'lessons', label: '教学', glyph: '学' },
+  { page: 'play', label: '对局', glyph: '弈' },
+  { page: 'replay', label: '复盘', glyph: '复' },
 ]
 
 export function App() {
@@ -86,7 +88,7 @@ export function App() {
           navigate('lessons')
           window.scrollTo(0, 0)
         }}>
-          <span className="brand__mark" aria-hidden="true"><i /><i /><i /><i /></span>
+          <InkMark size={36} />
           <h1 className="topbar__title">The Go Room</h1>
         </a>
         <nav className="topbar__nav" aria-label="主导航">
@@ -96,13 +98,14 @@ export function App() {
               type="button"
               className="topbar__link"
               aria-current={item.page === page ? 'page' : undefined}
+              aria-label={item.label}
+              title={item.label}
               onClick={() => navigate(item.page)}
             >
-              {item.label}
+              {item.glyph}
             </button>
           ))}
         </nav>
-        <p className="topbar__note">属于你的围棋教室</p>
       </header>
       <main>
         {page === 'lessons' && <LearningPage session={learning} onChange={changeLearning} onPlay={() => navigate('play')}
@@ -110,7 +113,7 @@ export function App() {
         {page === 'play' && <PlayPage session={session} onChange={setSession} onFinish={finish} coaching={coaching} onCoachingChange={changeCoaching} preferenceMessage={preferenceMessage} />}
         {page === 'replay' && <ReplayPage games={games} selectedId={selectedId} onSelect={setSelectedId} onPlay={() => navigate('play')} storageMessage={storageMessage} />}
       </main>
-      <footer className="site-footer"><span>The Go Room</span><span>不急着赢，先看懂每一步。</span></footer>
+      <footer className="site-footer"><span>不急着赢，先看懂每一步。</span><InkMark size={22} /></footer>
     </>
   )
 }

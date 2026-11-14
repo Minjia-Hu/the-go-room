@@ -1,6 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect x=".5" y=".5" width="31" height="31" rx="4" fill="#f4f0e6" stroke="#d7d0c1"/>
-  <path d="M10 5v22M22 5v22M5 10h22M5 22h22" stroke="#ad9670" stroke-width="1"/>
-  <circle cx="10" cy="10" r="6.5" fill="#302e29"/>
-  <circle cx="22" cy="22" r="6" fill="#fffdf7" stroke="#795a42" stroke-width="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- 「一子一气」：一颗墨子落在棋盘一角，正下方的朱砂点是它最后的一口气。深色标签栏改用白子。 -->
+  <style>
+    .grid { stroke: #1c1a17; stroke-opacity: .4; }
+    .stone { fill: #1c1a17; }
+    @media (prefers-color-scheme: dark) { .grid { stroke: #f3ede2; stroke-opacity: .45; } .stone { fill: #f3ede2; } }
+  </style>
+  <path class="grid" d="M4 11H36M4 29H36M11 4V36M29 4V36" stroke-width="1.4" stroke-linecap="round"/>
+  <circle class="stone" cx="11" cy="11" r="8.4"/>
+  <circle cx="11" cy="29" r="4" fill="#b5352a"/>
 </svg>

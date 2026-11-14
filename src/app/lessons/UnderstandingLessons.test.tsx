@@ -12,6 +12,8 @@ function Harness() {
   return <LearningPage session={session} onChange={setSession} onPlay={onPlay} />
 }
 const click = (name: string) => fireEvent.click(screen.getByRole('button', { name }))
+// 首页卷目一次只展开一卷：先点开书脊，再点其中的课程。
+const chapter = (title: string) => fireEvent.click(screen.getByRole('button', { name: new RegExp(`卷：${title}$`) }))
 function number(value: string) {
   fireEvent.change(screen.getByRole('spinbutton'), { target: { value } })
   click('核对答案')
@@ -20,7 +22,7 @@ function number(value: string) {
 describe('规则慢镜头与终局课程界面', () => {
   it('每一步都展示盘面变化，两个原因回答正确才完成，切页保留进度', () => {
     const { container } = render(<Harness />)
-    click('规则慢镜头：落子后先提谁？')
+    chapter('认识规则'); click('规则慢镜头：落子后先提谁？')
     expect(container.querySelectorAll('[data-stone="black"]')).toHaveLength(14)
     click('下一步')
     expect(screen.getByText(/尚未判定合法，不是正式落子/)).toBeTruthy()
@@ -36,14 +38,14 @@ describe('规则慢镜头与终局课程界面', () => {
     expect(container.querySelectorAll('[data-stone="black"]')).toHaveLength(13)
     expect(container.querySelector('[data-stone="white"][data-x="3"][data-y="4"]')).toBeNull()
     click('先提对方没气的棋，再检查自己的气')
-    click('返回章节'); click('规则慢镜头：落子后先提谁？')
+    click('返回章节'); chapter('认识规则'); click('规则慢镜头：落子后先提谁？')
     click('学习围地与终局')
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('围住的空点属于谁')
   })
   it('归属、数子、贴目、终局的完整路径；不会把教学结果当正式对局', () => {
     onPlay.mockClear()
     render(<Harness />)
-    click('1. 围住的空点属于谁')
+    chapter('围地与终局'); click('1. 围住的空点属于谁')
     expect((screen.getByRole('button', { name: '归黑方' }) as HTMLButtonElement).disabled).toBe(true)
     click('交叉点 1,1'); click('归白方')
     expect(screen.getByRole('status').textContent).toContain('只接触黑棋')
@@ -73,14 +75,14 @@ describe('规则慢镜头与终局课程界面', () => {
   })
   it('从两眼课进入慢镜头，返回后保留两眼题进度；重来仅重置当前课', () => {
     render(<Harness />)
-    click('4. 两个小空点为什么能保命')
+    chapter('保住自己的棋'); click('4. 两个小空点为什么能保命')
     click('交叉点 3,4'); click('交叉点 5,4')
     click('分步看：为什么不算自杀？')
-    click('返回章节'); click('4. 两个小空点为什么能保命')
+    click('返回章节'); chapter('保住自己的棋'); click('4. 两个小空点为什么能保命')
     expect(screen.getByText('为什么白棋下不进这两个眼？')).toBeTruthy()
-    click('返回章节'); click('3. 白棋为什么加 7.5 分')
+    click('返回章节'); chapter('围地与终局'); click('3. 白棋为什么加 7.5 分')
     number('42.5')
-    click('返回章节'); click('3. 白棋为什么加 7.5 分')
+    click('返回章节'); chapter('围地与终局'); click('3. 白棋为什么加 7.5 分')
     expect(screen.getByRole('button', { name: '白方赢' })).toBeTruthy()
     click('重来本课')
     expect(screen.getByRole('spinbutton')).toBeTruthy()
