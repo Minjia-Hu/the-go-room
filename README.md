@@ -6,7 +6,7 @@
 
 从认识一口气，到保护自己的棋，再到完成一盘九路对局。课程、练习、简单电脑对手和复盘都在浏览器本地运行，无需账号、API 密钥或付费围棋服务。
 
-![首页：一子一气，棋盘可以直接下](docs/qa/ink-and-stone/home-try-a.png)
+![当前首页：一子一气，点击 A 或 B 试着救棋](docs/images/home.png)
 
 ## 学 · 练 · 弈 · 复
 
@@ -21,7 +21,11 @@
 
 先后判断题会让你比较“先救棋还是先吃子”“向外伸还是提子解围”等选择：试下一手，确认后看白棋如何回应，再回答为什么。完成记录区分独立完成、重试和借助提示，每题保留最好的一次结果。
 
-![先后判断：错误延伸后，展示白棋提子与原因解释](docs/qa/practice-expansion/priority-wrong-desktop.png)
+下面的动图演示一次真实练习：试着向外伸 → 看到黑棋被提 → 改用提子救棋 → 解释原因。
+
+![练习演示：比较错误延伸与提子救棋，并回答原因](docs/images/practice-demo.gif)
+
+[查看静态截图与完整解释](docs/qa/practice-expansion/priority-wrong-desktop.png)
 
 ## 第一次使用
 
