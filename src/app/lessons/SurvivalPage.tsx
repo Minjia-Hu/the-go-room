@@ -8,8 +8,8 @@ import { groupMarks } from '../coaching/explanations'
 import { choosePracticePoint, chooseReason, confirmPractice, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
 import type { SurvivalRun } from './survivalRunner'
 
-interface Props { readonly nextLabel?: string; readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onScoring?: () => void }
-export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onScoring, nextLabel }: Props) {
+interface Props { readonly practiceOnly?: boolean; readonly nextLabel?: string; readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onScoring?: () => void }
+export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onScoring, nextLabel, practiceOnly = false }: Props) {
   const { scene } = run
   const shown = practiceBoard(run)
   const reveal = run.hint >= 2 || run.stage === 'done' || run.stage === 'liberty' || run.stage === 'reason' || run.preview?.ok
@@ -29,9 +29,9 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
   return <BoardLayout
       legend={<p className="small">棋子上的圈：目标棋块 · 空心圈：气 · 虚线：试下</p>}
       feedback={run.message && <LessonFeedback message={run.message} />}
-      heading={<><p className="eyebrow">保住自己的棋 / 第 {scene.course} 课 · {scene.guided ? "一起练习" : "自己试试"}</p><h2>{scene.title}</h2><p className="turn">{goals[run.stage]}</p></>}
+      heading={<><p className="eyebrow">{practiceOnly ? "认危险 · 专项练习" : `保住自己的棋 / 第 ${scene.course} 课 · ${scene.guided ? "一起练习" : "自己试试"}`}</p><h2>{scene.title}</h2><p className="turn">{goals[run.stage]}</p></>}
       board={<>
-      <p className="figure-number">第 {scene.course} 课 / {scene.guided ? '一起练习' : '自己试试'}</p>
+      <p className="figure-number">{practiceOnly ? '换个局面，自己判断' : `第 ${scene.course} 课 / ${scene.guided ? '一起练习' : '自己试试'}`}</p>
       <Board board={shown.board} marks={marks} lastMove={last?.kind === 'play' ? last.point : null}
         disabled={run.view === 'reply' || run.view.startsWith('contrast') || run.stage === 'done' || run.stage === 'reason'}
         ghostColor={run.stage === 'move' ? 'black' : null} onPointClick={(p) => onChange(choosePracticePoint(run, p))} />

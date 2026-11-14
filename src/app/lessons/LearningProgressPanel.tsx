@@ -18,7 +18,7 @@ interface Props {
 export function LearningProgressPanel({ progress, onContinue, onClear }: Props) {
   const [confirmClear, setConfirmClear] = useState(false)
   const unit = continueLearningUnit(progress)
-  const count = Object.keys(progress.completed).length
+  const count = LEARNING_UNITS.filter((item) => progress.completed[item.id]).length
   return <section className="learning-record" aria-label="我的学习记录">
     <div>
       <p className="eyebrow">学习手记</p>
@@ -29,7 +29,7 @@ export function LearningProgressPanel({ progress, onContinue, onClear }: Props) 
       <p className="muted small">刷新后回到待继续的题目，从该题开头开始；中途棋盘不保存。记录只在此浏览器中，清除浏览器数据后会丢失。</p>
     </div>
     {onClear && <div className="learning-record__reset">{confirmClear ? <div role="group" aria-label="确认清除学习记录">
-      <p>清除所有课程完成记录和学习位置，并从头开始？已保存棋谱、当前对局和陪练设置都会保留。</p>
+      <p>清除所有课程、专项练习的完成记录和学习位置，并从头开始？已保存棋谱、当前对局和陪练设置都会保留。</p>
       <div className="actions"><button className="button button--ghost" onClick={() => { onClear(); setConfirmClear(false) }}>确认清除学习记录</button><button className="text-button" onClick={() => setConfirmClear(false)}>保留记录</button></div>
     </div> : <button className="text-button" onClick={() => setConfirmClear(true)}>清除学习记录</button>}</div>}
   </section>

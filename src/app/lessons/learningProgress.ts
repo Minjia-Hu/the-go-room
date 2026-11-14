@@ -1,3 +1,4 @@
+import { PRACTICE_DANGER_SCENES, PRACTICE_RESCUE_SCENES, PRIORITY_SCENES } from '../../content/practiceExtras'
 import { LESSONS } from '../../content/lessons'
 import { SURVIVAL_SCENES } from '../../content/survival'
 import { ENDGAME_LESSONS, RULE_SEQUENCE_SCENES } from '../../content/endgame'
@@ -28,6 +29,8 @@ export const LEARNING_UNITS: readonly LearningUnit[] = [
   { id: 'walkthrough/full-game', page: 'walkthrough', index: 0, title: '一盘九路，从头到尾' },
   ...INDEPENDENT_SCENES.map((scene, index) => ({ id: `independent/${scene.id}`, page: 'independent' as const, index, title: `独立练习 · 第 ${index + 1} 题` })),
 ]
+const PRACTICE_IDS = [...PRACTICE_DANGER_SCENES, ...PRACTICE_RESCUE_SCENES, ...PRIORITY_SCENES].map((scene) => `practice/${scene.id}`)
+
 export interface LearningProgress {
   readonly version: 1
   readonly completed: Readonly<Record<string, Completion>>
@@ -60,6 +63,12 @@ export function recordLearningProgress(progress: LearningProgress, session: Lear
   session.independentRuns.forEach((run) => {
     if (run.stage === 'done') record(`independent/${run.scene.id}`, run.help > 0 ? 'hint' : run.mistakes > 0 ? 'retry' : 'independent')
   })
+  session.practiceDangerRuns.forEach((run) => {
+    if (run.stage === 'done') record(`practice/${run.scene.id}`, run.assisted ? 'demo' : run.hint > 0 ? 'hint' : run.mistakes > 0 ? 'retry' : 'independent')
+  })
+  for (const run of [...session.practiceRescueRuns, ...session.priorityRuns]) {
+    if (run.stage === 'done') record(`practice/${run.scene.id}`, run.help > 0 ? 'hint' : run.mistakes > 0 ? 'retry' : 'independent')
+  }
   const lastVisited = options.visit === false ? progress.lastVisited : currentLearningUnit(session)?.id ?? progress.lastVisited
   return completed === progress.completed && lastVisited === progress.lastVisited ? progress : { version: 1, completed, lastVisited }
 }
@@ -67,7 +76,7 @@ export function recordLearningProgress(progress: LearningProgress, session: Lear
 /** 未完成则回到该题；已完成则从后面寻找下一道未完成题，全部完成后回看最近一课。 */
 export function continueLearningUnit(progress: LearningProgress): LearningUnit | undefined {
   const last = LEARNING_UNITS.findIndex((unit) => unit.id === progress.lastVisited)
-  if (last < 0) return Object.keys(progress.completed).length ? LEARNING_UNITS.find((unit) => !progress.completed[unit.id]) : undefined
+  if (last < 0) return LEARNING_UNITS.some((unit) => progress.completed[unit.id]) ? LEARNING_UNITS.find((unit) => !progress.completed[unit.id]) : undefined
   if (!progress.completed[LEARNING_UNITS[last].id]) return LEARNING_UNITS[last]
   const ordered = [...LEARNING_UNITS.slice(last + 1), ...LEARNING_UNITS.slice(0, last)]
   return ordered.find((unit) => !progress.completed[unit.id]) ?? LEARNING_UNITS[last]
@@ -81,11 +90,11 @@ export function parseLearningProgress(raw: string): LearningProgress | null {
     if (!object(value) || value.version !== 1 || !object(value.completed)
       || (value.lastVisited !== null && typeof value.lastVisited !== 'string')) return null
     const completed: Record<string, Completion> = {}
-    for (const unit of LEARNING_UNITS) {
-      const mode = value.completed[unit.id]
+    for (const id of [...LEARNING_UNITS.map((unit) => unit.id), ...PRACTICE_IDS]) {
+      const mode = value.completed[id]
       if (mode === undefined) continue
       if (typeof mode !== 'string' || !Object.hasOwn(COMPLETION_LABELS, mode)) return null
-      completed[unit.id] = mode as Completion
+      completed[id] = mode as Completion
     }
     return { version: 1, completed, lastVisited: LEARNING_UNITS.some((unit) => unit.id === value.lastVisited) ? value.lastVisited as string : null }
   } catch { return null }

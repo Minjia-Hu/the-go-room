@@ -9,11 +9,11 @@ import { choosePracticePoint } from './survivalRunner'
 
 const allIndependent = Object.fromEntries(PRACTICE_ITEMS.map((item) => [item.id, 'independent' as Completion]))
 describe('practice catalog', () => {
-  it('reuses exactly four unguided and six independent scenes, in five groups', () => {
-    expect(PRACTICE_ITEMS).toHaveLength(10)
-    expect(new Set(PRACTICE_ITEMS.map((item) => item.id)).size).toBe(10)
-    expect(PRACTICE_GROUPS.map((group) => PRACTICE_ITEMS.filter((item) => item.group === group).length)).toEqual([1, 3, 2, 3, 1])
-    for (const item of PRACTICE_ITEMS) {
+  it('keeps ten course exercises and adds twelve practice-only scenes, in six groups', () => {
+    expect(PRACTICE_ITEMS).toHaveLength(22)
+    expect(new Set(PRACTICE_ITEMS.map((item) => item.id)).size).toBe(22)
+    expect(PRACTICE_GROUPS.map((group) => PRACTICE_ITEMS.filter((item) => item.group === group).length)).toEqual([3, 5, 4, 5, 1, 4])
+    for (const item of PRACTICE_ITEMS.filter((item) => item.source === 'survival' || item.source === 'independent')) {
       expect(LEARNING_UNITS.find((unit) => unit.id === item.id)).toMatchObject({ page: item.source, index: item.index })
       const scene = item.source === 'survival' ? SURVIVAL_SCENES[item.index] : INDEPENDENT_SCENES[item.index]
       expect(item.id).toBe(`${item.source}/${scene.id}`)
@@ -22,7 +22,7 @@ describe('practice catalog', () => {
     }
   })
   it('links capture rescue to the lesson that compares capture and extension', () => {
-    expect(PRACTICE_ITEMS.filter((item) => item.group === '提子').map((item) => item.related.id)).toEqual(['survival/escape-guided', 'survival/escape-guided'])
+    expect(PRACTICE_ITEMS.filter((item) => item.group === '提子').map((item) => item.related.id)).toEqual(Array(4).fill('survival/escape-guided'))
   })
   it('skips independent completions, wraps, and still recommends assisted attempts', () => {
     const progress = { ...emptyLearningProgress(), completed: allIndependent }

@@ -409,7 +409,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   .ink-hero__title, .ink-hero__board, .ink-hero__copy, .ink-feedback, .scroll__panel--unroll, .ink-hero .board__liberty { animation: none; }
 }
 
-/* 练：沿用纸色、墨条与朱砂序号，题目仍由课程共用。 */
+/* 练：沿用纸色、墨条与朱砂序号，课程配套题与专项新题共用记录方式。 */
 .practice-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .7fr); gap: 64px; padding: 24px 0 40px; border-bottom: 1px solid var(--line-soft); align-items: center; }
 .practice-heading h2 { margin: 0 0 18px; font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.4 var(--serif); }
 .practice-heading p { margin: 0 0 14px; }
@@ -440,3 +440,8 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   #root .topbar--four-items .topbar__title { font-size: .95rem; }
   #root .topbar--four-items .topbar__nav { gap: 0; }
 }
+
+/* 比较题在棋盘旁就能选方案，选中后突出确认，不让长选项挤出横向滚动。 */
+.priority-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.priority-options .button { min-height: 44px; padding: 8px; font-size: .82rem; white-space: normal; }
+.priority-options .button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }

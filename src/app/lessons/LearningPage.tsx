@@ -36,7 +36,7 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
   const allIndependentDone = session.independentRuns.every((_, index) => independentDone(index))
   if (session.page === 'home') {
     const next = continueLearningUnit(session.progress)
-    const allDone = Object.keys(completed).length === LEARNING_UNITS.length
+    const allDone = LEARNING_UNITS.every((unit) => completed[unit.id])
     const isNext = (id: string) => !allDone && next?.id === id
     const tally = (pages: readonly LearningUnit['page'][]): [number, number] => {
       const units = LEARNING_UNITS.filter((unit) => pages.includes(unit.page))

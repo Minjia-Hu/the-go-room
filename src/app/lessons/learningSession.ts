@@ -1,3 +1,6 @@
+import { PRACTICE_DANGER_SCENES, PRACTICE_RESCUE_SCENES, PRIORITY_SCENES } from '../../content/practiceExtras'
+import { startPriority } from './priorityRunner'
+import type { PriorityRun } from './priorityRunner'
 import { LESSONS } from '../../content/lessons'
 import { SURVIVAL_SCENES } from '../../content/survival'
 import { startLesson } from './lessonRunner'
@@ -12,7 +15,7 @@ import { createStrategyRuns } from './strategyRunner'
 import type { StrategyRun } from './strategyRunner'
 import { startWalk } from './walkthroughRunner'
 import type { WalkRun } from './walkthroughRunner'
-import { createIndependentRuns } from './independentRunner'
+import { createIndependentRuns, startIndependent } from './independentRunner'
 import type { IndependentRun } from './independentRunner'
 import { continueLearningUnit, emptyLearningProgress } from './learningProgress'
 import type { LearningProgress, LearningUnit } from './learningProgress'
@@ -32,9 +35,12 @@ export interface LearningSession {
   readonly walk: WalkRun
   readonly independentIndex: number
   readonly independentRuns: readonly IndependentRun[]
+  readonly practiceDangerRuns: readonly SurvivalRun[]
+  readonly practiceRescueRuns: readonly IndependentRun[]
+  readonly priorityRuns: readonly PriorityRun[]
 }
 export function createLearningSession(): LearningSession {
-  return { progress: emptyLearningProgress(), page: 'home', rules: { index: 0, run: startLesson(LESSONS[0]) }, sceneIndex: 0, runs: SURVIVAL_SCENES.map(startSurvival), sequence: startRuleSequence(), endgameIndex: 0, endgameRuns: createEndgameRuns(), strategyIndex: 0, strategyRuns: createStrategyRuns(), walk: startWalk(), independentIndex: 0, independentRuns: createIndependentRuns() }
+  return { progress: emptyLearningProgress(), page: 'home', rules: { index: 0, run: startLesson(LESSONS[0]) }, sceneIndex: 0, runs: SURVIVAL_SCENES.map(startSurvival), sequence: startRuleSequence(), endgameIndex: 0, endgameRuns: createEndgameRuns(), strategyIndex: 0, strategyRuns: createStrategyRuns(), walk: startWalk(), independentIndex: 0, independentRuns: createIndependentRuns(), practiceDangerRuns: PRACTICE_DANGER_SCENES.map(startSurvival), practiceRescueRuns: PRACTICE_RESCUE_SCENES.map(startIndependent), priorityRuns: PRIORITY_SCENES.map(startPriority) }
 }
 
 export function openLearningUnit(session: LearningSession, unit: LearningUnit): LearningSession {
