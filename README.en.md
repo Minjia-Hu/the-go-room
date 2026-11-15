@@ -25,7 +25,7 @@ The learning path has **29 lesson and practice units**. The Practice page contai
 
 Move-priority problems ask you to compare choices such as saving a group versus capturing, or extending versus capturing to escape. Try a move, confirm it, see White's reply, then explain the result. Records distinguish independent completion, retries, and help from hints or demonstrations, keeping each problem's best result.
 
-This animation shows a real practice sequence: try extending → see Black captured → retry by capturing to save the group → explain why.
+This roughly 40-second recording includes cursor movement, click indicators, and pauses to read each result: try extending → see Black captured → retry by capturing to save the group → explain why.
 
 ![Practice walkthrough comparing an unsuccessful extension with a saving capture](docs/images/practice-demo.gif)
 
