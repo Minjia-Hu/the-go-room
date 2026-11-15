@@ -6,8 +6,8 @@
 - 上述改动已合并到 `main`，应用版本为 `4a8b7a0`。Node.js 24.22.3 下本地验收为 45 个测试文件、330 个测试、lint 和构建通过，详见[练习扩充验收](qa/practice-expansion/README.md)、[课程目录分组验收](qa/grouped-course-contents/README.md)。此前重试记录修复的验收见[发布前修复验收](qa/release-readiness/README.md)。
 - 历史清理后的提交需要重新通过远程检查。以 [main 的 CI 运行记录](https://github.com/Minjia-Hu/the-go-room/actions/workflows/ci.yml?query=branch%3Amain)中对应新提交的结果为准；此前运行记录属于重写前历史，不能替代新提交的验证。
 - 新增 12 题已在浏览器逐题验证，并检查 1440、1000、375 三种宽度及 375 × 667 试下确认布局。教学效果仍待更多实际使用反馈，实体手机触控与 Safari 工具栏尚未验证；电脑提示只解释局部后果，死子由使用者确认。
-- 公开在线体验链接尚未发布。GitHub Pages 工作流已准备，尚未部署。
-- 本次补清历史文档中遗漏的托管标识，并迁移到同名独立仓库；新仓库先保持私有，原仓库改名后继续私有保留。仓库公开和网站上线仍须单独决定。迁移说明见[历史清理记录](qa/history-cleanup/README.md)。
+- [公开在线体验](https://minjia-hu.github.io/the-go-room/)已通过 GitHub Pages 部署，版本为 `f5c2652`，[首次部署检查](https://github.com/Minjia-Hu/the-go-room/actions/runs/43692612068)通过安装、330 个测试、lint、构建与发布。已用未登录浏览器验证桌面主要流程、刷新保存和 375 × 667 手机模拟布局，详见[公开发布验收](qa/public-release/README.md)。
+- 补清历史托管标识并迁移后的同名独立仓库已公开，原仓库改名后继续私有保留。`main` 已要求 PR、GitHub Actions 的 `check` 检查通过且分支最新，管理员也适用；不要求第二位维护者审批。已启用 Dependabot 提醒与安全更新、密钥扫描和推送保护。迁移说明见[历史清理记录](qa/history-cleanup/README.md)。
 
 ## 独立静态托管
 

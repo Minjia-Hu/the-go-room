@@ -1,0 +1,24 @@
+{
+  "url": "https://minjia-hu.github.io/the-go-room/",
+  "anonymous": true,
+  "checks": [
+    "Anonymous HTTPS home and assets loaded; desktop has no horizontal overflow.",
+    "Lesson placement, completion storage and hash-route refresh restore the next lesson.",
+    "Practice trial, capture feedback, explanation and saved retry result; lesson position unchanged.",
+    "Coached move and AI reply, round retry, agreed scoring, saved replay, stepping and refresh.",
+    "Logo returns to the home page.",
+    "Published project and third-party license files return HTTP 200.",
+    "375x667 emulation: no horizontal overflow, board and confirm visible together, practice completion persists."
+  ],
+  "page_errors": [],
+  "http_errors": [],
+  "physical_phone_tested": false,
+  "desktop_viewport": [
+    1280,
+    900
+  ],
+  "mobile_viewport": [
+    375,
+    667
+  ]
+}

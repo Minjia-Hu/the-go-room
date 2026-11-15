@@ -8,6 +8,8 @@ A browser-based introduction to Go (Weiqi / Baduk) for complete beginners. Place
 
 **The interface and lessons are currently in Simplified Chinese.** This English README introduces the project; it does not indicate English-language support in the app.
 
+**[Try it online (Chinese) →](https://minjia-hu.github.io/the-go-room/)**
+
 Interactive lessons, practice problems, a simple computer opponent, and game review all run locally in your browser. No account, API key, or paid Go service is required to use the app.
 
 ![Current home page: choose A or B to try to save a group](docs/images/home.png)
@@ -37,7 +39,7 @@ This roughly 40-second recording includes cursor movement, click indicators, and
 2. Visit **练** to try a different position on your own. Use hints or related lessons when you need help.
 3. Play a 9×9 game in **弈** with coaching enabled. Inspect each trial move before confirming, then revisit the completed game in **复**.
 
-A public live site is not available yet. You can run the app locally as described below.
+Open the [live site](https://minjia-hu.github.io/the-go-room/) to get started without installing anything. To run it locally or contribute, follow the instructions below.
 
 ## Run locally
 
