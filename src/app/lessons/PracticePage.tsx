@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { LearningSession } from './learningSession'
 import { COMPLETION_LABELS } from './learningProgress'
 import type { LearningUnit } from './learningProgress'
@@ -8,6 +8,7 @@ import { LadderDefensePage } from './LadderDefensePage'
 import { PriorityPage } from './PriorityPage'
 import { SurvivalPage } from './SurvivalPage'
 import { IndependentPage } from './IndependentPage'
+import { DirectoryToolbar } from './DirectoryToolbar'
 
 interface Props {
   readonly session: LearningSession
@@ -18,7 +19,20 @@ interface Props {
 }
 export function PracticePage({ session, onChange, onLesson, onPlay, storageMessage }: Props) {
   const [active, setActive] = useState<PracticeItem | null>(null)
-  useLayoutEffect(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0 }, [active])
+  const hubTitle = useRef<HTMLHeadingElement>(null)
+  const returningToHub = useRef(false)
+  useLayoutEffect(() => {
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+    if (!active && returningToHub.current) {
+      returningToHub.current = false
+      hubTitle.current?.focus()
+    }
+  }, [active])
+  function returnToHub() {
+    returningToHub.current = true
+    setActive(null)
+  }
   const completed = session.progress.completed
   function open(item: PracticeItem) {
     onChange(openPracticeItem(session, item))
@@ -28,12 +42,24 @@ export function PracticePage({ session, onChange, onLesson, onPlay, storageMessa
   const notice = storageMessage && <p className="message message--hint" role="alert">{storageMessage}</p>
   if (active) {
     const next = nextPracticeItem(session.progress, active.id)
-    const onNext = () => next ? open(next) : setActive(null)
+    const onNext = () => next ? open(next) : returnToHub()
     const nextLabel = next ? '下一道练习' : '返回练习列表'
     const mode = completed[active.id]
     return <>
       {notice}
-      <div className="learning-toolbar practice-toolbar"><button className="text-button" onClick={() => setActive(null)}>返回练习</button><span>练 · {active.group}</span></div>
+      <DirectoryToolbar title={`练 · ${active.group}`} navLabel={`${active.group}练习目录`}
+        currentId={active.id} catalog={{ label: '全部练习', onOpen: returnToHub }}>
+        <div className="volume-guide__lessons">
+          {PRACTICE_ITEMS.filter(item => item.group === active.group).map(item =>
+            <div className="course-pair" key={item.id}>
+              <button className="course-index__link" aria-label={item.title} aria-current={item.id === active.id ? 'step' : undefined}
+                onClick={() => { if (item.id !== active.id) open(item) }}>
+                <span>{item.title}</span>
+                {item.id === active.id && <span className="volume-guide__current">当前</span>}
+              </button>
+            </div>)}
+        </div>
+      </DirectoryToolbar>
       {active.source === 'survival' || active.source === 'danger'
         ? <SurvivalPage run={(active.source === 'survival' ? session.runs : session.practiceDangerRuns)[active.index]} practice={practiceLabels(active)} isLast={false} nextLabel={nextLabel} onNext={onNext}
             onChange={(run) => { const key = active.source === 'survival' ? 'runs' : 'practiceDangerRuns'; onChange({ ...session, [key]: session[key].map((old, index) => index === active.index ? run : old) }) }} />
@@ -57,28 +83,37 @@ export function PracticePage({ session, onChange, onLesson, onPlay, storageMessa
   return <section className="practice-hub" aria-labelledby="practice-title">
     {notice}
     <header className="practice-heading">
-      <div><p className="eyebrow">{PRACTICE_ITEMS.length} 个局面 · {PRACTICE_GROUPS.length} 种本领</p><h2 id="practice-title">练 · 自己判断</h2>
-        <p className="muted">课程配套题与新局面，按能力集中练。做题不改变课程里的学习位置。</p></div>
-      <div className="practice-progress"><p>独立完成 <strong>{count} / {PRACTICE_ITEMS.length}</strong></p>
-        <div className="ink-strokes" aria-hidden="true">{PRACTICE_ITEMS.map((item) => <i key={item.id} className={completed[item.id] === 'independent' ? 'ink-strokes__on' : undefined} />)}</div>
-        {next ? <button className="button" onClick={() => open(next)}>来一道还没独立完成的题</button>
-          : <><p className="muted">这些题都已独立完成。可以重做任意一题，或者去下一盘。</p><button className="button" onClick={onPlay}>去弈下一盘</button></>}
+      <h2 id="practice-title" ref={hubTitle} tabIndex={-1}>全部练习</h2>
+      <div className="practice-progress">
+        <span>独立完成 <strong>{count} / {PRACTICE_ITEMS.length}</strong></span>
+        {next ? <button className="button" onClick={() => open(next)} title="优先练习尚未独立完成的题">练一道</button>
+          : <button className="button" onClick={onPlay}>去弈下一盘</button>}
       </div>
     </header>
-    <div className="practice-groups">{PRACTICE_GROUPS.map((group, index) => <section className="practice-group" key={group} aria-labelledby={`practice-group-${index}`}>
-      <h3 id={`practice-group-${index}`}><span aria-hidden="true">{['壹', '贰', '叁', '肆', '伍', '陆', '柒'][index]}</span>{group}</h3>
-      <ul className="practice-list">{PRACTICE_ITEMS.filter((item) => item.group === group).map((item) => {
-        const mode = completed[item.id]
-        return <li className={`practice-item${mode === 'independent' ? ' practice-item--independent' : ''}`} key={item.id}>
-          <button className="lesson-link" onClick={() => open(item)} aria-label={item.title} aria-describedby={item.courseUnit ? `tag-${item.id}` : undefined}>
-            <span className="lesson-link__dot" aria-hidden="true" />
-            <span>{item.courseUnit && <span className="course-pair__tag" id={`tag-${item.id}`}>课程题</span>}{item.title}</span>
-            <span className="lesson-link__go" aria-hidden="true">↗</span>
-          </button>
-          <p className="practice-status">{mode ? COMPLETION_LABELS[mode] : '还没完成'}</p>
-          <button className="text-button practice-related" onClick={() => onLesson(item.related)}>相关讲解：{item.relatedTitle}</button>
-        </li>
-      })}</ul>
-    </section>)}</div>
+    <div className="practice-groups">{PRACTICE_GROUPS.map((group, index) => {
+      const items = PRACTICE_ITEMS.filter(item => item.group === group)
+      const sharedLesson = items.every(item => item.related.id === items[0].related.id)
+      function explanation(item: PracticeItem) {
+        return <button className="text-button practice-related" onClick={() => onLesson(item.related)}
+          aria-label={`相关讲解：${item.relatedTitle}`} title={item.relatedTitle}>讲解 <span aria-hidden="true">↗</span></button>
+      }
+      return <section className="practice-group" key={group} aria-labelledby={`practice-group-${index}`}>
+        <header className="practice-group__head">
+          <h3 id={`practice-group-${index}`}><span aria-hidden="true">{['壹', '贰', '叁', '肆', '伍', '陆', '柒'][index]}</span>{group}</h3>
+          {sharedLesson && explanation(items[0])}
+        </header>
+        <ul className="practice-list">{items.map(item => {
+          const mode = completed[item.id]
+          return <li key={item.id}>
+            <button className="course-index__link" onClick={() => open(item)} aria-label={item.title}
+              aria-description={[item.courseUnit && '课程题', mode ? COMPLETION_LABELS[mode] : '还没完成'].filter(Boolean).join('，')}>
+              <span>{item.title}{item.courseUnit && <small className="practice-source">课程题</small>}</span>
+              {mode && <span className="practice-status" title={COMPLETION_LABELS[mode]}>{mode === 'independent' ? '✓' : COMPLETION_LABELS[mode]}</span>}
+            </button>
+            {!sharedLesson && explanation(item)}
+          </li>
+        })}</ul>
+      </section>
+    })}</div>
   </section>
 }
