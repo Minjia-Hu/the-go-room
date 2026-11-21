@@ -45,7 +45,7 @@ export function choosePracticePoint(run: SurvivalRun, p: Point): SurvivalRun {
     if (group.liberties.some((s) => samePoint(s, p))) {
       const message = group.stones.length === 1
         ? '这颗黑棋只剩 A 这一口气。白棋下在 A，就能把它提走。'
-        : `这 ${group.stones.length} 颗黑棋连在一起，共用 A 这一口气。白棋占住 A，整块就被提走。下面看看两种选择的后果。`
+        : `这 ${group.stones.length} 颗黑棋连在一起，共用 A 这一口气。白棋占住 A，整块就被提走。展开「看看对照」，比较两种选择的后果。`
       return { ...run, selected: [...group.stones, p], stage: 'done', message }
     }
     const diagonal = run.scene.id === 'danger-guided'
