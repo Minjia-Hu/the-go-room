@@ -84,7 +84,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .scroll { position: relative; display: flex; flex: 0 0 auto; border-right: 1px solid var(--line-soft); }
 .scroll--open { flex: 1 1 auto; min-width: 0; }
 .scroll--live::before { content: ''; position: absolute; inset: 0 auto 0 -1px; width: 3px; background: var(--mark); }
-.scroll__spine { display: grid; grid-template-rows: auto 1fr auto; justify-items: start; gap: 16px; width: 118px; padding: 24px 20px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: background 160ms ease; }
+.scroll__spine { display: grid; grid-template-rows: auto 1fr auto; justify-items: start; gap: 16px; width: 104px; padding: 24px 20px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; transition: background 160ms ease; }
 .scroll__spine:hover { background: rgba(28, 26, 23, .05); }
 .scroll--open .scroll__spine { background: rgba(28, 26, 23, .035); }
 .scroll__spine:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
@@ -395,7 +395,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   .ink-hero__title p { padding: 0; letter-spacing: .15em; }
   .ink-hero__board { width: min(88%, 420px); justify-self: center; }
 }
-/* 六根书脊在中等屏幕会挤压课程正文，提前切换为纵向卷目。 */
+/* 七根书脊在中等屏幕会挤压课程正文，提前切换为纵向卷目。 */
 @media (max-width: 1180px) {
   .scrolls__row { flex-direction: column; min-height: 0; border-left: 0; border-top: 1px solid var(--line-soft); }
   .scroll { flex-direction: column; border-right: 0; border-bottom: 1px solid var(--line-soft); }

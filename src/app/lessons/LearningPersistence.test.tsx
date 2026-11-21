@@ -3,6 +3,7 @@ import { StrictMode } from 'react'
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from '../App'
+import { CAPTURE_SCENES } from '../../content/capture'
 import { INDEPENDENT_SCENES } from '../../content/independent'
 import { COACHING_KEY } from '../play/preferences'
 import { STORAGE_KEY } from '../replay/records'
@@ -48,7 +49,7 @@ describe('学习进度跨刷新', () => {
     expect(view.container.querySelectorAll('[data-mark="selected"]')).toHaveLength(0)
     expect(view.container.querySelectorAll('.progress__step--done')).toHaveLength(1)
     click('返回章节')
-    expect(screen.getByRole('heading', { name: '已完成 1 / 29 个课程与练习' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '已完成 1 / 35 个课程与练习' })).toBeTruthy()
     expect(screen.getByText('跟着引导完成')).toBeTruthy()
     click('继续学习')
     expect(screen.getByRole('heading', { name: '第 2 关:气' })).toBeTruthy()
@@ -86,8 +87,8 @@ describe('学习进度跨刷新', () => {
     }
     expect(screen.getByRole('button', { name: '去陪练试试' })).toBeTruthy()
     click('返回章节')
-    expect(screen.getByRole('heading', { name: '已完成 6 / 29 个课程与练习' })).toBeTruthy()
-    // 回到首页时展开的是下一课所在的卷，这里手动展开第伍卷查看记录。
+    expect(screen.getByRole('heading', { name: '已完成 6 / 35 个课程与练习' })).toBeTruthy()
+    // 回到首页时展开的是下一课所在的卷，这里手动展开第陆卷查看记录。
     chapter('从看懂到自己下')
     fireEvent.click(screen.getByText('六道独立练习 · 已完成 6 / 6'))
     expect(screen.getByText('借助提示完成')).toBeTruthy()
@@ -114,7 +115,7 @@ describe('清除与存储降级', () => {
     expect(window.localStorage.getItem(COACHING_KEY)).toBe(preference)
     click('对局'); expect(screen.getByText('已下 2 手')).toBeTruthy()
     click('教学'); view.unmount(); render(<App />)
-    expect(screen.getByRole('heading', { name: '已完成 0 / 29 个课程与练习' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '已完成 0 / 35 个课程与练习' })).toBeTruthy()
   })
   it('损坏或未来版本不在初始化时覆盖，提示后仍可以继续学习', () => {
     for (const raw of ['{bad', JSON.stringify({ version: 99, completed: {}, lastVisited: null })]) {
@@ -134,7 +135,7 @@ describe('清除与存储降级', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota') })
     const view = render(<App />)
     click('返回章节'); click('清除学习记录'); click('确认清除学习记录')
-    expect(screen.getByRole('heading', { name: '已完成 0 / 29 个课程与练习' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '已完成 0 / 35 个课程与练习' })).toBeTruthy()
     expect(screen.getByRole('alert').textContent).toContain('恢复旧记录')
     click('从第一课开始'); point(4, 4)
     expect(screen.getByRole('button', { name: '下一关' })).toBeTruthy()
@@ -160,4 +161,31 @@ describe('首页卷目跟随学习位置', () => {
     expect(container.querySelector('[aria-current="step"]')?.textContent).toContain('第 2 关:气')
     expect(container.querySelector('.learning-entry--done')?.textContent).toContain('第 1 关:落子')
   })
+})
+
+it('完成生存末题可进入吃子卷并续读，吃子末题去终局或陪练', () => {
+  let view = render(<App />)
+  chapter('保住自己的棋'); click('自己试试：自己解释两只眼')
+  point(4, 3); point(4, 5); click('白棋一次只能填一个，另一个还在')
+  click('下一章 · 吃掉对方的棋 →')
+  expect(screen.getByRole('heading', { name: '关住白棋的出路' })).toBeTruthy()
+  expect(stored().lastVisited).toBe('capture/direction-guided')
+  point(2, 3)
+  expect(stored().completed['capture/direction-guided']).toBeUndefined()
+  view.unmount(); view = render(<App />)
+  expect(screen.getByRole('heading', { name: '关住白棋的出路' })).toBeTruthy()
+  expect(screen.getByText('追吃中 · 已下 0 手 / 最多 2 手')).toBeTruthy()
+  point(2, 3); point(2, 1)
+  expect(stored().completed['capture/direction-guided']).toBe('guided')
+  view.unmount(); render(<App />)
+  expect(screen.getByRole('heading', { name: '赶向有黑棋的一边' })).toBeTruthy()
+
+  click('返回章节'); chapter('吃掉对方的棋'); click('自己试试：换个方向征白棋')
+  for (const move of CAPTURE_SCENES[5].solution) point(move.x, move.y)
+  expect(stored().completed['capture/ladder-check']).toBe('independent')
+  click('学习围地与终局 →')
+  expect(screen.getByRole('heading', { name: '围住的空点属于谁' })).toBeTruthy()
+  click('返回章节'); chapter('吃掉对方的棋'); click('自己试试：换个方向征白棋')
+  click('开始我的陪练')
+  expect(screen.getByRole('heading', { name: '对局' })).toBeTruthy()
 })

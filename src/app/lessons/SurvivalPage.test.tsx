@@ -10,10 +10,10 @@ import { startSurvival } from './survivalRunner'
 
 afterEach(cleanup)
 const scene = (id: string) => SURVIVAL_SCENES.find((s) => s.id === id)!
-interface HarnessProps { readonly id: string; readonly isLast?: boolean; readonly nextLabel?: string; readonly onNext?: () => void; readonly onScoring?: () => void }
-function Harness({ id, isLast = false, nextLabel, onNext = vi.fn(), onScoring }: HarnessProps) {
+interface HarnessProps { readonly id: string; readonly isLast?: boolean; readonly nextLabel?: string; readonly onNext?: () => void; readonly onNextChapter?: () => void }
+function Harness({ id, isLast = false, nextLabel, onNext = vi.fn(), onNextChapter }: HarnessProps) {
   const [run, setRun] = useState(() => startSurvival(scene(id)))
-  return <SurvivalPage run={run} onChange={setRun} onNext={onNext} isLast={isLast} nextLabel={nextLabel} onScoring={onScoring} />
+  return <SurvivalPage run={run} onChange={setRun} onNext={onNext} isLast={isLast} nextLabel={nextLabel} onNextChapter={onNextChapter} />
 }
 const click = (name: string) => fireEvent.click(screen.getByRole('button', { name }))
 const point = (x: number, y: number) => click(`交叉点 ${x},${y}`)
@@ -61,18 +61,23 @@ describe('生存课分步布局', () => {
     expect(folded('看看对照').open).toBe(false)
   })
 
-  it('最后一题：主按钮去终局，陪练为次要；调用方的 nextLabel 优先', () => {
-    const onScoring = vi.fn()
-    const { container } = render(<Harness id="eyes-check" isLast onScoring={onScoring} />)
+  it('最后一题：主按钮去吃子卷，陪练为次要；练习去向单独传入', () => {
+    const onNextChapter = vi.fn()
+    const onPlay = vi.fn()
+    const nextLabel = '下一章 · 吃掉对方的棋 →'
+    const { container } = render(<Harness id="eyes-check" isLast nextLabel={nextLabel} onNextChapter={onNextChapter} onNext={onPlay} />)
     point(4, 3); point(4, 5); click('白棋一次只能填一个，另一个还在')
-    expect(solid(container)).toEqual(['学习围地与终局 →'])
-    click('学习围地与终局')
-    expect(onScoring).toHaveBeenCalledOnce()
+    expect(solid(container)).toEqual([nextLabel])
     expect(screen.getByRole('button', { name: '开始我的陪练' }).className).toContain('button--ghost')
+    click(nextLabel)
+    expect(onNextChapter).toHaveBeenCalledOnce()
+    click('开始我的陪练')
+    expect(onPlay).toHaveBeenCalledOnce()
     cleanup()
     const practice = render(<Harness id="danger-check" nextLabel="下一道练习" />)
     point(0, 3); point(0, 5)
     expect(solid(practice.container)).toEqual(['下一道练习'])
+    expect(screen.queryByRole('button', { name: '开始我的陪练' })).toBeNull()
   })
 })
 

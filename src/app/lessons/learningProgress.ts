@@ -1,5 +1,7 @@
 import { PRACTICE_DANGER_SCENES, PRACTICE_RESCUE_SCENES, PRIORITY_SCENES } from '../../content/practiceExtras'
 import { LESSONS } from '../../content/lessons'
+import { CAPTURE_SCENES } from '../../content/capture'
+import { captureCompletion } from './captureRunner'
 import { SURVIVAL_SCENES } from '../../content/survival'
 import { ENDGAME_LESSONS, RULE_SEQUENCE_SCENES } from '../../content/endgame'
 import { STRATEGY_LESSONS } from '../../content/strategy'
@@ -25,6 +27,7 @@ export const LEARNING_UNITS: readonly LearningUnit[] = [
   ...LESSONS.map((lesson, index) => ({ id: `rules/${lesson.id}`, page: 'rules' as const, index, title: lesson.title })),
   ...RULE_SEQUENCE_SCENES.map((scene, index) => ({ id: `rule-sequence/${scene.id}`, page: 'rule-sequence' as const, index, title: scene.title })),
   ...SURVIVAL_SCENES.map((scene, index) => ({ id: `survival/${scene.id}`, page: 'survival' as const, index, title: `生存练习 ${scene.course} · ${scene.guided ? '一起练习' : '自己试试'}：${scene.title}` })),
+  ...CAPTURE_SCENES.map((scene, index) => ({ id: `capture/${scene.id}`, page: 'capture' as const, index, title: `吃子技巧 ${scene.lesson} · ${scene.guided ? '一起练习' : '自己试试'}：${scene.title}` })),
   ...ENDGAME_LESSONS.map((lesson, index) => ({ id: `endgame/${lesson.id}`, page: 'endgame' as const, index, title: lesson.title })),
   ...STRATEGY_LESSONS.map((lesson, index) => ({ id: `strategy/${lesson.id}`, page: 'strategy' as const, index, title: lesson.title })),
   { id: 'walkthrough/full-game', page: 'walkthrough', index: 0, title: '一盘九路，从头到尾' },
@@ -41,7 +44,7 @@ export function emptyLearningProgress(): LearningProgress { return { version: 1,
 export function currentLearningUnit(session: LearningSession): LearningUnit | undefined {
   const index = session.page === 'rules' ? session.rules.index : session.page === 'survival' ? session.sceneIndex
     : session.page === 'rule-sequence' ? session.sequence.sceneIndex : session.page === 'endgame' ? session.endgameIndex
-      : session.page === 'strategy' ? session.strategyIndex : session.page === 'independent' ? session.independentIndex : 0
+      : session.page === 'capture' ? session.captureIndex : session.page === 'strategy' ? session.strategyIndex : session.page === 'independent' ? session.independentIndex : 0
   return LEARNING_UNITS.find((unit) => unit.page === session.page && unit.index === index)
 }
 const RANK: Record<Completion, number> = { demo: 0, hint: 1, guided: 2, retry: 2, independent: 3 }
@@ -55,6 +58,7 @@ export function recordLearningProgress(progress: LearningProgress, session: Lear
   if (isLessonDone(session.rules.run)) record(`rules/${session.rules.run.lesson.id}`, 'guided')
   session.sequence.solved.forEach((index) => record(`rule-sequence/${RULE_SEQUENCE_SCENES[index].id}`, 'guided'))
   session.runs.forEach((run) => { if (run.stage === 'done') record(`survival/${run.scene.id}`, survivalCompletion(run)) })
+  session.captureRuns.forEach((run) => { if (run.stage === 'done') record(`capture/${run.scene.id}`, captureCompletion(run)) })
   session.endgameRuns.forEach((run) => { if (run.done) record(`endgame/${run.lesson.id}`, run.assisted ? 'hint' : 'guided') })
   session.strategyRuns.forEach((run) => { if (run.done) record(`strategy/${run.lesson.id}`, 'guided') })
   if (session.walk.furthest === WALK_MOVES.length && WALK_QUESTIONS.every((question) => session.walk.answered.includes(question.step))) record('walkthrough/full-game', 'guided')
