@@ -18,12 +18,14 @@ Interactive lessons, practice problems, a simple computer opponent, and game rev
 
 | Section | What you can do |
 | --- | --- |
-| **Learn · 学** | Learn stone placement, liberties, captures, suicide restrictions, and ko. Then explore saving groups, connecting stones, two eyes, territory, and the end of a game, followed by a guided walkthrough of a complete 9×9 game. Interactive questions explain mistakes as you go. |
-| **Practice · 练** | Practice six skills: spotting danger, escaping, capturing, connecting, making two eyes, and choosing what to do first. Find problems you have not yet completed independently, or return to a related lesson. |
+| **Learn · 学** | Learn stone placement, liberties, captures, suicide restrictions, and ko. Then explore saving groups, connecting stones, two eyes, atari, double atari, ladders, territory, and the end of a game, followed by a guided walkthrough of a complete 9×9 game. Interactive questions explain mistakes as you go. |
+| **Practice · 练** | Practice spotting danger, escaping, capturing, connecting, making two eyes, choosing what to do first, and defending against ladders. Find problems you have not yet completed independently, or return to a related lesson. |
 | **Play · 弈** | Play 9×9 Go against a simple computer opponent. Coaching is on by default: try a move, inspect its local consequences, then confirm. Retry the most recent round, mark dead stones, and score the game. |
 | **Review · 复** | Keep the ten most recent completed games and replay them move by move, with explanations of rule events such as captures, ko, and the end of the game. |
 
-The learning path has **29 lesson and practice units**. The Practice page contains **22 problems**: ten shared with the lessons, eight additional positions, and four move-priority problems. Shared problems use the same completion record. Practicing does not change your place in the learning path.
+The learning path has **35 lesson and practice units**. The Practice page contains **24 problems**, including ten shared with the lessons, eight additional positions, four move-priority problems, and two ladder defense drills. Shared problems use the same completion record. Practicing does not change your place in the learning path.
+
+Six interactive capture puzzles let you choose the direction of an atari, try a double atari, and chase a group in a ladder. Two defense drills let you compare running with and without a supporting stone.
 
 Move-priority problems ask you to compare choices such as saving a group versus capturing, or extending versus capturing to escape. Try a move, confirm it, see White's reply, then explain the result. Records distinguish independent completion, retries, and help from hints or demonstrations, keeping each problem's best result.
 

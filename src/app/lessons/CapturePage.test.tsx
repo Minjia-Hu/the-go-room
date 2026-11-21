@@ -86,6 +86,7 @@ describe('追吃页面', () => {
     for (let i = 0; i < 10; i++) click('下一手')
     expect(stone(6, 1)).toBe('white')
     expect(screen.getByRole('status').textContent).toContain('白棋逃出去了')
+    expect(screen.getByRole('status').textContent).toContain('连上了路上的白棋，现在有 3 口气')
     click('上一手')
     expect(stone(6, 1)).toBeUndefined()
     click('回看原图')
