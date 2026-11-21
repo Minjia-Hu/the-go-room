@@ -9,7 +9,7 @@ import { createLearningSession } from './learningSession'
 afterEach(cleanup)
 function Harness() {
   const [session, setSession] = useState(createLearningSession)
-  return <LearningPage session={session} onChange={setSession} onPlay={vi.fn()} />
+  return <LearningPage onPractice={() => {}} session={session} onChange={setSession} onPlay={vi.fn()} />
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('button', { name }))
 // 首页卷目一次只展开一卷：先点开书脊，再点其中的课程。

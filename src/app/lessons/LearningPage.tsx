@@ -16,6 +16,7 @@ import { VolumeContents } from './VolumeContents'
 import { VolumeIndex } from './VolumeIndex'
 import { COURSE_VOLUMES, volumeFor } from './courseVolumes'
 import { ScrollContents } from './ScrollContents'
+import type { PracticeItem } from './practiceCatalog'
 import type { ScrollChapter } from './ScrollContents'
 import { ENDGAME_LESSONS } from '../../content/endgame'
 import { EndgamePage } from './EndgamePage'
@@ -25,8 +26,16 @@ import { StrategyPage } from './StrategyPage'
 import { WalkthroughPage } from './WalkthroughPage'
 import { IndependentPage } from './IndependentPage'
 
-interface Props { readonly session: LearningSession; readonly onChange: (next: LearningSession) => void; readonly onPlay: () => void; readonly onClear?: () => void; readonly storageMessage?: string | null }
-export function LearningPage({ session, onChange, onPlay, onClear, storageMessage }: Props) {
+interface Props {
+  readonly catalogVisit?: number
+  readonly onPractice: (item: PracticeItem | null) => void
+  readonly session: LearningSession
+  readonly onChange: (next: LearningSession) => void
+  readonly onPlay: () => void
+  readonly onClear?: () => void
+  readonly storageMessage?: string | null
+}
+export function LearningPage({ onPractice, catalogVisit, session, onChange, onPlay, onClear, storageMessage }: Props) {
   const completed = session.progress.completed
   const currentUnit = currentLearningUnit(session)
   const recorded = currentUnit ? completed[currentUnit.id] : undefined
@@ -36,7 +45,7 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
     document.body.scrollTop = 0
     if (returningToCatalog.current && session.page === 'home') {
       returningToCatalog.current = false
-      document.getElementById('scrolls-title')?.focus()
+      document.getElementById('course-catalog-switch')?.focus()
     }
   }, [currentUnit?.id, session.page])
   const openScene = (sceneIndex: number) => onChange({ ...session, page: 'survival', sceneIndex })
@@ -56,10 +65,10 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
     const allDone = LEARNING_UNITS.every((unit) => completed[unit.id])
     const startRules = () => onChange({ ...session, page: 'rules', rules: { index: 0, run: startLesson(LESSONS[0]) } })
     const current = next ? COURSE_VOLUMES.indexOf(volumeFor(next)) : 0
-    const chapters: ScrollChapter[] = COURSE_VOLUMES.map((volume, index) => {
+    const chapters: ScrollChapter[] = COURSE_VOLUMES.map(volume => {
       const entries = volume.groups.flatMap(group => group.entries)
       return {
-        number: volume.number, title: volume.title, count: volume.count, live: index === current,
+        number: volume.number, title: volume.title, count: volume.count,
         done: [entries.filter(({ unit }) => completed[unit.id]).length, entries.length],
         content: <VolumeIndex volume={volume} currentId={allDone ? undefined : next?.id} completed={completed}
           onSelect={unit => onChange(openLearningUnit(session, unit))} />,
@@ -72,7 +81,7 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
           <div className="ink-hero__title"><h2>一子一气</h2><p>写给第一次拿起棋子的人</p></div>
           <HeroExercise onStart={startRules} onSurvival={() => openScene(0)} />
         </div>
-        <ScrollContents chapters={chapters} initialOpen={current} onPlay={onPlay} />
+        <ScrollContents key={catalogVisit} onPractice={onPractice} completed={completed} chapters={chapters} initialOpen={current} onPlay={onPlay} />
         <LearningProgressPanel progress={session.progress} onContinue={(unit) => onChange(openLearningUnit(session, unit))} onClear={onClear} />
         <p className="muted small archive-note">切换页面保留当前练习和对局。课程完成记录与学习位置保存在此浏览器；刷新后题目从头开始，进行中的对局不保留，已完成棋谱仍可复盘。</p>
       </section>

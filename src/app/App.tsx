@@ -1,6 +1,7 @@
 import { useLayoutEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { InkMark } from './InkMark'
+import { openPracticeItem, type PracticeItem } from './lessons/practiceCatalog'
 import { PracticePage } from './lessons/PracticePage'
 import { LearningPage } from './lessons/LearningPage'
 import { createLearningSession, openLearningUnit, restoreLearningSession } from './lessons/learningSession'
@@ -27,9 +28,14 @@ const NAV: readonly { page: Page; label: string; glyph: string }[] = [
 
 export function App() {
   const [page, navigate] = usePage()
-  // 再点「练」时重新打开列表；每道题的作答状态由 learning 保存。
-  const [practiceVisit, setPracticeVisit] = useState(0)
-  useLayoutEffect(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0 }, [page])
+  const [activePractice, setActivePractice] = useState<PracticeItem | null>(null)
+  const [catalogVisit, setCatalogVisit] = useState(0)
+  // 离开练习后，下次从导航或浏览器历史进入时先显示题目列表。
+  if (page !== 'practice' && activePractice !== null) setActivePractice(null)
+  useLayoutEffect(() => {
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+  }, [page])
   const [loadedLearning] = useState(() => {
     try { return readLearningProgress(window.localStorage) }
     catch { return { progress: emptyLearningProgress(), message: '无法读取此浏览器的学习记录，本次仍可正常学习。' } }
@@ -63,15 +69,23 @@ export function App() {
     setLearning(next)
   }
 
+  function openPractice(item: PracticeItem | null) {
+    if (item) changeLearning(openPracticeItem(learning, item), false)
+    // 再练同一道题时也触发换题后的滚动定位。
+    setActivePractice(item && { ...item })
+    navigate('practice')
+  }
+
   function openCourseCatalog() {
     // 先挂载卷目，再把键盘焦点和视口一起移到目录。
     flushSync(() => {
+      setCatalogVisit(visit => visit + 1)
       setLearning(current => ({ ...current, page: 'home' }))
       navigate('lessons')
     })
-    const heading = document.getElementById('scrolls-title')
-    heading?.focus({ preventScroll: true })
-    heading?.scrollIntoView?.({ block: 'start' })
+    const courseSwitch = document.getElementById('course-catalog-switch')
+    courseSwitch?.focus({ preventScroll: true })
+    courseSwitch?.scrollIntoView?.({ block: 'start' })
   }
 
   function finish(completed: Match) {
@@ -100,6 +114,7 @@ export function App() {
         <a className="brand" href="#/lessons" aria-label="The Go Room 首页" onClick={(event) => {
           if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
           event.preventDefault()
+          setCatalogVisit(visit => visit + 1)
           setLearning((current) => ({ ...current, page: 'home' }))
           navigate('lessons')
           window.scrollTo(0, 0)
@@ -118,7 +133,7 @@ export function App() {
               title={item.label}
               onClick={() => {
                 if (item.page === 'lessons') return openCourseCatalog()
-                if (page === 'practice' && item.page === 'practice') setPracticeVisit(visit => visit + 1)
+                if (item.page === 'practice') return openPractice(null)
                 navigate(item.page)
               }}
             >
@@ -128,9 +143,9 @@ export function App() {
         </nav>
       </header>
       <main>
-        {page === 'lessons' && <LearningPage session={learning} onChange={changeLearning} onPlay={() => navigate('play')}
+        {page === 'lessons' && <LearningPage catalogVisit={catalogVisit} onPractice={openPractice} session={learning} onChange={changeLearning} onPlay={() => navigate('play')}
           storageMessage={learningMessage} onClear={clearLearning} />}
-        {page === 'practice' && <PracticePage key={practiceVisit} session={learning} onChange={(next) => changeLearning(next, false)}
+        {page === 'practice' && <PracticePage active={activePractice} onOpen={openPractice} session={learning} onChange={(next) => changeLearning(next, false)}
           onLesson={(unit) => { changeLearning(openLearningUnit(learning, unit)); navigate('lessons') }}
           onPlay={() => navigate('play')} storageMessage={learningMessage} />}
         {page === 'play' && <PlayPage session={session} onChange={setSession} onFinish={finish} coaching={coaching} onCoachingChange={changeCoaching} preferenceMessage={preferenceMessage} />}
