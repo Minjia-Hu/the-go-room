@@ -83,7 +83,7 @@ describe('生存课分步布局', () => {
 
 function LearningHarness() {
   const [session, setSession] = useState(createLearningSession)
-  return <LearningPage session={session} onChange={setSession} onPlay={vi.fn()} />
+  return <LearningPage onPractice={() => {}} session={session} onChange={setSession} onPlay={vi.fn()} />
 }
 
 describe('生存课程去向', () => {

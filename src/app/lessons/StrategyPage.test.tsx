@@ -10,7 +10,7 @@ afterEach(cleanup)
 const onPlay = vi.fn()
 function Harness() {
   const [session, setSession] = useState(createLearningSession)
-  return <LearningPage session={session} onChange={setSession} onPlay={onPlay} />
+  return <LearningPage onPractice={() => {}} session={session} onChange={setSession} onPlay={onPlay} />
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('button', { name }))
 // 首页卷目一次只展开一卷：先点开书脊，再点其中的课程。

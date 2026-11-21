@@ -18,7 +18,7 @@ Interactive lessons, practice problems, a simple computer opponent, and game rev
 
 | Section | What you can do |
 | --- | --- |
-| **Learn · 学** | Learn stone placement, liberties, captures, suicide restrictions, and ko. Then explore saving groups, connecting stones, two eyes, atari, double atari, ladders, territory, and the end of a game, followed by a guided walkthrough of a complete 9×9 game. Interactive questions explain mistakes as you go. |
+| **Learn · 学** | Six chapters take you from the rules to saving your own stones and capturing your opponent’s. Learn about territory, the endgame, and 9×9 strategy, then play through a complete annotated game. |
 | **Practice · 练** | Practice spotting danger, escaping, capturing, connecting, making two eyes, choosing what to do first, and defending against ladders. Find problems you have not yet completed independently, or return to a related lesson. |
 | **Play · 弈** | Play 9×9 Go against a simple computer opponent. Coaching is on by default: try a move, inspect its local consequences, then confirm. Retry the most recent round, mark dead stones, and score the game. |
 | **Review · 复** | Keep the ten most recent completed games and replay them move by move, with explanations of rule events such as captures, ko, and the end of the game. |
@@ -37,9 +37,9 @@ This roughly 40-second recording includes cursor movement, click indicators, and
 
 ## Getting started
 
-1. Start with the first lesson in **学**. Learn placement, liberties, and captures before moving on to protecting groups.
-2. Visit **练** to try a different position on your own. Use hints or related lessons when you need help.
-3. Play a 9×9 game in **弈** with coaching enabled. Inspect each trial move before confirming, then revisit the completed game in **复**.
+- **New to Go?** Select **学** (Learn) in the catalog below the board on the home page. Open **认识规则** (Learn the rules) and choose the first lesson to place a stone.
+- **Want to practice a skill?** Switch to **练** (Practice) in the same catalog. Open a group such as **认危险** (Spot danger) or **找出路** (Find an escape), then select a problem.
+- **Ready for a game?** Select **弈** (Play) in the top navigation. Coaching is on by default, so you can try a move before confirming it. After the game, open **复** (Review) to replay it move by move.
 
 Open the [live site](https://minjia-hu.github.io/the-go-room/) to get started without installing anything. To run it locally or contribute, follow the instructions below.
 

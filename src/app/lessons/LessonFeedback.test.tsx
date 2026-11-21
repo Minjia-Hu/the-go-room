@@ -8,7 +8,7 @@ import { createLearningSession } from './learningSession'
 afterEach(cleanup)
 function Harness() {
   const [session, setSession] = useState(createLearningSession)
-  return <LearningPage session={session} onChange={setSession} onPlay={() => {}} />
+  return <LearningPage onPractice={() => {}} session={session} onChange={setSession} onPlay={() => {}} />
 }
 
 describe('课程答错反馈', () => {

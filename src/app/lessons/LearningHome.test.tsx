@@ -8,7 +8,7 @@ import { createLearningSession } from './learningSession'
 afterEach(cleanup)
 function Harness() {
   const [session, setSession] = useState(createLearningSession)
-  return <LearningPage session={session} onChange={setSession} onPlay={() => {}} />
+  return <LearningPage onPractice={() => {}} session={session} onChange={setSession} onPlay={() => {}} />
 }
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('button', { name }))
 const stones = (container: HTMLElement) => container.querySelectorAll('[data-stone]').length
@@ -68,7 +68,7 @@ describe('首页：一子一气与卷目', () => {
       '练习 别只叫吃一块', '3. 沿着台阶追到边上', '练习 换个方向征白棋']) {
       expect(screen.getByRole('button', { name })).toBeTruthy()
     }
-    expect(screen.getByRole('heading', { name: '学 · 课程卷目' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: '学 · 课程卷目' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '去下一盘九路棋' })).toBeTruthy()
   })
 })
