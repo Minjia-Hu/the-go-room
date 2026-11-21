@@ -1,4 +1,4 @@
-import { createGame, getCell, getGroup, neighbors, parseBoard, pass, play, toIndex } from '../../engine'
+import { createGame, getCell, getGroup, inspectPlay, neighbors, parseBoard, pass, play, toIndex } from '../../engine'
 import type { Color, GameState, Group, Point } from '../../engine'
 import type { CaptureScene } from '../../content/capture'
 import { REJECTIONS } from '../play/match'
@@ -83,12 +83,12 @@ export function startCapture(scene: CaptureScene, rows = scene.rows): CaptureRun
 
 export function capturePoint(run: CaptureRun, point: Point): CaptureRun {
   if (run.stage !== 'active') return run
-  const black = play(run.game, point)
+  const { result: black, captured } = inspectPlay(run.game, point)
   if (!black.ok) return { ...run, mistakes: run.mistakes + 1, message: REJECTIONS[black.reason] }
   const moves = run.moves + 1
   const round = { before: run.game, black: black.state }
   if (run.scene.targets.some((target) => getCell(black.state.board, target) !== 'white')) {
-    return { ...run, game: black.state, rounds: [...run.rounds, round], moves, stage: 'done', message: '提掉了目标白棋。' }
+    return { ...run, game: black.state, rounds: [...run.rounds, round], moves, stage: 'done', message: captured.length === 1 ? '提掉了这颗白棋。' : `提掉了 ${captured.length} 颗白棋。` }
   }
 
   const reply = captureReply(black.state, run.scene.targets)

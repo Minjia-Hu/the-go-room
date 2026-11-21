@@ -4,16 +4,18 @@ import { BoardLayout } from '../board/BoardLayout'
 import { answerIndependent, confirmIndependent, independentHint, independentPoint, independentReasons, independentView, startIndependent } from './independentRunner'
 import type { IndependentRun } from './independentRunner'
 
-interface Props { readonly practiceTitle?: string; readonly nextLabel?: string; readonly run: IndependentRun; readonly index: number; readonly onChange: (run: IndependentRun) => void; readonly onNext: () => void; readonly allDone: boolean }
-export function IndependentPage({ run, index, onChange, onNext, allDone, nextLabel, practiceTitle }: Props) {
+import type { PracticeLabels } from './practiceCatalog'
+
+interface Props { readonly practice?: PracticeLabels; readonly nextLabel?: string; readonly run: IndependentRun; readonly index: number; readonly onChange: (run: IndependentRun) => void; readonly onNext: () => void; readonly allDone: boolean }
+export function IndependentPage({ run, index, onChange, onNext, allDone, nextLabel, practice }: Props) {
   const view = independentView(run)
   const goal = run.scene.kind === 'capture' ? '试着用提子帮助目标黑棋，让它至少有两口气。' : run.scene.kind === 'connect' ? '把目标黑棋直线连接到旁边另一块黑棋，让整块至少有两口气。' : '选一手让目标黑块至少有两口气，先处理眼前危险。'
   return <BoardLayout
       legend={<p className="small">{view.marks.length ? '橙圈：关注棋块 · 小空心圈：气 · 虚线小圈：被提走的位置' : '不按棋子多少判断危险，要数整块棋的气'}</p>}
       feedback={run.message && <LessonFeedback message={run.message} />}
-      heading={<><p className="eyebrow">{practiceTitle ? '自己判断 · 独立练习' : `独立练习 / 第 ${index + 1} 题，共六题`}</p><h2>{practiceTitle ?? '这次，自己找出一手'}</h2><p className="turn">{run.stage === 'find' ? '第一步：找危险棋块' : run.stage === 'move' ? '第二步：试下、看后果，再确认' : run.stage === 'reason' ? '第三步：解释这一手为什么有用' : view.completion}</p></>}
+      heading={<><p className="eyebrow">{practice?.eyebrow ?? `独立练习 / 第 ${index + 1} 题，共六题`}</p><h2>{practice?.title ?? '这次，自己找出一手'}</h2><p className="turn">{run.stage === 'find' ? '第一步：找危险棋块' : run.stage === 'move' ? '第二步：试下、看后果，再确认' : run.stage === 'reason' ? '第三步：解释这一手为什么有用' : view.completion}</p></>}
       board={<>
-      <p className="figure-number">{practiceTitle ?? `换个棋形，自己判断 / 第 ${index + 1} / 6 题`}</p>
+      <p className="figure-number">{practice?.figure ?? `换个棋形，自己判断 / 第 ${index + 1} / 6 题`}</p>
       <Board board={view.game.board} marks={view.marks} disabled={run.stage === 'reason' || run.stage === 'done' || run.view === 'reply'} ghostColor={run.stage === 'move' && run.view !== 'reply' ? 'black' : null} onPointClick={(point) => onChange(independentPoint(run, point))} />
       <p className="board-caption">{run.view === 'reply' ? '反例演示：白棋占住最后一气，目标黑棋被提走' : run.point && run.view === 'after' ? '试下结果 · 从题目原图计算，不写正式棋谱' : run.stage === 'find' && run.help < 2 ? '初始不标答案 · 先自己找危险的黑棋' : '题目原图 · 你执黑'}</p>
     </>}

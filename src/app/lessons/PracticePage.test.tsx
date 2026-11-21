@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { App } from '../App'
 import { pageFromHash } from '../router'
 import { INDEPENDENT_SCENES } from '../../content/independent'
-import { LEARNING_KEY, emptyLearningProgress } from './learningProgress'
+import { LEARNING_KEY, LEARNING_UNITS, emptyLearningProgress } from './learningProgress'
 import type { Completion } from './learningProgress'
 import { PRACTICE_ITEMS } from './practiceCatalog'
 
@@ -26,6 +26,35 @@ const finishExtend = () => {
 const allIndependent = Object.fromEntries(PRACTICE_ITEMS.map((item) => [item.id, 'independent' as Completion]))
 
 describe('practice hub', () => {
+  const shared = PRACTICE_ITEMS.filter((item) => item.source === 'survival' || item.source === 'independent')
+  it('shows the practice group and shared caption on all course exercises', () => {
+    render(<App />)
+    for (const item of shared) {
+      click(item.title)
+      expect(screen.getByText(`练 · ${item.group} · 课程里的检验题`)).toBeTruthy()
+      expect(screen.getByText('换个局面，自己判断')).toBeTruthy()
+      click('返回练习')
+    }
+  })
+  it('names the matching course unit in a shared completion record', () => {
+    window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), completed: allIndependent }))
+    render(<App />)
+    for (const item of shared) {
+      click(item.title)
+      const unit = LEARNING_UNITS.find((entry) => entry.id === item.id)!
+      expect(screen.getByLabelText('已记录的学习结果').textContent).toBe(
+        `你在课程「${unit.title}」做过这道题：独立完成。可以再练一次，保留最好的一次记录。`)
+      click('返回练习')
+    }
+  })
+  it('labels only the ten course exercises in the practice list', () => {
+    render(<App />)
+    expect(screen.getAllByText('课程题')).toHaveLength(10)
+    for (const item of shared) {
+      const row = screen.getByRole('button', { name: item.title }).closest('li')!
+      expect(within(row).getByText('课程题')).toBeTruthy()
+    }
+  })
   it('routes directly to the list with an accessible fourth navigation item', () => {
     expect(pageFromHash('#/practice')).toBe('practice')
     render(<App />)
