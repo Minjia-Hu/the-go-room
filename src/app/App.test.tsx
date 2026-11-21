@@ -189,6 +189,13 @@ describe('默认陪练的应用闭环', () => {
     click('对局'); tick()
     expect(screen.getByText('已下 2 手')).toBeTruthy()
     click('教学')
+    expect(document.activeElement).toBe(screen.getByRole('heading', { name: '学 · 课程卷目' }))
+    click('继续学习')
+    expect(screen.getByText('点出它最后一口气。')).toBeTruthy()
+    click('教学')
+    expect(document.activeElement).toBe(screen.getByRole('heading', { name: '学 · 课程卷目' }))
+    expect(screen.getAllByRole('button', { name: /^第.卷：/ })).toHaveLength(6)
+    click('继续学习')
     expect(screen.getByText('点出它最后一口气。')).toBeTruthy()
   })
   it('实际提子可重试，存档只包含重试后保留的正式动作', () => {

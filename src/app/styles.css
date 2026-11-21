@@ -394,28 +394,31 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   .ink-hero__title, .ink-hero__board, .ink-hero__copy, .ink-feedback, .scroll__panel--unroll, .ink-hero .board__liberty { animation: none; }
 }
 
-/* 练：沿用纸色、墨条与朱砂序号，课程配套题与专项新题共用记录方式。 */
-.practice-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .7fr); gap: 64px; padding: 24px 0 40px; border-bottom: 1px solid var(--line-soft); align-items: center; }
-.practice-heading h2 { margin: 0 0 18px; font: 400 clamp(1.8rem, 4vw, 2.6rem)/1.4 var(--serif); }
-.practice-heading p { margin: 0 0 14px; }
-.practice-heading .muted { max-width: 30em; font-size: .9rem; }
-.practice-progress strong { font: 400 1.5rem var(--latin); margin-left: 12px; }
-.practice-progress .button { white-space: normal; text-align: center; }
-.practice-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 64px; padding-top: 32px; }
+/* 练习目录与课程目录共用题目行。 */
+.practice-heading, .practice-progress, .practice-group__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.practice-heading { padding: 12px 0 22px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.practice-heading h2 { margin: 0; font: 400 1.85rem/1.4 var(--serif); }
+.practice-progress { gap: 20px; color: var(--text-muted); font-size: .85rem; }
+.practice-progress strong { margin-left: .35em; font: 400 1rem var(--latin); color: var(--text); }
+.practice-progress .button { min-height: 44px; padding: 6px 20px; }
+.practice-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 64px; padding-top: 20px; }
 .practice-group { min-width: 0; }
-.practice-group h3 { margin: 0 0 10px; font-size: 1.3rem; font-weight: 400; }
-.practice-group h3 > span { color: var(--accent); margin-right: 16px; font-size: .8rem; }
+.practice-group__head { border-bottom: 1px solid var(--border); min-height: 46px; }
+.practice-group h3 { margin: 0; font: 400 1.25rem/1.5 var(--serif); }
+.practice-group h3 > span { color: var(--accent); margin-right: .8em; font-size: .78rem; }
 .practice-list { list-style: none; margin: 0; padding: 0; }
-.practice-item { padding-bottom: 16px; }
-.practice-item--independent .lesson-link__dot { background: var(--text); box-shadow: none; }
-.practice-status { margin: 6px 0 0 24px; color: var(--text-muted); font: max(12px, .72rem)/1.6 var(--serif); }
-.practice-item--independent .practice-status { color: var(--text); }
-.practice-related { margin-left: 24px; max-width: calc(100% - 24px); text-align: left; font-size: max(12px, .75rem); }
-.practice-toolbar { justify-content: space-between; }
-.practice-toolbar > span { font-size: max(12px, .75rem); color: var(--text-muted); }
+.practice-list li { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line-soft); }
+.practice-list .course-index__link { min-width: 0; flex: 1; }
+.practice-source, .practice-status, .practice-related { color: var(--text-muted); font: max(12px, .75rem)/1.5 var(--serif); }
+.practice-source { margin-left: .75em; white-space: nowrap; }
+.practice-status, .practice-related { flex-shrink: 0; }
+.practice-related { min-height: 44px; text-decoration: none; }
+.practice-related:hover { color: var(--accent); text-decoration: underline; }
 @media (max-width: 760px) {
-  .practice-heading { grid-template-columns: 1fr; gap: 20px; padding: 8px 0 28px; }
-  .practice-groups { grid-template-columns: 1fr; gap: 24px; padding-top: 24px; }
+  .practice-heading { padding: 4px 0 16px; }
+  .practice-heading h2 { font-size: 1.5rem; }
+  .practice-progress { gap: 10px; }
+  .practice-groups { grid-template-columns: 1fr; gap: 20px; padding-top: 12px; }
 }
 /* 四字导航仍保留 44px 点按区域，为窄屏腾出品牌文字的空间。 */
 @media (max-width: 600px) {

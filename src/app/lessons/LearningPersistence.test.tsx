@@ -200,8 +200,8 @@ it('练征子防守不会移动续读位置，点相关讲解才进入征子引�
   click('路上没有接应')
   click('B · 在别处下'); click('下一手')
   expect(stored().lastVisited).toBe('rules/ko')
-  click('返回练习')
-  const entry = screen.getByRole('button', { name: '路上没有接应' }).closest('li')!
+  click('练习')
+  const entry = screen.getByRole('region', { name: '别被吃' })
   fireEvent.click(within(entry).getByRole('button', { name: '相关讲解：沿着台阶追到边上' }))
   expect(screen.getByRole('heading', { name: '沿着台阶追到边上' })).toBeTruthy()
   expect(stored().lastVisited).toBe('capture/ladder-guided')
