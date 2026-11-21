@@ -76,7 +76,11 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props)
   const replayEnd = !!replay && replay.step === replay.frames.length - 1
   const turn = !last ? '题目原图 · 你执黑'
     : `${last.color === 'black' ? '黑棋' : '白棋'}${last.kind === 'pass' ? '停一手' : '落子'}`
-  const feedback = replay ? (replayEnd ? replay.run.message : null) : run.message
+  const contrastGroup = replayEnd && replay?.kind === 'contrast' && replay.run.failure === 'escape'
+    ? getGroup(shown.board, scene.targets[0]) : null
+  const feedback = contrastGroup
+    ? `白棋逃出去了。它连上了路上的白棋，现在有 ${contrastGroup.liberties.length} 口气，黑棋一手叫吃不了。`
+    : replay ? (replayEnd ? replay.run.message : null) : run.message
   const label = stage === 'done' ? COMPLETION_LABELS[captureCompletion(run)]
     : stage === 'failed' ? '这次没吃到'
     : `追吃中 · 已下 ${run.moves} 手 / 最多 ${scene.maxMoves} 手`
