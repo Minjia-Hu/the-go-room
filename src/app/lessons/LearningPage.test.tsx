@@ -14,6 +14,17 @@ const click = (name: string) => fireEvent.click(screen.getByRole('button', { nam
 // 首页卷目一次只展开一卷：先点开书脊，再点其中的课程。
 const chapter = (title: string) => fireEvent.click(screen.getByRole('button', { name: new RegExp(`卷：${title}$`) }))
 describe('生存章节界面', () => {
+  it('第五关显示当前步骤，完成后可直接进入生存章节第一课', () => {
+    render(<Harness />)
+    click('第 5 关:劫')
+    expect(screen.getByText('第 1 步 / 共 2 步')).toBeTruthy()
+    click('交叉点 4,3')
+    expect(screen.getByText('第 2 步 / 共 2 步')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '下一章 · 保住自己的棋 →' })).toBeNull()
+    click('交叉点 0,0')
+    click('下一章 · 保住自己的棋 →')
+    expect(screen.getByRole('heading', { name: '认出哪块棋危险' })).toBeTruthy()
+  })
   it('认险、对照和检验题连贯，返回章节保留练习', () => {
     render(<Harness />)
     chapter('保住自己的棋'); click('1. 认出哪块棋危险')
