@@ -5,18 +5,18 @@ export interface ScrollChapter {
   readonly number: string
   readonly title: string
   readonly count: string
-  /** 本卷已完成 / 总数；陪练不计入单元时省略。 */
-  readonly done?: readonly [number, number]
+  /** 本卷已完成 / 总数。 */
+  readonly done: readonly [number, number]
   readonly live?: boolean
   readonly content: ReactNode
 }
 
 /** 卷目：每卷收起时是一根竖排书脊，点开后展开完整课程目录；同一时间只展开一卷。 */
-export function ScrollContents({ chapters, initialOpen }: { readonly chapters: readonly ScrollChapter[]; readonly initialOpen: number }) {
+export function ScrollContents({ chapters, initialOpen, onPlay }: { readonly chapters: readonly ScrollChapter[]; readonly initialOpen: number; readonly onPlay: () => void }) {
   const [open, setOpen] = useState(initialOpen)
   const [animate, setAnimate] = useState(false)
   return <section className="scrolls" aria-labelledby="scrolls-title">
-    <div className="scrolls__head"><h3 id="scrolls-title">卷目</h3><p>七卷 · 点书脊展开</p></div>
+    <div className="scrolls__head"><h3 id="scrolls-title">学 · 课程卷目</h3><p>六卷 · 点书脊展开</p></div>
     <div className="scrolls__row">
       {chapters.map((chapter, index) => {
         const isOpen = index === open
@@ -26,7 +26,7 @@ export function ScrollContents({ chapters, initialOpen }: { readonly chapters: r
             onClick={() => { setOpen(index); setAnimate(true) }}>
             <span className="scroll__number" aria-hidden="true">{chapter.number}</span>
             <span className="scroll__title" aria-hidden="true">{chapter.title}</span>
-            <span className="scroll__meta" aria-hidden="true"><span>{chapter.count}</span>{chapter.done && <span className={chapter.done[0] === chapter.done[1] ? 'scroll__done scroll__done--full' : 'scroll__done'}>{chapter.done[0]} / {chapter.done[1]}</span>}</span>
+            <span className="scroll__meta" aria-hidden="true"><span>{chapter.count}</span><span className={chapter.done[0] === chapter.done[1] ? 'scroll__done scroll__done--full' : 'scroll__done'}>{chapter.done[0]} / {chapter.done[1]}</span></span>
           </button>
           {isOpen && <div id={panelId} className={`scroll__panel${animate ? ' scroll__panel--unroll' : ''}`} role="region" aria-label={chapter.title}>
             {chapter.content}
@@ -34,5 +34,6 @@ export function ScrollContents({ chapters, initialOpen }: { readonly chapters: r
         </article>
       })}
     </div>
+    <div className="scrolls__end"><button className="text-button" onClick={onPlay}>去下一盘九路棋 <span aria-hidden="true">→</span></button></div>
   </section>
 }

@@ -92,10 +92,6 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
           <div className="course-pair">{LEARNING_UNITS.filter((unit) => unit.page === 'independent').map((unit) =>
             indexLink(unit, `第 ${unit.index + 1} 题`, '独立练习'))}</div>
         </div> },
-      { number: '柒', title: '有提示的陪练', count: '一盘', content:
-        <div className="course-index"><div className="course-pair">
-          <button className="course-index__link" onClick={onPlay}>直接开始陪练</button>
-        </div></div> },
     ]
     const chapterOf: Record<LearningUnit['page'], number> = { rules: 0, 'rule-sequence': 0, survival: 1, capture: 2, endgame: 3, strategy: 4, walkthrough: 5, independent: 5 }
     const current = next ? chapterOf[next.page] : 0
@@ -106,7 +102,7 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
           <div className="ink-hero__title"><h2>一子一气</h2><p>写给第一次拿起棋子的人</p></div>
           <HeroExercise onStart={startRules} onSurvival={() => openScene(0)} />
         </div>
-        <ScrollContents chapters={chapters.map((chapter, index) => index === current ? { ...chapter, live: true } : chapter)} initialOpen={current} />
+        <ScrollContents chapters={chapters.map((chapter, index) => index === current ? { ...chapter, live: true } : chapter)} initialOpen={current} onPlay={onPlay} />
         <LearningProgressPanel progress={session.progress} onContinue={(unit) => onChange(openLearningUnit(session, unit))} onClear={onClear} />
         <p className="muted small archive-note">切换页面保留当前练习和对局。课程完成记录与学习位置保存在此浏览器；刷新后题目从头开始，进行中的对局不保留，已完成棋谱仍可复盘。</p>
       </section>
