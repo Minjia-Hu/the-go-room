@@ -14,7 +14,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 新增八道专项局面在认危险、找出路、提子、连接四组各加两题，改变方向、棋块大小或救法。四道先后判断比较救棋与吃子、救棋与追子、提子与延伸、连接与远处落子：先选择试下，再确认，看白棋实际回应，最后解释原因才算完成。比较从同一原图重放，只解释指定局部变化，不声称整盘最佳手或长期死活。专项记录可跨刷新保存，不进入课程计数或续读位置；详见[练习扩充验收](qa/practice-expansion/README.md)。
 
-生存练习覆盖认险、延伸或提子解围、连接与两只眼。例题可对照不同走法，检验题默认不标答案，提示逐级展开；使用演示后明确标记“跟着演示完成”。
+生存练习覆盖认险、延伸或提子解围、连接与两只眼。例题可对照不同走法，检验题默认不标答案，提示逐级展开；使用演示后明确标记“跟着演示完成”。生存课通用页面改为分步显示：标题区标出“第几步 / 共几步”和一句任务，棋盘旁最多一个主按钮，讲解、图例与对照默认收起，完成后主按钮写明去向。见[生存课分步验收](qa/survival-step-layout/README.md)。
 
 规则慢镜头用一眼、两眼两个例子拆解“暂放白子 → 先提对方 → 检查自己”，中间画面明确标注尚未判定合法。禁入点和两眼课提供直达入口。围地与终局四课依次练习空区归属、活子加空点、白方加 7.5、双方连续停手与死子确认；错误回答会解释原因，数子提示会标记辅助完成。教学计分由实际规则引擎计算，预设局面不保存为正式棋谱。
 
@@ -40,7 +40,7 @@ A Go learning and playing app, from first moves to deeper understanding.
 
 最近 10 盘已完成棋谱单独保存在此浏览器中。切换页面保留当前课程题内状态与正式对局，未确认的对局预览会清除；刷新仍不保留进行中的正式对局。棋谱格式错误或存储不可用不影响下棋，保存失败时会提示并保留当前内存中的复盘。
 
-目前 330 个测试。`npm test`、`npm run build`、`npm run lint` 均通过；本轮新增 34 项测试，已有测试仅因练习目录数量与推荐顺序变化调整对应期望。最新检查见[练习扩充验收](qa/practice-expansion/README.md)；此前发布前检查见[发布前修复验收](qa/release-readiness/README.md)；练习页验收见[练习页验收](qa/practice-hub/README.md)。此前学习记录一轮检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。项目持续完善中，欢迎试用和反馈；教学效果仍待更多实际使用反馈，实体手机体验尚未验证。
+目前 343 个测试。`npm test`、`npm run build`、`npm run lint` 均通过，本轮新增 13 项测试。最新检查见[生存课分步验收](qa/survival-step-layout/README.md)。此前练习扩充新增 34 项测试，见[练习扩充验收](qa/practice-expansion/README.md)；此前发布前检查见[发布前修复验收](qa/release-readiness/README.md)；练习页验收见[练习页验收](qa/practice-hub/README.md)。此前学习记录一轮检查了完成方式、跨刷新恢复、清除记录隔离、存储异常、桌面与手机触屏、键盘操作，并回归原五关、八个生存场景与陪练流程，见[学习记录验收](qa/learning-progress/README.md)。此前检查见[陪练数子验收](qa/friendly-scoring/README.md)、[整盘讲解与独立练习验收](qa/full-game-and-practice/README.md)、[九路策略验收](qa/nine-line-strategy/README.md)、[规则与终局验收](qa/rules-and-scoring/README.md)、[陪练验收与试用清单](qa/beginner-coaching/README.md)。项目持续完善中，欢迎试用和反馈；教学效果仍待更多实际使用反馈，实体手机体验尚未验证。
 
 GitHub 仓库：[Minjia-Hu/the-go-room](https://github.com/Minjia-Hu/the-go-room)。
 
