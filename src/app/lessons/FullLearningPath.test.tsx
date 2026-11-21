@@ -42,7 +42,7 @@ describe('整盘讲解与独立练习界面', () => {
   it('六题均需找到目标、确认合法解法和原因；仅最后完成后进入陪练', () => {
     onPlay.mockClear()
     render(<Harness />)
-    chapter('从看懂到自己下'); click('换个棋形，自己判断')
+    chapter('从看懂到自己下'); click('独立练习 第 1 题')
     for (const [index, scene] of INDEPENDENT_SCENES.entries()) {
       point(scene.target.x, scene.target.y)
       point(scene.example.x, scene.example.y)
@@ -59,7 +59,7 @@ describe('整盘讲解与独立练习界面', () => {
   it('错误回应可以回原图重试，提示和已答问题跨页保留', () => {
     render(<Harness />)
     chapter('从看懂到自己下'); click('一盘九路，从头到尾'); click('先考虑角边和自己的发展方向'); click('到下一讲解点')
-    click('返回章节'); chapter('从看懂到自己下'); click('换个棋形，自己判断'); click('第 2 题')
+    click('返回章节'); chapter('从看懂到自己下'); click('独立练习 第 1 题'); click('第 2 题')
     click('给我一点思路'); click('标出需要观察的棋块')
     point(5, 3); point(5, 4); click('确认这一手'); click('看白棋怎样提')
     expect((screen.getByRole('button', { name: '确认这一手' }) as HTMLButtonElement).disabled).toBe(true)
@@ -70,7 +70,7 @@ describe('整盘讲解与独立练习界面', () => {
     expect(screen.getByText('借助提示完成')).toBeTruthy()
     click('返回章节'); chapter('从看懂到自己下'); click('一盘九路，从头到尾')
     expect(screen.getByText(/关键问题：已答对 1 \/ 6 个/)).toBeTruthy()
-    click('返回章节'); chapter('从看懂到自己下'); click('换个棋形，自己判断')
+    click('返回章节'); chapter('从看懂到自己下'); click('独立练习 第 2 题')
     expect(screen.getByText('借助提示完成')).toBeTruthy()
     click('重做这一题')
     expect(screen.getByText('第一步：找危险棋块')).toBeTruthy()

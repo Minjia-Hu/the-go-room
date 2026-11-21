@@ -88,9 +88,10 @@ describe('practice hub', () => {
     // Restore selected liberties; practice must leave this session.page and index intact.
     expect(screen.getByRole('heading', { name: '第 2 关:气' })).toBeTruthy()
     click('返回章节'); click('第贰卷：保住自己的棋')
-    const entry = screen.getByRole('button', { name: '自己试试：换到边上，自己找一找' }).parentElement!
-    expect(within(entry).getByText('独立完成')).toBeTruthy()
-    click('自己试试：换到边上，自己找一找'); click('下一课 · 给自己的棋找出路 →')
+    const entry = screen.getByRole('button', { name: '练习 换到边上，自己找一找' })
+    expect(entry.getAttribute('aria-description')).toBe('独立完成')
+    expect(within(entry).getByText('✓')).toBeTruthy()
+    click('练习 换到边上，自己找一找'); click('下一课 · 给自己的棋找出路 →')
     expect(screen.getByRole('heading', { name: '给自己的棋找出路' })).toBeTruthy()
     click('返回章节')
     expect(screen.getByRole('button', { name: '第贰卷：保住自己的棋' })).toBeTruthy()
@@ -127,7 +128,7 @@ describe('practice hub', () => {
     render(<App />)
     click('来一道还没独立完成的题'); point(0, 3)
     click('返回练习'); click('教学')
-    click('第贰卷：保住自己的棋'); click('自己试试：换到边上，自己找一找')
+    click('第贰卷：保住自己的棋'); click('练习 换到边上，自己找一找')
     expect(screen.getByText('点出这整块黑棋最后的一口气。')).toBeTruthy()
     point(0, 5)
     click('练习'); click('换到边上，自己找一找')

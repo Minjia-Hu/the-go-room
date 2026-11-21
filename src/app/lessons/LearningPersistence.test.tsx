@@ -26,7 +26,7 @@ const stored = () => JSON.parse(window.localStorage.getItem(LEARNING_KEY)!)
 describe('学习进度跨刷新', () => {
   it('两个慢镜头可跨刷新分别完成，最后仍能进入下一章', () => {
     let view = render(<App />)
-    chapter('认识规则'); click('规则慢镜头：落子后先提谁？')
+    chapter('认识规则'); click('慢镜头 只剩一只眼：为什么白棋可以下？')
     for (let i = 0; i < 3; i++) click('下一步')
     click('先提对方没气的棋，再检查自己的气')
     view.unmount(); view = render(<App />)
@@ -50,7 +50,7 @@ describe('学习进度跨刷新', () => {
     expect(view.container.querySelectorAll('.progress__step--done')).toHaveLength(1)
     click('返回章节')
     expect(screen.getByRole('heading', { name: '已完成 1 / 35 个课程与练习' })).toBeTruthy()
-    expect(screen.getByText('跟着引导完成')).toBeTruthy()
+    expect(screen.getByRole('button', { name: '第 1 关:落子' }).getAttribute('aria-description')).toBe('跟着引导完成')
     click('继续学习')
     expect(screen.getByRole('heading', { name: '第 2 关:气' })).toBeTruthy()
   })
@@ -58,7 +58,7 @@ describe('学习进度跨刷新', () => {
     const { container } = render(<App />)
     click('第 5 关:劫')
     expect(container.querySelectorAll('.progress__step--done')).toHaveLength(0)
-    click('返回章节'); chapter('保住自己的棋'); click('自己试试：竖着也能连接')
+    click('返回章节'); chapter('保住自己的棋'); click('练习 竖着也能连接')
     click('提醒我看哪里'); click('标出相关棋块和气'); click('演示一种做法')
     expect(stored().completed['survival/connect-check']).toBe('demo')
     click('重来这一题')
@@ -66,11 +66,11 @@ describe('学习进度跨刷新', () => {
     point(4, 4); click('确认这一步')
     expect(stored().completed['survival/connect-check']).toBe('independent')
     click('返回章节')
-    expect(screen.getByText('独立完成')).toBeTruthy()
+    expect(screen.getByRole('button', { name: '练习 竖着也能连接' }).getAttribute('aria-description')).toBe('独立完成')
   })
   it('六道独立题跨多次刷新累积完成，提示和重试不会被冒充为独立完成', () => {
     let view = render(<App />)
-    chapter('从看懂到自己下'); click('换个棋形，自己判断')
+    chapter('从看懂到自己下'); click('独立练习 第 1 题')
     for (const [index, scene] of INDEPENDENT_SCENES.entries()) {
       if (index === 0) click('给我一点思路')
       if (index === 1) point(8, 8)
@@ -90,9 +90,11 @@ describe('学习进度跨刷新', () => {
     expect(screen.getByRole('heading', { name: '已完成 6 / 35 个课程与练习' })).toBeTruthy()
     // 回到首页时展开的是下一课所在的卷，这里手动展开第陆卷查看记录。
     chapter('从看懂到自己下')
-    fireEvent.click(screen.getByText('六道独立练习 · 已完成 6 / 6'))
-    expect(screen.getByText('借助提示完成')).toBeTruthy()
-    expect(screen.getByText('重试后完成')).toBeTruthy()
+    for (let n = 1; n <= 6; n++) {
+      const entry = screen.getByRole('button', { name: `独立练习 第 ${n} 题` })
+      expect(entry.textContent).toContain('✓')
+      expect(entry.getAttribute('aria-description')).toBe(n === 1 ? '借助提示完成' : n === 2 ? '重试后完成' : '独立完成')
+    }
   })
 })
 
@@ -159,13 +161,13 @@ describe('首页卷目跟随学习位置', () => {
     click('第 1 关:落子'); point(4, 4); click('返回章节')
     expect(screen.getByRole('button', { name: '第壹卷：认识规则' }).getAttribute('aria-expanded')).toBe('true')
     expect(container.querySelector('[aria-current="step"]')?.textContent).toContain('第 2 关:气')
-    expect(container.querySelector('.learning-entry--done')?.textContent).toContain('第 1 关:落子')
+    expect(screen.getByRole('button', { name: '第 1 关:落子' }).textContent).toContain('✓')
   })
 })
 
 it('完成生存末题可进入吃子卷并续读，吃子末题去终局或陪练', () => {
   let view = render(<App />)
-  chapter('保住自己的棋'); click('自己试试：自己解释两只眼')
+  chapter('保住自己的棋'); click('练习 自己解释两只眼')
   point(4, 3); point(4, 5); click('白棋一次只能填一个，另一个还在')
   click('下一章 · 吃掉对方的棋 →')
   expect(screen.getByRole('heading', { name: '关住白棋的出路' })).toBeTruthy()
@@ -180,12 +182,12 @@ it('完成生存末题可进入吃子卷并续读，吃子末题去终局或陪�
   view.unmount(); render(<App />)
   expect(screen.getByRole('heading', { name: '赶向有黑棋的一边' })).toBeTruthy()
 
-  click('返回章节'); chapter('吃掉对方的棋'); click('自己试试：换个方向征白棋')
+  click('返回章节'); chapter('吃掉对方的棋'); click('练习 换个方向征白棋')
   for (const move of CAPTURE_SCENES[5].solution) point(move.x, move.y)
   expect(stored().completed['capture/ladder-check']).toBe('independent')
   click('学习围地与终局 →')
   expect(screen.getByRole('heading', { name: '围住的空点属于谁' })).toBeTruthy()
-  click('返回章节'); chapter('吃掉对方的棋'); click('自己试试：换个方向征白棋')
+  click('返回章节'); chapter('吃掉对方的棋'); click('练习 换个方向征白棋')
   click('开始我的陪练')
   expect(screen.getByRole('heading', { name: '对局' })).toBeTruthy()
 })
