@@ -18,6 +18,7 @@ export interface PracticeItem {
   readonly source: 'survival' | 'independent' | 'danger' | 'rescue' | 'priority' | 'ladder-defense'
   readonly index: number
   readonly title: string
+  readonly courseUnit?: LearningUnit
   readonly relatedTitle: string
   readonly related: LearningUnit
 }
@@ -48,7 +49,29 @@ const items: Omit<PracticeItem, 'relatedTitle'>[] = [
     index, title: scene.title, related: related('capture/ladder-guided'),
   })),
 ]
-export const PRACTICE_ITEMS: readonly PracticeItem[] = PRACTICE_GROUPS.flatMap((group) => items.filter((item) => item.group === group).map((item) => ({ ...item, relatedTitle: item.related.page === 'survival' ? SURVIVAL_SCENES[item.related.index].title : item.related.page === 'capture' ? CAPTURE_SCENES[item.related.index].title : item.related.title })))
+export const PRACTICE_ITEMS: readonly PracticeItem[] = PRACTICE_GROUPS.flatMap((group) =>
+  items.filter((item) => item.group === group).map((item) => ({
+    ...item,
+    courseUnit: LEARNING_UNITS.find((unit) => unit.id === item.id),
+    relatedTitle: item.related.page === 'survival' ? SURVIVAL_SCENES[item.related.index].title
+      : item.related.page === 'capture' ? CAPTURE_SCENES[item.related.index].title : item.related.title,
+  })),
+)
+
+export interface PracticeLabels {
+  readonly title: string
+  readonly eyebrow: string
+  readonly figure: string
+}
+
+export function practiceLabels(item: PracticeItem): PracticeLabels {
+  if (item.courseUnit) {
+    return { title: item.title, eyebrow: `练 · ${item.group} · 课程里的检验题`, figure: '换个局面，自己判断' }
+  }
+  return item.source === 'danger'
+    ? { title: item.title, eyebrow: '认危险 · 专项练习', figure: '换个局面，自己判断' }
+    : { title: item.title, eyebrow: '自己判断 · 独立练习', figure: item.title }
+}
 
 /** 从当前题之后循环寻找；用过帮助的题仍值得再练。 */
 export function nextPracticeItem(progress: LearningProgress, afterId?: string): PracticeItem | undefined {

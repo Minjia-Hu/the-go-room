@@ -10,8 +10,10 @@ import { groupMarks } from '../coaching/explanations'
 import { choosePracticePoint, chooseReason, confirmPractice, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
 import type { SurvivalRun } from './survivalRunner'
 
-interface Props { readonly practiceOnly?: boolean; readonly nextLabel?: string; readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onNextChapter?: () => void }
-export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onNextChapter, nextLabel, practiceOnly = false }: Props) {
+import type { PracticeLabels } from './practiceCatalog'
+
+interface Props { readonly practice?: PracticeLabels; readonly nextLabel?: string; readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onNextChapter?: () => void }
+export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onNextChapter, nextLabel, practice }: Props) {
   const { scene } = run
   if (scene.id === 'danger-guided') return <GuidedDangerPage run={run} onChange={onChange} onNext={onNext} />
   const shown = practiceBoard(run)
@@ -36,7 +38,7 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
   return <BoardLayout key={scene.id}
       feedback={run.message && <LessonFeedback message={run.message} />}
       heading={<>
-        <p className="eyebrow">{practiceOnly ? '认危险 · 专项练习' : `保住自己的棋 / 第 ${scene.course} 课 · ${scene.guided ? '一起练习' : '自己试试'}`}</p>
+        <p className="eyebrow">{practice?.eyebrow ?? `保住自己的棋 / 第 ${scene.course} 课 · ${scene.guided ? '一起练习' : '自己试试'}`}</p>
         <h2>{scene.title}</h2>
         <div className="step-task">
           <p className="step-label">{step.done ? step.label : `第 ${step.current} 步 / 共 ${step.total} 步 · ${step.label}`}</p>
@@ -45,7 +47,7 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
         </div>
       </>}
       board={<>
-      <p className="figure-number">{practiceOnly ? '换个局面，自己判断' : `第 ${scene.course} 课 / ${scene.guided ? '一起练习' : '自己试试'}`}</p>
+      <p className="figure-number">{practice?.figure ?? `第 ${scene.course} 课 / ${scene.guided ? '一起练习' : '自己试试'}`}</p>
       <Board board={shown.board} marks={marks} lastMove={last?.kind === 'play' ? last.point : null}
         disabled={run.view === 'reply' || run.view.startsWith('contrast') || run.stage === 'done' || run.stage === 'reason'}
         ghostColor={run.stage === 'move' ? 'black' : null} onPointClick={(p) => onChange(choosePracticePoint(run, p))} />

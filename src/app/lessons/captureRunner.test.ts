@@ -47,6 +47,13 @@ describe('白棋应对', () => {
 })
 
 describe('六道追吃棋形', () => {
+  it.each([
+    ['direction-guided', '提掉了这颗白棋。'],
+    ['ladder-check', '提掉了 9 颗白棋。'],
+  ])('%s reports the stones captured by the finishing move', (id, message) => {
+    const scene = CAPTURE_SCENES.find((item) => item.id === id)!
+    expect(scene.solution.reduce(capturePoint, startCapture(scene)).message).toBe(message)
+  })
   it.each(CAPTURE_SCENES)('$id 正解在限手内得子，错手在白棋第一回合逃出', (scene) => {
     const start = startCapture(scene)
     const groups = scene.targets.map((target) => getGroup(start.game.board, target))
