@@ -445,3 +445,12 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .priority-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .priority-options .button { min-height: 44px; padding: 8px; font-size: .82rem; white-space: normal; }
 .priority-options .button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+
+.danger-study .danger-task { margin-top: 16px; border-left: 2px solid var(--accent); padding-left: 14px; }
+.danger-step { color: var(--accent); font-size: .85rem; }
+.danger-study .turn { margin: 3px 0 0; font-family: var(--serif); font-size: 1.12rem; }
+.danger-study .danger-next { white-space: normal; text-align: center; }
+@media (max-width: 680px) {
+  .danger-study .danger-task { margin: 6px 0; padding-left: 10px; }
+  .danger-study .turn { font-size: 1rem; }
+}

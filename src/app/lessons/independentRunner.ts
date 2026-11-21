@@ -35,12 +35,19 @@ export function independentPoint(run: IndependentRun, point: Point): Independent
   if (run.stage === 'find') {
     const group = getGroup(run.game.board, point)
     if (!group || group.color !== 'black') return { ...run, mistakes: run.mistakes + 1, message: '先选一块黑棋，不是空点或白棋。点同一块里的任意一颗都可以。' }
-    if (!group.stones.some((stone) => samePoint(stone, run.scene.target))) return { ...run, mistakes: run.mistakes + 1, message: `你选的这块黑棋有 ${group.liberties.length} 口气。本题先找只有一口气、下一手可能被提的那块。` }
-    return { ...run, stage: 'move', message: `找到了：这 ${group.stones.length} 颗黑棋连成一块，只剩一口气。现在自己选一个落点试试。` }
+    if (!group.stones.some((stone) => samePoint(stone, run.scene.target))) {
+      const message = group.stones.length === 1
+        ? `你选的这颗黑棋有 ${group.liberties.length} 口气。本题先找只有一口气、下一手可能被提的黑棋。`
+        : `你选的这块黑棋有 ${group.liberties.length} 口气。本题先找只有一口气、下一手可能被提的那块。`
+      return { ...run, mistakes: run.mistakes + 1, message }
+    }
+    const target = group.stones.length === 1 ? '这颗黑棋' : `这 ${group.stones.length} 颗黑棋连成一块，`
+    return { ...run, stage: 'move', message: `找到了：${target}只剩一口气。现在自己选一个落点试试。` }
   }
   const trial = independentTrial(run, point)
   if (!trial.result.ok) return { ...run, point: null, view: 'before', mistakes: run.mistakes + 1, message: trial.result.reason === 'occupied' ? '这里已经有棋子。请选择空的交叉点试下。' : '这一手不合法：落子、提掉对方后自己仍不能没气，也不能重复之前的盘面。换个空点试试。' }
-  return { ...run, point, view: 'after', message: `试下后，目标整块有 ${trial.group?.liberties.length ?? 0} 口气，提掉白棋 ${trial.captured} 颗。先看看变化，再确认是否完成了本题目标。` }
+  const target = trial.group?.stones.length === 1 ? '这颗黑棋' : '目标整块'
+  return { ...run, point, view: 'after', message: `试下后，${target}有 ${trial.group?.liberties.length ?? 0} 口气，提掉白棋 ${trial.captured} 颗。先看看变化，再确认是否完成了本题目标。` }
 }
 export function confirmIndependent(run: IndependentRun): IndependentRun {
   if (run.stage !== 'move' || !run.point || run.view !== 'after') return run

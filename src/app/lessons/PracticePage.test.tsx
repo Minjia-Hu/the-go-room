@@ -61,7 +61,7 @@ describe('practice hub', () => {
     click('返回章节'); click('第贰卷：保住自己的棋')
     const entry = screen.getByRole('button', { name: '自己试试：换到边上，自己找一找' }).parentElement!
     expect(within(entry).getByText('独立完成')).toBeTruthy()
-    click('自己试试：换到边上，自己找一找'); click('下一课')
+    click('自己试试：换到边上，自己找一找'); click('下一课 · 给自己的棋找出路 →')
     expect(screen.getByRole('heading', { name: '给自己的棋找出路' })).toBeTruthy()
     click('返回章节')
     expect(screen.getByRole('button', { name: '第贰卷：保住自己的棋' })).toBeTruthy()

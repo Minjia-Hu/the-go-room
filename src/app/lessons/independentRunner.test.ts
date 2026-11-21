@@ -35,10 +35,12 @@ describe('换棋形独立练习', () => {
     const found = independentPoint(run, { x: 3, y: 4 })
     expect(found.stage).toBe('move')
     expect(found.mistakes).toBe(0)
+    expect(found.message).toContain('这 3 颗黑棋连成一块')
   })
   it('向外伸仍只有一气时不算成功，白棋回应会实际提掉目标与新子', () => {
     let run = startIndependent(INDEPENDENT_SCENES[1])
     run = independentPoint(run, run.scene.target)
+    expect(run.message).toContain('这颗黑棋只剩一口气')
     run = independentPoint(run, { x: 5, y: 4 })
     const trial = independentTrial(run, run.point!)
     expect(trial.result.ok).toBe(true)

@@ -1,3 +1,4 @@
+import { GuidedDangerPage } from './GuidedDangerPage'
 import { LessonFeedback } from './LessonFeedback'
 import { Board } from '../board/Board'
 import { briefExplanation } from '../coaching/briefExplanation'
@@ -11,6 +12,7 @@ import type { SurvivalRun } from './survivalRunner'
 interface Props { readonly practiceOnly?: boolean; readonly nextLabel?: string; readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onScoring?: () => void }
 export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onScoring, nextLabel, practiceOnly = false }: Props) {
   const { scene } = run
+  if (scene.id === 'danger-guided') return <GuidedDangerPage run={run} onChange={onChange} onNext={onNext} />
   const shown = practiceBoard(run)
   const reveal = run.hint >= 2 || run.stage === 'done' || run.stage === 'liberty' || run.stage === 'reason' || run.preview?.ok
   const target = analyzePosition(shown).find((g) => g.stones.some((p) => p.x === scene.target.x && p.y === scene.target.y))

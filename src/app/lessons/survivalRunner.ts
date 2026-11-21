@@ -30,15 +30,30 @@ export function choosePracticePoint(run: SurvivalRun, p: Point): SurvivalRun {
   if (run.stage === 'done' || run.stage === 'reason') return run
   if (run.stage === 'group') {
     const group = getGroup(run.game.board, run.scene.target)!
+    const message = run.scene.id === 'danger-guided'
+      ? '找到了。它的三面都被白棋堵住了。'
+      : group.stones.length === 1
+        ? '找到了。现在点出这颗黑棋最后一口气。'
+        : '找到了。现在点出这整块棋最后的一口气。斜着的空点不算。'
     return group.stones.some((s) => samePoint(s, p))
-      ? { ...run, selected: group.stones, stage: 'liberty', message: '找到了。现在点出这整块棋最后的一口气。斜着的空点不算。' }
+      ? { ...run, selected: group.stones, stage: 'liberty', message }
       : { ...run, mistakes: run.mistakes + 1, message: '再看看哪块黑棋只剩一个上下左右紧挨着的空点。请点那块棋。' }
   }
   if (run.stage === 'liberty') {
     const group = getGroup(run.game.board, run.scene.target)!
-    return group.liberties.some((s) => samePoint(s, p))
-      ? { ...run, selected: [...group.stones, p], stage: 'done', message: `这 ${group.stones.length} 颗黑棋连在一起，共用 A 这一口气。白棋占住 A，整块就被提走。下面看看两种选择的后果。` }
-      : { ...run, mistakes: run.mistakes + 1, message: '这里不是它最后的气。气必须是上下左右紧挨着整块棋的空点。' }
+    if (group.liberties.some((s) => samePoint(s, p))) {
+      const message = group.stones.length === 1
+        ? '这颗黑棋只剩 A 这一口气。白棋下在 A，就能把它提走。'
+        : `这 ${group.stones.length} 颗黑棋连在一起，共用 A 这一口气。白棋占住 A，整块就被提走。下面看看两种选择的后果。`
+      return { ...run, selected: [...group.stones, p], stage: 'done', message }
+    }
+    const diagonal = run.scene.id === 'danger-guided'
+      && Math.abs(p.x - run.scene.target.x) === 1 && Math.abs(p.y - run.scene.target.y) === 1
+    return { ...run, mistakes: run.mistakes + 1, message: diagonal
+      ? '你点的是斜角。沿这颗黑棋的上、下、左、右，再找一个空点。'
+      : group.stones.length === 1
+        ? '这里不是它最后的气。找找上下左右紧挨着这颗黑棋的空点。'
+        : '这里不是它最后的气。气必须是上下左右紧挨着整块棋的空点。' }
   }
   if (run.stage === 'eyes') {
     if (!run.scene.eyes?.some((s) => samePoint(s, p))) return { ...run, mistakes: run.mistakes + 1, message: '找同一块黑棋围住的内部空点；外面的空点和黑棋本身不算眼。' }
