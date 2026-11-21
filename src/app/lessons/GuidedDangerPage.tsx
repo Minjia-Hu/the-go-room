@@ -43,7 +43,7 @@ export function GuidedDangerPage({ run, onChange, onNext }: Props) {
     : '黑棋向下接出，两颗棋现在有三口气。白棋一手提不走了。'
   return <section className="page page--with-board board-flow danger-study">
     <header className="board-task">
-      <p className="eyebrow">保住自己的棋 / 第一课</p>
+      <p className="eyebrow">第 {run.scene.course} 课 · 一起练习</p>
       <h2>{run.scene.title}</h2>
       {!done && <div className="danger-task">
         <span className="danger-step">{step}</span>

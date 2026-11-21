@@ -20,9 +20,8 @@ export function EndgamePage({ run, onChange, onNext, isLast, onStrategy }: Props
   return <BoardLayout
       legend={<p className="small">{lesson.id === 'count' && !done ? '棋子上的圈：本次要数的活子 · 空心小圈：本次要数的空点' : lesson.id === 'ending' && !done ? '橙圈：本题死子 · 叉号：已标记移除 · 虚线小圈：演示中被提的位置' : '深色底：黑方归属 · 浅色底：白方归属 · 字母：当前观察的空区'}</p>}
       feedback={run.message && <LessonFeedback message={run.message} />}
-      heading={<><p className="eyebrow">围地与终局 / 第 {course} 课，共四课</p><h2>{lesson.title}</h2><p className="turn">{done ? "本课完成，再看看计分的原因。" : lesson.id === "territory" ? `先点 ${TERRITORY_QUESTIONS[run.step].label} 所在的空区，再判断归属` : numberQuestion ? inputLabel : lesson.id === "komi" ? "比较贴目后的分数，选出胜方。" : run.game.phase === "playing" ? `轮到${run.game.toPlay === "black" ? "黑" : "白"}棋，试着停一手。` : "点圈出的白棋标记死子，再确认数子。"}</p></>}
+      heading={<><p className="eyebrow">第 {course} 课 · 共四课</p><h2>{lesson.title}</h2><p className="turn">{done ? "本课完成，再看看计分的原因。" : lesson.id === "territory" ? `先点 ${TERRITORY_QUESTIONS[run.step].label} 所在的空区，再判断归属` : numberQuestion ? inputLabel : lesson.id === "komi" ? "比较贴目后的分数，选出胜方。" : run.game.phase === "playing" ? `轮到${run.game.toPlay === "black" ? "黑" : "白"}棋，试着停一手。` : "点圈出的白棋标记死子，再确认数子。"}</p></>}
       board={<>
-      <p className="figure-number">围地与终局 / 第 {course} 课</p>
       <Board board={view.board} marks={view.marks} disabled={!canPick} onPointClick={(point) => onChange(selectEndgame(run, point))} />
       <p className={`board-caption${run.demo ? ' board-caption--notice' : ''}`}>{run.demo ? '独立提子演示 · 不改变本题的停手记录和死子标记' : lesson.id === 'ending' ? done ? '已移除约定的死子 · 按剩余棋子与空点数子' : '教学局面 · 圈出的白子待双方确认，其余棋子已确认活着' : '已确认活棋的教学终局 · 中盘不能照颜色直接判定归属'}</p>
     </>}

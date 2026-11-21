@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openCatalog } from './openCatalog.test-helper'
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from '../App'
@@ -87,13 +88,13 @@ describe('practice hub', () => {
     click('返回练习'); click('教学')
     // Restore selected liberties; practice must leave this session.page and index intact.
     expect(screen.getByRole('heading', { name: '第 2 关:气' })).toBeTruthy()
-    click('返回章节'); click('第贰卷：保住自己的棋')
+    openCatalog(); click('第贰卷：保住自己的棋')
     const entry = screen.getByRole('button', { name: '练习 换到边上，自己找一找' })
     expect(entry.getAttribute('aria-description')).toBe('独立完成')
     expect(within(entry).getByText('✓')).toBeTruthy()
     click('练习 换到边上，自己找一找'); click('下一课 · 给自己的棋找出路 →')
     expect(screen.getByRole('heading', { name: '给自己的棋找出路' })).toBeTruthy()
-    click('返回章节')
+    openCatalog()
     expect(screen.getByRole('button', { name: '第贰卷：保住自己的棋' })).toBeTruthy()
   })
   it.each(['hint', 'retry'] as const)('keeps %s completions eligible, preserves unfinished attempts, and resets finished attempts', (mode) => {

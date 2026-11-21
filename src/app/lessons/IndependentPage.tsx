@@ -15,7 +15,7 @@ export function IndependentPage({ run, index, onChange, onNext, allDone, nextLab
       feedback={run.message && <LessonFeedback message={run.message} />}
       heading={<><p className="eyebrow">{practice?.eyebrow ?? `独立练习 / 第 ${index + 1} 题，共六题`}</p><h2>{practice?.title ?? '这次，自己找出一手'}</h2><p className="turn">{run.stage === 'find' ? '第一步：找危险棋块' : run.stage === 'move' ? '第二步：试下、看后果，再确认' : run.stage === 'reason' ? '第三步：解释这一手为什么有用' : view.completion}</p></>}
       board={<>
-      <p className="figure-number">{practice?.figure ?? `换个棋形，自己判断 / 第 ${index + 1} / 6 题`}</p>
+      {practice && <p className="figure-number">{practice.figure}</p>}
       <Board board={view.game.board} marks={view.marks} disabled={run.stage === 'reason' || run.stage === 'done' || run.view === 'reply'} ghostColor={run.stage === 'move' && run.view !== 'reply' ? 'black' : null} onPointClick={(point) => onChange(independentPoint(run, point))} />
       <p className="board-caption">{run.view === 'reply' ? '反例演示：白棋占住最后一气，目标黑棋被提走' : run.point && run.view === 'after' ? '试下结果 · 从题目原图计算，不写正式棋谱' : run.stage === 'find' && run.help < 2 ? '初始不标答案 · 先自己找危险的黑棋' : '题目原图 · 你执黑'}</p>
     </>}

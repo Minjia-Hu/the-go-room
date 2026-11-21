@@ -39,7 +39,6 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
         ) : <p className="turn">这一关完成了，看看原因再继续。</p>}
       </>}
       board={<>
-        <p className="figure-number">图 {String(index + 1).padStart(2, '0')} / 认识规则</p>
         <Board
           board={run.game.board}
           lastMove={run.lastMove}

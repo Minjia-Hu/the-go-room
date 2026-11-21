@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openCatalog } from './openCatalog.test-helper'
 import { useState } from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -38,7 +39,7 @@ describe('规则慢镜头与终局课程界面', () => {
     expect(container.querySelectorAll('[data-stone="black"]')).toHaveLength(13)
     expect(container.querySelector('[data-stone="white"][data-x="3"][data-y="4"]')).toBeNull()
     click('先提对方没气的棋，再检查自己的气')
-    click('返回章节'); chapter('认识规则'); click('慢镜头 两只眼：为什么同一个位置不能下？')
+    openCatalog(); chapter('认识规则'); click('慢镜头 两只眼：为什么同一个位置不能下？')
     click('学习围地与终局')
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('围住的空点属于谁')
   })
@@ -78,11 +79,11 @@ describe('规则慢镜头与终局课程界面', () => {
     chapter('保住自己的棋'); click('4. 两个小空点为什么能保命')
     click('交叉点 3,4'); click('交叉点 5,4')
     click('分步看：为什么不算自杀？')
-    click('返回章节'); chapter('保住自己的棋'); click('4. 两个小空点为什么能保命')
+    openCatalog(); chapter('保住自己的棋'); click('4. 两个小空点为什么能保命')
     expect(screen.getByText('为什么白棋下不进这两个眼？')).toBeTruthy()
-    click('返回章节'); chapter('围地与终局'); click('3. 白棋为什么加 7.5 分')
+    openCatalog(); chapter('围地与终局'); click('3. 白棋为什么加 7.5 分')
     number('42.5')
-    click('返回章节'); chapter('围地与终局'); click('3. 白棋为什么加 7.5 分')
+    openCatalog(); chapter('围地与终局'); click('3. 白棋为什么加 7.5 分')
     expect(screen.getByRole('button', { name: '白方赢' })).toBeTruthy()
     click('重来本课')
     expect(screen.getByRole('spinbutton')).toBeTruthy()

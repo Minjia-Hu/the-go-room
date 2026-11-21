@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { LESSONS } from '../../content/lessons'
 import { CAPTURE_SCENES } from '../../content/capture'
 import { CapturePage } from './CapturePage'
@@ -6,13 +6,15 @@ import { SURVIVAL_SCENES } from '../../content/survival'
 import type { LearningSession } from './learningSession'
 import { openLearningUnit } from './learningSession'
 import { COMPLETION_LABELS, continueLearningUnit, currentLearningUnit, LEARNING_UNITS } from './learningProgress'
-import type { LearningUnit } from './learningProgress'
 import { LearningProgressPanel } from './LearningProgressPanel'
 import { startLesson } from './lessonRunner'
 import { LessonPage } from './LessonPage'
 import { survivalNextLabel } from './survivalSteps'
 import { SurvivalPage } from './SurvivalPage'
 import { HeroExercise } from './HeroExercise'
+import { VolumeContents } from './VolumeContents'
+import { VolumeIndex } from './VolumeIndex'
+import { COURSE_VOLUMES, volumeFor } from './courseVolumes'
 import { ScrollContents } from './ScrollContents'
 import type { ScrollChapter } from './ScrollContents'
 import { ENDGAME_LESSONS } from '../../content/endgame'
@@ -28,7 +30,15 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
   const completed = session.progress.completed
   const currentUnit = currentLearningUnit(session)
   const recorded = currentUnit ? completed[currentUnit.id] : undefined
-  useLayoutEffect(() => { document.documentElement.scrollTop = 0; document.body.scrollTop = 0 }, [currentUnit?.id])
+  const returningToCatalog = useRef(false)
+  useLayoutEffect(() => {
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+    if (returningToCatalog.current && session.page === 'home') {
+      returningToCatalog.current = false
+      document.getElementById('scrolls-title')?.focus()
+    }
+  }, [currentUnit?.id, session.page])
   const openScene = (sceneIndex: number) => onChange({ ...session, page: 'survival', sceneIndex })
   const openCapture = (captureIndex: number) => onChange({ ...session, page: 'capture', captureIndex })
   const survivalLast = session.sceneIndex === SURVIVAL_SCENES.length - 1
@@ -44,57 +54,17 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
   if (session.page === 'home') {
     const next = continueLearningUnit(session.progress)
     const allDone = LEARNING_UNITS.every((unit) => completed[unit.id])
-    const isNext = (id: string) => !allDone && next?.id === id
-    const tally = (pages: readonly LearningUnit['page'][]): [number, number] => {
-      const units = LEARNING_UNITS.filter((unit) => pages.includes(unit.page))
-      return [units.filter((unit) => completed[unit.id]).length, units.length]
-    }
     const startRules = () => onChange({ ...session, page: 'rules', rules: { index: 0, run: startLesson(LESSONS[0]) } })
-    function indexLink(unit: LearningUnit, title = unit.title, tag?: '练习' | '慢镜头' | '独立练习') {
-      const mode = completed[unit.id]
-      return <button key={unit.id} className={`course-index__link${tag ? ' course-index__secondary' : ''}`}
-        aria-label={tag && `${tag} ${title}`} aria-current={isNext(unit.id) ? 'step' : undefined}
-        aria-description={mode && COMPLETION_LABELS[mode]} onClick={() => onChange(openLearningUnit(session, unit))}>
-        <span>{tag && <span className="course-index__tag">{tag} </span>}{title}</span>
-        {mode && <span className="course-index__check" aria-hidden="true">✓</span>}
-      </button>
-    }
-    function pairedIndex(page: 'survival' | 'capture') {
-      const entries = LEARNING_UNITS.filter((unit) => unit.page === page).map((unit) => {
-        const scene = page === 'survival' ? SURVIVAL_SCENES[unit.index] : CAPTURE_SCENES[unit.index]
-        return { unit, scene, number: 'course' in scene ? scene.course : scene.lesson }
-      })
-      return <div className="course-index">{entries.filter(({ scene }) => scene.guided).map((lesson) =>
-        <div className="course-pair" role="group" aria-label={`第 ${lesson.number} 课：${lesson.scene.title}`} key={lesson.unit.id}>
-          {entries.filter(({ number }) => number === lesson.number).map(({ unit, scene, number }) =>
-            scene.guided ? indexLink(unit, `${number}. ${scene.title}`) : indexLink(unit, scene.title, '练习'))}
-        </div>)}</div>
-    }
-    function numberedIndex(page: 'endgame' | 'strategy') {
-      return <div className="course-index">{LEARNING_UNITS.filter((unit) => unit.page === page).map((unit) =>
-        <div className="course-pair" key={unit.id}>{indexLink(unit, `${unit.index + 1}. ${unit.title}`)}</div>)}</div>
-    }
-    const chapters: ScrollChapter[] = [
-      { number: '壹', title: '认识规则', count: '五关 · 两镜头', done: tally(['rules', 'rule-sequence']), content:
-        <div className="course-index">
-          {LEARNING_UNITS.filter((unit) => unit.page === 'rules').map((unit) =>
-            <div className="course-pair" key={unit.id}>{indexLink(unit)}</div>)}
-          <div className="course-pair">{LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence').map((unit) =>
-            indexLink(unit, unit.title, '慢镜头'))}</div>
-        </div> },
-      { number: '贰', title: '保住自己的棋', count: '四课 · 八局', done: tally(['survival']), content: pairedIndex('survival') },
-      { number: '叁', title: '吃掉对方的棋', count: '三课 · 六局', done: tally(['capture']), content: pairedIndex('capture') },
-      { number: '肆', title: '围地与终局', count: '四课', done: tally(['endgame']), content: numberedIndex('endgame') },
-      { number: '伍', title: '九路策略入门', count: '三课', done: tally(['strategy']), content: numberedIndex('strategy') },
-      { number: '陆', title: '从看懂到自己下', count: '一盘 · 六题', done: tally(['walkthrough', 'independent']), content:
-        <div className="course-index">
-          <div className="course-pair">{LEARNING_UNITS.filter((unit) => unit.page === 'walkthrough').map((unit) => indexLink(unit))}</div>
-          <div className="course-pair">{LEARNING_UNITS.filter((unit) => unit.page === 'independent').map((unit) =>
-            indexLink(unit, `第 ${unit.index + 1} 题`, '独立练习'))}</div>
-        </div> },
-    ]
-    const chapterOf: Record<LearningUnit['page'], number> = { rules: 0, 'rule-sequence': 0, survival: 1, capture: 2, endgame: 3, strategy: 4, walkthrough: 5, independent: 5 }
-    const current = next ? chapterOf[next.page] : 0
+    const current = next ? COURSE_VOLUMES.indexOf(volumeFor(next)) : 0
+    const chapters: ScrollChapter[] = COURSE_VOLUMES.map((volume, index) => {
+      const entries = volume.groups.flatMap(group => group.entries)
+      return {
+        number: volume.number, title: volume.title, count: volume.count, live: index === current,
+        done: [entries.filter(({ unit }) => completed[unit.id]).length, entries.length],
+        content: <VolumeIndex volume={volume} currentId={allDone ? undefined : next?.id} completed={completed}
+          onSelect={unit => onChange(openLearningUnit(session, unit))} />,
+      }
+    })
     return <>
       {storageMessage && <p className="message message--hint" role="alert">{storageMessage}</p>}
       <section className="learning-home">
@@ -102,7 +72,7 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
           <div className="ink-hero__title"><h2>一子一气</h2><p>写给第一次拿起棋子的人</p></div>
           <HeroExercise onStart={startRules} onSurvival={() => openScene(0)} />
         </div>
-        <ScrollContents chapters={chapters.map((chapter, index) => index === current ? { ...chapter, live: true } : chapter)} initialOpen={current} onPlay={onPlay} />
+        <ScrollContents chapters={chapters} initialOpen={current} onPlay={onPlay} />
         <LearningProgressPanel progress={session.progress} onContinue={(unit) => onChange(openLearningUnit(session, unit))} onClear={onClear} />
         <p className="muted small archive-note">切换页面保留当前练习和对局。课程完成记录与学习位置保存在此浏览器；刷新后题目从头开始，进行中的对局不保留，已完成棋谱仍可复盘。</p>
       </section>
@@ -110,7 +80,9 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
   }
   return <>
     {storageMessage && <p className="message message--hint" role="alert">{storageMessage}</p>}
-    <div className="learning-toolbar"><button className="text-button" onClick={() => onChange({ ...session, page: 'home' })}>返回章节</button><button className="text-button" onClick={onPlay}>直接开始陪练</button></div>
+    {currentUnit && <VolumeContents volume={volumeFor(currentUnit)} currentId={currentUnit.id} onPlay={onPlay}
+      onSelect={unit => onChange(openLearningUnit(session, unit))}
+      onCatalog={() => { returningToCatalog.current = true; onChange({ ...session, page: 'home' }) }} />}
 
     {session.page === 'rules' && <LessonPage lessons={LESSONS} progress={session.rules} completedIds={LESSONS.filter((lesson) => completed[`rules/${lesson.id}`]).map((lesson) => lesson.id)} onProgress={(rules) => onChange({ ...session, rules })} onFinish={onPlay} onSurvival={() => openScene(0)} onRuleSequence={openSequence} />}
     {session.page === 'rule-sequence' && <RuleSequencePage run={session.sequence} completedSceneIds={LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence' && completed[unit.id]).map((unit) => unit.id.slice('rule-sequence/'.length))} onChange={(sequence) => onChange({ ...session, sequence })} onScoring={() => openEndgame(0)} />}

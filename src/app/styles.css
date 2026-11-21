@@ -454,3 +454,17 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   .step-task .turn { font-size: 1rem; }
   .step-task .step-label, .step-task .step-progress { font-size: max(12px, .72rem); }
 }
+
+.volume-guide { position: relative; display: block; }
+.volume-guide summary { display: inline-flex; align-items: center; gap: .45em; max-width: calc(100% - 7rem); min-height: 44px; color: var(--accent); font: .9rem/1.5 var(--serif); list-style: none; cursor: pointer; }
+.volume-guide summary::-webkit-details-marker { display: none; }
+.volume-guide details[open] summary span { transform: rotate(180deg); }
+.volume-guide__play { position: absolute; top: 0; right: 0; min-height: 44px; }
+.volume-guide__panel { padding: 6px 0; border-block: 1px solid var(--border); }
+.volume-guide__lessons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
+.volume-guide__lessons .course-pair { padding: 4px 0; border: 0; border-bottom: 1px solid var(--line-soft); }
+.volume-guide__current { flex-shrink: 0; color: var(--accent); font-size: .76rem; }
+.volume-guide__panel > .text-button { margin-top: 4px; }
+@media (max-width: 680px) {
+  .volume-guide__lessons { grid-template-columns: 1fr; }
+}

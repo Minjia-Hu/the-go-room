@@ -12,9 +12,8 @@ export function WalkthroughPage({ run, onChange, onPractice }: Props) {
   return <BoardLayout
       legend={<p className="small">圈：最后落子或关注棋块 · 虚线小圈：刚被提走的位置</p>}
       feedback={run.message && <LessonFeedback message={run.message} />}
-      heading={<><p className="eyebrow">完整九路讲解 / 第 {run.step} 手</p><h2>{view.chapter.title}</h2><p className="turn">{view.question && !questionDone ? view.question.title : "观察这一手的变化，再继续往下看。"}</p></>}
+      heading={<><p className="eyebrow">一盘九路，从头到尾 · 第 {run.step} / {WALK_MOVES.length} 手</p><h2>{view.chapter.title}</h2><p className="turn">{view.question && !questionDone ? view.question.title : "观察这一手的变化，再继续往下看。"}</p></>}
       board={<>
-      <p className="figure-number">一盘九路，从头到尾 / 第 {run.step} / {WALK_MOVES.length} 手</p>
       <Board board={view.game.board} marks={view.marks} lastMove={view.last?.kind === 'play' ? view.last.point : null} disabled />
       <p className="board-caption">{view.score ? '双方已连续停手 · 无待移除死子 · 底色为最终归属' : '从空棋盘重放 · 可逐手查看，也可跳到下一讲解点'}</p>
     </>}

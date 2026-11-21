@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openCatalog } from './openCatalog.test-helper'
 import { useState } from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -10,7 +11,7 @@ function Harness() {
   const [session, setSession] = useState(createLearningSession)
   return <LearningPage session={session} onChange={setSession} onPlay={vi.fn()} />
 }
-const click = (name: string) => fireEvent.click(screen.getByRole('button', { name }))
+const click = (name: string | RegExp) => fireEvent.click(screen.getByRole('button', { name }))
 // 首页卷目一次只展开一卷：先点开书脊，再点其中的课程。
 const chapter = (title: string) => fireEvent.click(screen.getByRole('button', { name: new RegExp(`卷：${title}$`) }))
 describe('生存章节界面', () => {
@@ -38,8 +39,27 @@ describe('生存章节界面', () => {
     click('下一题：在棋盘边上找危险的黑棋 →')
     expect(screen.getByRole('heading', { level: 2 }).textContent).toContain('边上')
     click('交叉点 0,3')
-    click('返回章节'); chapter('保住自己的棋'); click('1. 认出哪块棋危险')
+    openCatalog()
+    chapter('保住自己的棋'); click('1. 认出哪块棋危险')
     expect(screen.getByRole('status').textContent).toContain('这颗黑棋只剩 A 这一口气')
+  })
+  it('卷内目录标出当前题，跳课和收起目录都保留答题步骤', () => {
+    render(<Harness />)
+    chapter('保住自己的棋'); click('练习 换到边上，自己找一找')
+    click('交叉点 0,3')
+    const toggle = screen.getByText('卷贰 · 保住自己的棋')
+    fireEvent.click(toggle)
+    const directory = screen.getByRole('navigation', { name: '卷贰目录' })
+    expect(directory.querySelectorAll('[role="group"]')).toHaveLength(4)
+    expect(directory.querySelector('[aria-current="step"]')?.textContent).toContain('换到边上，自己找一找')
+    fireEvent.keyDown(toggle, { key: 'Escape' })
+    expect(toggle.closest('details')?.open).toBe(false)
+    expect(screen.getByText('第 2 步 / 共 2 步 · 找气')).toBeTruthy()
+    fireEvent.click(toggle); click('2. 给自己的棋找出路')
+    expect(toggle.closest('details')?.open).toBe(false)
+    expect(screen.getByRole('heading', { name: '给自己的棋找出路' })).toBeTruthy()
+    fireEvent.click(toggle); click(/^自己试试.*换到边上，自己找一找$/)
+    expect(screen.getByText('第 2 步 / 共 2 步 · 找气')).toBeTruthy()
   })
   it('两眼需要自己选原因，一眼对照可以查看', () => {
     const { container } = render(<Harness />)

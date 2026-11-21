@@ -14,9 +14,9 @@ export function StrategyPage({ run, onChange, onNext, isLast, onWalk }: Props) {
   return <BoardLayout
       legend={<p className="small">{lesson.id === 'edges' ? '只比较围地形状与用子，不表示已做活或已经得到分数' : '橙圈：目标黑块 · 小空心圈：气 · 虚线小圈：刚被提走的位置'}</p>}
       feedback={run.message && <LessonFeedback message={run.message} />}
-      heading={<><p className="eyebrow">九路策略入门 / 第 {course} 课，共三课</p><h2>{lesson.title}</h2><p className="turn">{run.done ? "这一课完成，可以回看不同走法。" : allSeen ? "比较结果，再选出原因。" : run.choiceIndex === null ? lesson.id === 'edges' ? "比较角、边和中腹，看看围同样的空点用了多少棋。" : "先数目标棋块的气，再选择一手比较。" : `正在看 ${view.choice.letter} 变化，第 ${run.step} / ${view.choice.moves.length} 手。`}</p></>}
+      heading={<><p className="eyebrow">第 {course} 课 · 共三课</p><h2>{lesson.title}</h2><p className="turn">{run.done ? "这一课完成，可以回看不同走法。" : allSeen ? "比较结果，再选出原因。" : run.choiceIndex === null ? lesson.id === 'edges' ? "比较角、边和中腹，看看围同样的空点用了多少棋。" : "先数目标棋块的气，再选择一手比较。" : `正在看 ${view.choice.letter} 变化，第 ${run.step} / ${view.choice.moves.length} 手。`}</p></>}
       board={<>
-      <p className="figure-number">九路策略 / 第 {course} 课 · {run.choiceIndex === null ? '先观察' : `${view.choice.letter} 变化，第 ${run.step} / ${view.choice.moves.length} 手`}</p>
+      <p className="figure-number">{run.choiceIndex === null ? '先观察' : `${view.choice.letter} 变化，第 ${run.step} / ${view.choice.moves.length} 手`}</p>
       <Board board={view.game.board} marks={view.marks} disabled={run.step > 0} onPointClick={(point) => onChange(strategyPoint(run, point))} />
       <p className="board-caption">{lesson.id === 'edges' ? `独立对照图：${view.choice.label.replace('补一手', '')} · 圆点是${run.step === 0 ? '准备围住' : '围住'}的四个空点` : '固定教学变化 · 你执黑，双方按示例交替落子'}</p>
     </>}
