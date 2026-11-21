@@ -20,6 +20,13 @@ describe('LessonPage', () => {
     fireEvent.click(screen.getByRole('button', { name: '重来这一关' }))
     expect(container.querySelectorAll('[data-mark="selected"]')).toHaveLength(0)
   })
+  it('每一关都显示当前是第几步、共几步', () => {
+    for (const lesson of LESSONS) {
+      render(<LessonPage lessons={[lesson]} onFinish={() => {}} />)
+      expect(screen.getByText(`第 1 步 / 共 ${lesson.steps.length} 步`)).toBeTruthy()
+      cleanup()
+    }
+  })
   it('显示第一关的标题、说明和任务', () => {
     render(<LessonPage lessons={LESSONS} onFinish={() => {}} />)
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('第 1 关:落子')

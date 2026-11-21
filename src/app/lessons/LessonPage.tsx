@@ -29,7 +29,15 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
   return (
     <BoardLayout
       feedback={run.message && <LessonFeedback message={run.message?.text ?? null} kind={run.message?.kind} />}
-      heading={<><h2>{lesson.title}</h2><p className="turn">{step?.goal ?? "这一关完成了，看看原因再继续。"}</p></>}
+      heading={<>
+        <h2>{lesson.title}</h2>
+        {step ? (
+          <div className="step-task">
+            <p className="step-label">第 {run.stepIndex + 1} 步 / 共 {lesson.steps.length} 步</p>
+            <p className="turn">{step.goal}</p>
+          </div>
+        ) : <p className="turn">这一关完成了，看看原因再继续。</p>}
+      </>}
       board={<>
         <p className="figure-number">图 {String(index + 1).padStart(2, '0')} / 认识规则</p>
         <Board
@@ -65,7 +73,7 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
           )}
           {done && isLast && (
             <>
-              {onSurvival && <button type="button" className="button" onClick={onSurvival}>练习保住自己的棋</button>}{' '}
+              {onSurvival && <button type="button" className="button" onClick={onSurvival}>下一章 · 保住自己的棋 →</button>}{' '}
               <button type="button" className={onSurvival ? 'button button--ghost' : 'button'} onClick={onFinish}>
                 {onSurvival ? '直接开始陪练' : '去对局'}
               </button>
