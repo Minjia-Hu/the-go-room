@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SURVIVAL_SCENES } from '../../content/survival'
+import { LearningPage } from './LearningPage'
+import { createLearningSession } from './learningSession'
 import { SurvivalPage } from './SurvivalPage'
 import { startSurvival } from './survivalRunner'
 
@@ -71,5 +73,24 @@ describe('生存课分步布局', () => {
     const practice = render(<Harness id="danger-check" nextLabel="下一道练习" />)
     point(0, 3); point(0, 5)
     expect(solid(practice.container)).toEqual(['下一道练习'])
+  })
+})
+
+function LearningHarness() {
+  const [session, setSession] = useState(createLearningSession)
+  return <LearningPage session={session} onChange={setSession} onPlay={vi.fn()} />
+}
+
+describe('生存课程去向', () => {
+  const chapter = (title: string) => fireEvent.click(screen.getByRole('button', { name: new RegExp(`卷：${title}$`) }))
+  it('每道检验题完成后写明下一课，底部跳题链接降为次要', () => {
+    const { container } = render(<LearningHarness />)
+    chapter('保住自己的棋'); click('3. 把分开的棋连起来')
+    click('交叉点 4,4'); click('确认这一步')
+    expect(screen.getByRole('button', { name: '换个局面，自己试试 →' })).toBeTruthy()
+    click('换个局面，自己试试 →')
+    click('交叉点 4,4'); click('确认这一步')
+    expect(screen.getByRole('button', { name: '下一课 · 两个小空点为什么能保命 →' })).toBeTruthy()
+    expect(container.querySelector('.learning-toolbar--quiet')!.textContent).toContain('先跳过这一题')
   })
 })
