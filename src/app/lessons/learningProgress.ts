@@ -7,6 +7,7 @@ import { INDEPENDENT_SCENES } from '../../content/independent'
 import { WALK_MOVES, WALK_QUESTIONS } from '../../content/walkthrough'
 import type { LearningSession } from './learningSession'
 import { isLessonDone } from './lessonRunner'
+import { survivalCompletion } from './survivalRunner'
 
 export const LEARNING_KEY = 'the-go-room.learning.v1'
 export type Completion = 'guided' | 'independent' | 'retry' | 'hint' | 'demo'
@@ -53,19 +54,14 @@ export function recordLearningProgress(progress: LearningProgress, session: Lear
   }
   if (isLessonDone(session.rules.run)) record(`rules/${session.rules.run.lesson.id}`, 'guided')
   session.sequence.solved.forEach((index) => record(`rule-sequence/${RULE_SEQUENCE_SCENES[index].id}`, 'guided'))
-  session.runs.forEach((run) => {
-    if (run.stage === 'done') record(`survival/${run.scene.id}`, run.assisted ? 'demo'
-      : run.hint > (run.scene.guided ? 1 : 0) ? 'hint' : run.scene.guided ? 'guided' : run.mistakes > 0 ? 'retry' : 'independent')
-  })
+  session.runs.forEach((run) => { if (run.stage === 'done') record(`survival/${run.scene.id}`, survivalCompletion(run)) })
   session.endgameRuns.forEach((run) => { if (run.done) record(`endgame/${run.lesson.id}`, run.assisted ? 'hint' : 'guided') })
   session.strategyRuns.forEach((run) => { if (run.done) record(`strategy/${run.lesson.id}`, 'guided') })
   if (session.walk.furthest === WALK_MOVES.length && WALK_QUESTIONS.every((question) => session.walk.answered.includes(question.step))) record('walkthrough/full-game', 'guided')
   session.independentRuns.forEach((run) => {
     if (run.stage === 'done') record(`independent/${run.scene.id}`, run.help > 0 ? 'hint' : run.mistakes > 0 ? 'retry' : 'independent')
   })
-  session.practiceDangerRuns.forEach((run) => {
-    if (run.stage === 'done') record(`practice/${run.scene.id}`, run.assisted ? 'demo' : run.hint > 0 ? 'hint' : run.mistakes > 0 ? 'retry' : 'independent')
-  })
+  session.practiceDangerRuns.forEach((run) => { if (run.stage === 'done') record(`practice/${run.scene.id}`, survivalCompletion(run)) })
   for (const run of [...session.practiceRescueRuns, ...session.priorityRuns]) {
     if (run.stage === 'done') record(`practice/${run.scene.id}`, run.help > 0 ? 'hint' : run.mistakes > 0 ? 'retry' : 'independent')
   }
