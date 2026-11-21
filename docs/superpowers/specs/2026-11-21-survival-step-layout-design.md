@@ -64,7 +64,8 @@ interface SurvivalStep {
 补充规则：
 
 - `escape` 引导题要求比较所有示例救法。确认一种后回到第 ① 步，`progress` 为“已比较 n / m 种”，其中 n 为 `solved.length`，m 为 `scene.examples.length`。
-- `stage` 为 `done` 时 `done` 为真，`label` 为完成方式：`assisted` 为真是“跟着演示完成”；否则提示级数超过起始值（引导题 1、检验题 0）是“借助提示完成”；否则 `mistakes > 0` 是“重试后完成”；否则是“已完成”。
+- `stage` 为 `done` 时 `done` 为真，`label` 与学习记录的完成方式一致（取自 `COMPLETION_LABELS`）：`assisted` 为真是“跟着演示完成”；否则提示级数超过起始值（引导题 1、检验题 0）是“借助提示完成”；否则引导题是“跟着引导完成”；否则 `mistakes > 0` 是“重试后完成”，再否则是“独立完成”。借助演示或提示完成时，`task` 保留现有建议“可以重来一次，自己找答案 / 不看提示试试”。
+- 引导题 `escape` 中已确认过的试下点不再算第 ② 步，也不再显示“确认这一步”。
 - 任务句沿用 `SurvivalPage` 现有 `goals` 的措辞，按步骤拆分。单颗棋的场景不使用“整块”“连在一起”等措辞，与 `codex/single-stone-wording` 的修复保持一致。
 
 ### 页面槽位
@@ -76,7 +77,7 @@ interface SurvivalStep {
 - 课程位置（现有 eyebrow）；
 - 标题；
 - 步骤标签，如“第 1 步 / 共 2 步 · 找棋”；完成后显示完成方式；
-- 一句任务（完成后不显示）；
+- 一句任务（完成后只在借助演示或提示时显示重来建议）；
 - `progress` 存在时紧跟步骤标签显示。
 
 **主操作区 `primary`**，任何时刻最多一个实心主按钮（回答原因时没有，只有两个选项）：
@@ -120,7 +121,7 @@ interface SurvivalStep {
 
 ## 测试
 
-- 新增 `survivalSteps.test.ts`：四种课型的每个步骤、`escape` 引导题的“已比较 n / m 种”、四种完成方式。
+- 新增 `survivalSteps.test.ts`：四种课型的每个步骤、`escape` 引导题的“已比较 n / m 种”、各种完成方式。
 - 新增或扩充 `SurvivalPage` 组件测试：
   - 每个阶段最多一个实心主按钮；
   - “讲解与图例”与“看看对照”默认收起；
