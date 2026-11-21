@@ -32,7 +32,7 @@ describe('陪练交互', () => {
     expect(ai).toHaveBeenCalledTimes(1)
     expect(screen.getByText('已下 2 手')).toBeTruthy()
     point(3, 3)
-    expect(screen.getByLabelText('陪练提示').textContent).toContain('这块黑棋有 1 颗棋')
+    expect(screen.getByLabelText('陪练提示').textContent).toContain('这颗黑棋有 4 口气')
   })
   it('逐级提示不自动落子，点建议仍需确认；关陪练清除预览', () => {
     render(<Harness />)
@@ -60,7 +60,7 @@ describe('陪练交互', () => {
     ai.mockReturnValue({ kind: 'play', point: { x: 2, y: 3 } })
     const { container } = render(<Harness initial={initial} />)
     point(0, 0); click('下在这里'); tick()
-    expect(screen.getByLabelText('看懂这次提子')).toBeTruthy()
+    expect(screen.getByLabelText('看懂这次提子').textContent).toContain('占住这颗黑棋最后一口气')
     expect(container.querySelectorAll('[data-stone="black"]')).toHaveLength(1)
     click('被吃前')
     expect(container.querySelectorAll('[data-stone="black"]')).toHaveLength(2)

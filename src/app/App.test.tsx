@@ -189,7 +189,7 @@ describe('默认陪练的应用闭环', () => {
     click('对局'); tick()
     expect(screen.getByText('已下 2 手')).toBeTruthy()
     click('教学')
-    expect(screen.getByText('点出这整块黑棋最后的一口气。')).toBeTruthy()
+    expect(screen.getByText('点出它最后一口气。')).toBeTruthy()
   })
   it('实际提子可重试，存档只包含重试后保留的正式动作', () => {
     render(<App />)

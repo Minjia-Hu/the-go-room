@@ -5,7 +5,7 @@ export const SURVIVAL_SCENES: readonly SurvivalScene[] = [
     id: 'danger-guided', course: 1, title: '认出哪块棋危险', guided: true, kind: 'danger',
     rows: ['.........', '.X.......', '.........', '....O....', '...OXO...', '.........', '.........', '.........', '.........'],
     target: { x: 4, y: 4 }, examples: [{ x: 4, y: 5 }], wrongMove: { x: 8, y: 8 },
-    intro: '先找到危险，再想怎么救。上下左右相连的黑棋共用气；只剩一口气时，叫做“被叫吃”。',
+    intro: '先找到危险，再想怎么救。看看哪颗黑棋的上下左右只剩一个空点。只剩一口气时，叫做“被叫吃”。',
     hints: ['看看被白棋围住的黑棋。', '圈起的棋只剩一个紧挨着的空点。', '先点中央黑棋，再点它下面的空点。'],
   },
   {
