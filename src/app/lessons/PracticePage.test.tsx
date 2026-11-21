@@ -179,7 +179,7 @@ it('先后判断展示真实回应，必须解释原因才记录，刷新保留�
   cleanup(); render(<App />)
   expect(screen.getByText('重试后完成')).toBeTruthy()
   click('教学')
-  expect(screen.getByRole('heading', { name: '已完成 0 / 29 个课程与练习' })).toBeTruthy()
+  expect(screen.getByRole('heading', { name: '已完成 0 / 35 个课程与练习' })).toBeTruthy()
   expect(screen.queryByRole('button', { name: '继续学习' })).toBeNull()
 })
 

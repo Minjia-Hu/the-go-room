@@ -17,7 +17,7 @@ export function ScrollContents({ chapters, initialOpen }: { readonly chapters: r
   const [open, setOpen] = useState(initialOpen)
   const [animate, setAnimate] = useState(false)
   return <section className="scrolls" aria-labelledby="scrolls-title">
-    <div className="scrolls__head"><h3 id="scrolls-title">卷目</h3><p>六卷 · 点书脊展开</p></div>
+    <div className="scrolls__head"><h3 id="scrolls-title">卷目</h3><p>七卷 · 点书脊展开</p></div>
     <div className="scrolls__row">
       {chapters.map((chapter, index) => {
         const isOpen = index === open

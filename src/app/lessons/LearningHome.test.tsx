@@ -59,7 +59,16 @@ describe('首页：一子一气与卷目', () => {
     expect(first.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByRole('button', { name: '第 1 关:落子' })).toBeNull()
     expect(screen.getByRole('button', { name: '1. 认出哪块棋危险' })).toBeTruthy()
-    click('第陆卷：有提示的陪练')
+    expect([...document.querySelectorAll('.scroll__spine')].map((spine) => spine.getAttribute('aria-label'))).toEqual([
+      '第壹卷：认识规则', '第贰卷：保住自己的棋', '第叁卷：吃掉对方的棋',
+      '第肆卷：围地与终局', '第伍卷：九路策略入门', '第陆卷：从看懂到自己下', '第柒卷：有提示的陪练',
+    ])
+    click('第叁卷：吃掉对方的棋')
+    for (const name of ['1. 关住白棋的出路', '自己试试：赶向有黑棋的一边', '2. 一手叫吃两块棋',
+      '自己试试：别只叫吃一块', '3. 沿着台阶追到边上', '自己试试：换个方向征白棋']) {
+      expect(screen.getByRole('button', { name })).toBeTruthy()
+    }
+    click('第柒卷：有提示的陪练')
     expect(screen.getByRole('button', { name: /直接开始陪练/ })).toBeTruthy()
   })
 })

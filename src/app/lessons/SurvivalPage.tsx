@@ -10,8 +10,8 @@ import { groupMarks } from '../coaching/explanations'
 import { choosePracticePoint, chooseReason, confirmPractice, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
 import type { SurvivalRun } from './survivalRunner'
 
-interface Props { readonly practiceOnly?: boolean; readonly nextLabel?: string; readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onScoring?: () => void }
-export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onScoring, nextLabel, practiceOnly = false }: Props) {
+interface Props { readonly practiceOnly?: boolean; readonly nextLabel?: string; readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onNextChapter?: () => void }
+export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onNextChapter, nextLabel, practiceOnly = false }: Props) {
   const { scene } = run
   if (scene.id === 'danger-guided') return <GuidedDangerPage run={run} onChange={onChange} onNext={onNext} />
   const shown = practiceBoard(run)
@@ -67,8 +67,8 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
           <button className="button button--ghost" onClick={() => onChange(chooseReason(run, true))}>白棋一次只能填一个，另一个还在</button>
         </div>}
         {!done && run.hint < 3 && <button className="text-button hint-button" onClick={() => onChange(practiceHint(run))}>{['提醒我看哪里', '标出相关棋块和气', '演示一种做法'][run.hint]}</button>}
-        {done && <div className="actions next-lesson">{!nextLabel && isLast && onScoring
-          ? <><button className="button" onClick={onScoring}>学习围地与终局<span aria-hidden="true"> →</span></button><button className="button button--ghost" onClick={onNext}>开始我的陪练</button></>
+        {done && <div className="actions next-lesson">{isLast && onNextChapter && nextLabel !== undefined
+          ? <><button className="button" onClick={onNextChapter}>{nextLabel}</button><button className="button button--ghost" onClick={onNext}>开始我的陪练</button></>
           : <button className="button" onClick={onNext}>{nextLabel ?? (isLast ? '开始我的陪练' : scene.guided ? '换个局面，自己试试 →' : '下一课 →')}</button>}</div>}
         {(dangerCompare || eyesCompare) && <details className="step-compare" key={run.stage}><summary>看看对照</summary>
           {dangerCompare && <div className="actions"><button className="button button--ghost" onClick={() => demo('ignore')}>如果去远处下</button><button className="button button--ghost" onClick={() => demo('escape')}>如果接向空处</button></div>}

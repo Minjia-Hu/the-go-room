@@ -24,7 +24,7 @@ const unit = (id: string) => LEARNING_UNITS.find((entry) => entry.id === id)!
 
 describe('学习记录的完成依据', () => {
   it('目录 ID 唯一，直接打开后面的课或跳过只记录位置，不伪造完成', () => {
-    expect(new Set(LEARNING_UNITS.map((entry) => entry.id)).size).toBe(29)
+    expect(new Set(LEARNING_UNITS.map((entry) => entry.id)).size).toBe(35)
     const session = openLearningUnit(createLearningSession(), unit('rules/ko'))
     const progress = recordLearningProgress(session.progress, session)
     expect(progress.completed).toEqual({})
@@ -156,4 +156,20 @@ describe('生存检验题的完成等级', () => {
     expect(independent.completed[id]).toBe('independent')
     expect(recordLearningProgress(independent, { ...base, runs: [solve(failed)] })).toBe(independent)
   })
+})
+
+it('吃子六个单元紧接生存课，版本 1 的 29 个旧 ID 原样读取并可续读', () => {
+  const start = LEARNING_UNITS.findIndex(({ id }) => id === 'survival/eyes-check') + 1
+  expect(LEARNING_UNITS.slice(start, start + 7).map(({ id }) => id)).toEqual([
+    'capture/direction-guided', 'capture/direction-check', 'capture/double-guided', 'capture/double-check',
+    'capture/ladder-guided', 'capture/ladder-check', 'endgame/territory',
+  ])
+  const oldUnits = LEARNING_UNITS.filter(({ id }) => !id.startsWith('capture/'))
+  expect(oldUnits).toHaveLength(29)
+  const old = { ...emptyLearningProgress(), lastVisited: 'survival/eyes-check',
+    completed: Object.fromEntries(oldUnits.map(({ id }) => [id, 'guided' as const])) }
+  const progress = parseLearningProgress(JSON.stringify(old))!
+  expect(progress).toEqual(old)
+  expect(continueLearningUnit(progress)?.id).toBe('capture/direction-guided')
+  expect(restoreLearningSession(progress)).toMatchObject({ page: 'capture', captureIndex: 0 })
 })
