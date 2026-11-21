@@ -33,7 +33,7 @@ describe('practice hub', () => {
     expect(within(nav).getAllByRole('button').map((button) => button.textContent)).toEqual(['学', '练', '弈', '复'])
     expect(screen.getByRole('button', { name: '练习' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: '练习' }).title).toBe('练习')
-    expect(screen.getAllByRole('listitem')).toHaveLength(22)
+    expect(screen.getAllByRole('listitem')).toHaveLength(24)
   })
   it('uses per-kind numbering consistently in the list and exercise, with short explanation titles', () => {
     render(<App />)
@@ -122,7 +122,7 @@ describe('practice hub', () => {
     click('来一道还没独立完成的题'); point(0, 3); point(0, 5); click('下一道练习')
     view.unmount(); view = render(<App />)
     expect(screen.getByRole('heading', { name: '练 · 自己判断' })).toBeTruthy()
-    expect(screen.getByText('1 / 22')).toBeTruthy()
+    expect(screen.getByText('1 / 24')).toBeTruthy()
     expect(screen.queryByRole('button', { name: '交叉点 0,0' })).toBeNull()
     click('来一道还没独立完成的题')
     expect(screen.getByRole('heading', { name: '边上三颗棋，共用几口气' })).toBeTruthy()
@@ -133,7 +133,7 @@ describe('practice hub', () => {
     render(<App />)
     click('来一道还没独立完成的题'); point(0, 3); point(0, 5); click('返回练习')
     expect(screen.getByRole('alert').textContent).toContain('未能保存')
-    expect(screen.getByText('1 / 22')).toBeTruthy()
+    expect(screen.getByText('1 / 24')).toBeTruthy()
   })
 })
 
@@ -155,7 +155,7 @@ it('生存题答错后保留重试记录和推荐资格，独立重做才升级�
   expect(stored().completed['survival/danger-check']).toBe('independent')
   expect(stored().lastVisited).toBe('rules/ko')
   click('返回练习列表')
-  expect(screen.getByText('22 / 22')).toBeTruthy()
+  expect(screen.getByText('24 / 24')).toBeTruthy()
   expect(screen.queryByRole('button', { name: '来一道还没独立完成的题' })).toBeNull()
 })
 
@@ -196,4 +196,28 @@ it('新增认危险与救棋入口完成后保存，相关讲解仍回原课程'
   fireEvent.click(within(item).getByRole('button', { name: '相关讲解：什么时候先不追了？' }))
   expect(screen.getByRole('heading', { name: '什么时候先不追了？' })).toBeTruthy()
   expect(stored().lastVisited).toBe('strategy/chase')
+})
+
+it('别被吃两题按顺序推荐，全部独立完成后返回练习列表', () => {
+  const ids = ['practice/ladder-defense-no-help', 'practice/ladder-defense-with-help']
+  window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), lastVisited: 'rules/ko',
+    completed: Object.fromEntries(Object.entries(allIndependent).filter(([id]) => !ids.includes(id))),
+  }))
+  render(<App />)
+  const group = screen.getByRole('region', { name: '别被吃' })
+  expect(within(group).getByRole('heading').textContent).toBe('柒别被吃')
+  click('路上没有接应')
+  click('B · 在别处下'); click('下一手'); click('下一手')
+  expect(stored().completed[ids[0]]).toBeUndefined()
+  click('一路没有接应，继续逃会让更多棋被提')
+  expect(stored().completed[ids[0]]).toBe('independent')
+  click('下一道练习')
+  expect(screen.getByRole('heading', { name: '路上有接应' })).toBeTruthy()
+  click('A · 继续逃')
+  for (let i = 0; i < 9; i++) click('下一手')
+  click('沿这条路线能连到接应的黑棋，多出气')
+  expect(stored().completed[ids[1]]).toBe('independent')
+  expect(stored().lastVisited).toBe('rules/ko')
+  click('返回练习列表')
+  expect(screen.getByText('24 / 24')).toBeTruthy()
 })

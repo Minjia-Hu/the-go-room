@@ -9,10 +9,10 @@ import { choosePracticePoint } from './survivalRunner'
 
 const allIndependent = Object.fromEntries(PRACTICE_ITEMS.map((item) => [item.id, 'independent' as Completion]))
 describe('practice catalog', () => {
-  it('keeps ten course exercises and adds twelve practice-only scenes, in six groups', () => {
-    expect(PRACTICE_ITEMS).toHaveLength(22)
-    expect(new Set(PRACTICE_ITEMS.map((item) => item.id)).size).toBe(22)
-    expect(PRACTICE_GROUPS.map((group) => PRACTICE_ITEMS.filter((item) => item.group === group).length)).toEqual([3, 5, 4, 5, 1, 4])
+  it('keeps ten course exercises and adds fourteen practice-only scenes, in seven groups', () => {
+    expect(PRACTICE_ITEMS).toHaveLength(24)
+    expect(new Set(PRACTICE_ITEMS.map((item) => item.id)).size).toBe(24)
+    expect(PRACTICE_GROUPS.map((group) => PRACTICE_ITEMS.filter((item) => item.group === group).length)).toEqual([3, 5, 4, 5, 1, 4, 2])
     for (const item of PRACTICE_ITEMS.filter((item) => item.source === 'survival' || item.source === 'independent')) {
       expect(LEARNING_UNITS.find((unit) => unit.id === item.id)).toMatchObject({ page: item.source, index: item.index })
       const scene = item.source === 'survival' ? SURVIVAL_SCENES[item.index] : INDEPENDENT_SCENES[item.index]
@@ -55,4 +55,12 @@ describe('practice catalog', () => {
     expect(recordLearningProgress(progress, session, { visit: false })).toBe(progress)
     expect(recordLearningProgress(progress, session).lastVisited).toBe('rules/liberties')
   })
+})
+
+it('places the two ladder drills in the last group with a shared lesson link', () => {
+  expect(PRACTICE_GROUPS.at(-1)).toBe('别被吃')
+  expect(PRACTICE_ITEMS.filter((item) => item.source === 'ladder-defense').map(({ id, group, related }) => [id, group, related.id])).toEqual([
+    ['practice/ladder-defense-no-help', '别被吃', 'capture/ladder-guided'],
+    ['practice/ladder-defense-with-help', '别被吃', 'capture/ladder-guided'],
+  ])
 })

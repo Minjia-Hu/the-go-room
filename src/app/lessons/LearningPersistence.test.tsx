@@ -189,3 +189,17 @@ it('完成生存末题可进入吃子卷并续读，吃子末题去终局或陪�
   click('开始我的陪练')
   expect(screen.getByRole('heading', { name: '对局' })).toBeTruthy()
 })
+
+it('练征子防守不会移动续读位置，点相关讲解才进入征子引导题', () => {
+  window.location.hash = '#/practice'
+  window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), lastVisited: 'rules/ko' }))
+  render(<App />)
+  click('路上没有接应')
+  click('B · 在别处下'); click('下一手')
+  expect(stored().lastVisited).toBe('rules/ko')
+  click('返回练习')
+  const entry = screen.getByRole('button', { name: '路上没有接应' }).closest('li')!
+  fireEvent.click(within(entry).getByRole('button', { name: '相关讲解：沿着台阶追到边上' }))
+  expect(screen.getByRole('heading', { name: '沿着台阶追到边上' })).toBeTruthy()
+  expect(stored().lastVisited).toBe('capture/ladder-guided')
+})

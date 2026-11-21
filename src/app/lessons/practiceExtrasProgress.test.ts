@@ -1,3 +1,4 @@
+import { answerDefense, chooseDefense, defenseStep } from './ladderDefenseRunner'
 import { describe, expect, it } from 'vitest'
 import { createLearningSession, restoreLearningSession } from './learningSession'
 import { continueLearningUnit, emptyLearningProgress, LEARNING_UNITS, parseLearningProgress, recordLearningProgress } from './learningProgress'
@@ -20,6 +21,15 @@ describe('专项练习进度与课程隔离', () => {
       const run = session.practiceRescueRuns[item.index]
       const done = answerIndependent(confirmIndependent(independentPoint(independentPoint(run, run.scene.target), run.scene.example)), { extend: 2, capture: 0, connect: 1 }[run.scene.kind])
       session = { ...session, practiceRescueRuns: session.practiceRescueRuns.map((r, i) => i === item.index ? done : r) }
+    } else if (item.source === 'ladder-defense') {
+      const run = session.ladderDefenseRuns[item.index]
+      const select = chooseDefense(run, run.scene.answer)
+      const showing = run.scene.choices[run.scene.answer].moves.reduce((r) => defenseStep(r, 1), select)
+      expect(recordLearningProgress(progress, { ...session, ladderDefenseRuns: [showing] }, { visit: false }).completed).toEqual({})
+      const pending = { ...session, ladderDefenseRuns: session.ladderDefenseRuns.map((r, i) => i === item.index ? showing : r) }
+      expect(openPracticeItem(pending, item)).toBe(pending)
+      const done = answerDefense(showing, run.scene.reasonAnswer)
+      session = { ...session, ladderDefenseRuns: session.ladderDefenseRuns.map((r, i) => i === item.index ? done : r) }
     } else {
       const run = session.priorityRuns[item.index]
       const done = answerPriority(confirmPriority(choosePriority(run, run.scene.answer)), run.scene.reasonAnswer)
@@ -34,6 +44,7 @@ describe('专项练习进度与课程隔离', () => {
     const reopened = openPracticeItem({ ...session, progress: saved }, item)
     expect(reopened.page).toBe(oldPage)
     expect(reopened.progress).toBe(saved)
+    if (item.source === 'ladder-defense') expect(reopened.ladderDefenseRuns[item.index].selected).toBeNull()
     expect(recordLearningProgress(saved, reopened, { visit: false })).toBe(saved)
   })
   it('先后判断须解释后才记录，提示优先于重试，独立重做升级且不降级', () => {

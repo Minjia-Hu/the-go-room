@@ -1,5 +1,7 @@
 import { PRACTICE_DANGER_SCENES, PRACTICE_RESCUE_SCENES, PRIORITY_SCENES } from '../../content/practiceExtras'
 import { LESSONS } from '../../content/lessons'
+import { LADDER_DEFENSE_SCENES } from '../../content/ladderDefense'
+import { defenseCompletion } from './ladderDefenseRunner'
 import { CAPTURE_SCENES } from '../../content/capture'
 import { captureCompletion } from './captureRunner'
 import { SURVIVAL_SCENES } from '../../content/survival'
@@ -33,7 +35,7 @@ export const LEARNING_UNITS: readonly LearningUnit[] = [
   { id: 'walkthrough/full-game', page: 'walkthrough', index: 0, title: '一盘九路，从头到尾' },
   ...INDEPENDENT_SCENES.map((scene, index) => ({ id: `independent/${scene.id}`, page: 'independent' as const, index, title: `独立练习 · 第 ${index + 1} 题` })),
 ]
-const PRACTICE_IDS = [...PRACTICE_DANGER_SCENES, ...PRACTICE_RESCUE_SCENES, ...PRIORITY_SCENES].map((scene) => `practice/${scene.id}`)
+const PRACTICE_IDS = [...PRACTICE_DANGER_SCENES, ...PRACTICE_RESCUE_SCENES, ...PRIORITY_SCENES, ...LADDER_DEFENSE_SCENES].map((scene) => `practice/${scene.id}`)
 
 export interface LearningProgress {
   readonly version: 1
@@ -69,6 +71,7 @@ export function recordLearningProgress(progress: LearningProgress, session: Lear
   for (const run of [...session.practiceRescueRuns, ...session.priorityRuns]) {
     if (run.stage === 'done') record(`practice/${run.scene.id}`, run.help > 0 ? 'hint' : run.mistakes > 0 ? 'retry' : 'independent')
   }
+  session.ladderDefenseRuns.forEach((run) => { if (run.stage === 'done') record(`practice/${run.scene.id}`, defenseCompletion(run)) })
   const lastVisited = options.visit === false ? progress.lastVisited : currentLearningUnit(session)?.id ?? progress.lastVisited
   return completed === progress.completed && lastVisited === progress.lastVisited ? progress : { version: 1, completed, lastVisited }
 }
