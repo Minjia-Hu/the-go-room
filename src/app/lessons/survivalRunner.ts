@@ -1,3 +1,4 @@
+import type { Completion } from './learningProgress'
 import { createGame, getGroup, parseBoard, play, samePoint } from '../../engine'
 import type { GameState, Point } from '../../engine'
 import type { SurvivalScene } from '../../content/survivalTypes'
@@ -112,4 +113,12 @@ export function practiceBoard(run: SurvivalRun): GameState {
   if (!run.preview?.ok || run.view === 'before') return run.game
   if (run.view === 'reply') return run.preview.dangers[0]?.capture?.after ?? run.preview.after
   return run.preview.after
+}
+
+/** 统一页面和学习记录的完成方式。引导题开场自带的提示不计入辅助。 */
+export function survivalCompletion(run: SurvivalRun): Completion {
+  if (run.assisted) return 'demo'
+  if (run.hint > (run.scene.guided ? 1 : 0)) return 'hint'
+  if (run.scene.guided) return 'guided'
+  return run.mistakes > 0 ? 'retry' : 'independent'
 }
