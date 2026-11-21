@@ -4,6 +4,7 @@ import { COMPLETION_LABELS } from './learningProgress'
 import type { LearningUnit } from './learningProgress'
 import { PRACTICE_GROUPS, PRACTICE_ITEMS, nextPracticeItem, openPracticeItem } from './practiceCatalog'
 import type { PracticeItem } from './practiceCatalog'
+import { LadderDefensePage } from './LadderDefensePage'
 import { PriorityPage } from './PriorityPage'
 import { SurvivalPage } from './SurvivalPage'
 import { IndependentPage } from './IndependentPage'
@@ -36,6 +37,9 @@ export function PracticePage({ session, onChange, onLesson, onPlay, storageMessa
       {active.source === 'survival' || active.source === 'danger'
         ? <SurvivalPage run={(active.source === 'survival' ? session.runs : session.practiceDangerRuns)[active.index]} practiceOnly={active.source === 'danger'} isLast={false} nextLabel={nextLabel} onNext={onNext}
             onChange={(run) => { const key = active.source === 'survival' ? 'runs' : 'practiceDangerRuns'; onChange({ ...session, [key]: session[key].map((old, index) => index === active.index ? run : old) }) }} />
+        : active.source === 'ladder-defense'
+          ? <LadderDefensePage run={session.ladderDefenseRuns[active.index]} nextLabel={nextLabel} onNext={onNext}
+              onChange={(run) => onChange({ ...session, ladderDefenseRuns: session.ladderDefenseRuns.map((old, index) => index === active.index ? run : old) })} />
         : active.source === 'priority'
           ? <PriorityPage run={session.priorityRuns[active.index]} nextLabel={nextLabel} onNext={onNext}
               onChange={(run) => onChange({ ...session, priorityRuns: session.priorityRuns.map((old, index) => index === active.index ? run : old) })} />
@@ -58,7 +62,7 @@ export function PracticePage({ session, onChange, onLesson, onPlay, storageMessa
       </div>
     </header>
     <div className="practice-groups">{PRACTICE_GROUPS.map((group, index) => <section className="practice-group" key={group} aria-labelledby={`practice-group-${index}`}>
-      <h3 id={`practice-group-${index}`}><span aria-hidden="true">{['壹', '贰', '叁', '肆', '伍', '陆'][index]}</span>{group}</h3>
+      <h3 id={`practice-group-${index}`}><span aria-hidden="true">{['壹', '贰', '叁', '肆', '伍', '陆', '柒'][index]}</span>{group}</h3>
       <ul className="practice-list">{PRACTICE_ITEMS.filter((item) => item.group === group).map((item) => {
         const mode = completed[item.id]
         return <li className={`practice-item${mode === 'independent' ? ' practice-item--independent' : ''}`} key={item.id}>

@@ -1,3 +1,6 @@
+import { LADDER_DEFENSE_SCENES } from '../../content/ladderDefense'
+import { CAPTURE_SCENES } from '../../content/capture'
+import { startLadderDefense } from './ladderDefenseRunner'
 import { PRACTICE_DANGER_SCENES, PRACTICE_RESCUE_SCENES, PRIORITY_SCENES } from '../../content/practiceExtras'
 import { startPriority } from './priorityRunner'
 import { SURVIVAL_SCENES } from '../../content/survival'
@@ -8,11 +11,11 @@ import type { LearningSession } from './learningSession'
 import { startSurvival } from './survivalRunner'
 import { startIndependent } from './independentRunner'
 
-export const PRACTICE_GROUPS = ['认危险', '找出路', '提子', '连接', '两只眼', '先后判断'] as const
+export const PRACTICE_GROUPS = ['认危险', '找出路', '提子', '连接', '两只眼', '先后判断', '别被吃'] as const
 export interface PracticeItem {
   readonly id: string
   readonly group: typeof PRACTICE_GROUPS[number]
-  readonly source: 'survival' | 'independent' | 'danger' | 'rescue' | 'priority'
+  readonly source: 'survival' | 'independent' | 'danger' | 'rescue' | 'priority' | 'ladder-defense'
   readonly index: number
   readonly title: string
   readonly relatedTitle: string
@@ -40,8 +43,12 @@ const items: Omit<PracticeItem, 'relatedTitle'>[] = [
   ...PRACTICE_DANGER_SCENES.map((scene, index) => ({ id: `practice/${scene.id}`, group: '认危险' as const, source: 'danger' as const, index, title: scene.title, related: related('danger') })),
   ...PRACTICE_RESCUE_SCENES.map((scene, index) => ({ id: `practice/${scene.id}`, group: independentGroups[scene.kind], source: 'rescue' as const, index, title: scene.title, related: related(scene.kind === 'connect' ? 'connect' : 'escape') })),
   ...PRIORITY_SCENES.map((scene, index) => ({ id: `practice/${scene.id}`, group: '先后判断' as const, source: 'priority' as const, index, title: scene.title, related: related(scene.related) })),
+  ...LADDER_DEFENSE_SCENES.map((scene, index) => ({
+    id: `practice/${scene.id}`, group: '别被吃' as const, source: 'ladder-defense' as const,
+    index, title: scene.title, related: related('capture/ladder-guided'),
+  })),
 ]
-export const PRACTICE_ITEMS: readonly PracticeItem[] = PRACTICE_GROUPS.flatMap((group) => items.filter((item) => item.group === group).map((item) => ({ ...item, relatedTitle: item.related.page === 'survival' ? SURVIVAL_SCENES[item.related.index].title : item.related.title })))
+export const PRACTICE_ITEMS: readonly PracticeItem[] = PRACTICE_GROUPS.flatMap((group) => items.filter((item) => item.group === group).map((item) => ({ ...item, relatedTitle: item.related.page === 'survival' ? SURVIVAL_SCENES[item.related.index].title : item.related.page === 'capture' ? CAPTURE_SCENES[item.related.index].title : item.related.title })))
 
 /** 从当前题之后循环寻找；用过帮助的题仍值得再练。 */
 export function nextPracticeItem(progress: LearningProgress, afterId?: string): PracticeItem | undefined {
@@ -63,6 +70,11 @@ export function openPracticeItem(session: LearningSession, item: PracticeItem): 
   if (item.source === 'rescue') {
     if (session.practiceRescueRuns[item.index].stage !== 'done') return session
     return { ...session, practiceRescueRuns: session.practiceRescueRuns.map((run, index) => index === item.index ? startIndependent(run.scene) : run) }
+  }
+  if (item.source === 'ladder-defense') {
+    const current = session.ladderDefenseRuns[item.index]
+    if (current.stage !== 'done') return session
+    return { ...session, ladderDefenseRuns: session.ladderDefenseRuns.map((run, index) => index === item.index ? startLadderDefense(run.scene) : run) }
   }
   if (item.source === 'priority') {
     if (session.priorityRuns[item.index].stage !== 'done') return session

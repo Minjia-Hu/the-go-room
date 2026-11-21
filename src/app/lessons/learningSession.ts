@@ -2,6 +2,9 @@ import { PRACTICE_DANGER_SCENES, PRACTICE_RESCUE_SCENES, PRIORITY_SCENES } from 
 import { startPriority } from './priorityRunner'
 import type { PriorityRun } from './priorityRunner'
 import { LESSONS } from '../../content/lessons'
+import { LADDER_DEFENSE_SCENES } from '../../content/ladderDefense'
+import { startLadderDefense } from './ladderDefenseRunner'
+import type { LadderDefenseRun } from './ladderDefenseRunner'
 import { CAPTURE_SCENES } from '../../content/capture'
 import { startCapture } from './captureRunner'
 import type { CaptureRun } from './captureRunner'
@@ -43,10 +46,12 @@ export interface LearningSession {
   readonly practiceDangerRuns: readonly SurvivalRun[]
   readonly practiceRescueRuns: readonly IndependentRun[]
   readonly priorityRuns: readonly PriorityRun[]
+  readonly ladderDefenseRuns: readonly LadderDefenseRun[]
 }
 export function createLearningSession(): LearningSession {
   return { progress: emptyLearningProgress(), page: 'home', rules: { index: 0, run: startLesson(LESSONS[0]) }, sceneIndex: 0, runs: SURVIVAL_SCENES.map(startSurvival),
-    captureIndex: 0, captureRuns: CAPTURE_SCENES.map((scene) => startCapture(scene)), sequence: startRuleSequence(), endgameIndex: 0, endgameRuns: createEndgameRuns(), strategyIndex: 0, strategyRuns: createStrategyRuns(), walk: startWalk(), independentIndex: 0, independentRuns: createIndependentRuns(), practiceDangerRuns: PRACTICE_DANGER_SCENES.map(startSurvival), practiceRescueRuns: PRACTICE_RESCUE_SCENES.map(startIndependent), priorityRuns: PRIORITY_SCENES.map(startPriority) }
+    captureIndex: 0, captureRuns: CAPTURE_SCENES.map((scene) => startCapture(scene)), sequence: startRuleSequence(), endgameIndex: 0, endgameRuns: createEndgameRuns(), strategyIndex: 0, strategyRuns: createStrategyRuns(), walk: startWalk(), independentIndex: 0, independentRuns: createIndependentRuns(), practiceDangerRuns: PRACTICE_DANGER_SCENES.map(startSurvival), practiceRescueRuns: PRACTICE_RESCUE_SCENES.map(startIndependent), priorityRuns: PRIORITY_SCENES.map(startPriority),
+    ladderDefenseRuns: LADDER_DEFENSE_SCENES.map(startLadderDefense) }
 }
 
 export function openLearningUnit(session: LearningSession, unit: LearningUnit): LearningSession {
