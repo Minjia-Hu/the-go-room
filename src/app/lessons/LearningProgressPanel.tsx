@@ -1,14 +1,6 @@
 import { useState } from 'react'
-import type { ReactNode } from 'react'
-import { COMPLETION_LABELS, continueLearningUnit, LEARNING_UNITS } from './learningProgress'
-import type { Completion, LearningProgress, LearningUnit } from './learningProgress'
-
-export function LearningLink({ label, children, mode, current = false, onClick }: { readonly label: string; readonly children?: ReactNode; readonly mode?: Completion; readonly current?: boolean; readonly onClick: () => void }) {
-  return <div className={`learning-entry${mode ? ' learning-entry--done' : ''}${current ? ' learning-entry--current' : ''}`}>
-    <button className="lesson-link" onClick={onClick} aria-label={children ? label : undefined} aria-current={current ? 'step' : undefined}><span className="lesson-link__dot" aria-hidden="true" />{children ?? label}<span className="lesson-link__go" aria-hidden="true">{current ? '续读 →' : '↗'}</span></button>
-    {mode && <p className="completion-note"><span aria-hidden="true">✓ </span>{COMPLETION_LABELS[mode]}</p>}
-  </div>
-}
+import { continueLearningUnit, LEARNING_UNITS } from './learningProgress'
+import type { LearningProgress, LearningUnit } from './learningProgress'
 
 interface Props {
   readonly progress: LearningProgress

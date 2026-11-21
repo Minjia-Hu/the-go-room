@@ -4,7 +4,6 @@ import type { ReactNode } from 'react'
 export interface ScrollChapter {
   readonly number: string
   readonly title: string
-  readonly summary: string
   readonly count: string
   /** 本卷已完成 / 总数；陪练不计入单元时省略。 */
   readonly done?: readonly [number, number]
@@ -30,7 +29,6 @@ export function ScrollContents({ chapters, initialOpen }: { readonly chapters: r
             <span className="scroll__meta" aria-hidden="true"><span>{chapter.count}</span>{chapter.done && <span className={chapter.done[0] === chapter.done[1] ? 'scroll__done scroll__done--full' : 'scroll__done'}>{chapter.done[0]} / {chapter.done[1]}</span>}</span>
           </button>
           {isOpen && <div id={panelId} className={`scroll__panel${animate ? ' scroll__panel--unroll' : ''}`} role="region" aria-label={chapter.title}>
-            <p className="scroll__summary">{chapter.summary}</p>
             {chapter.content}
           </div>}
         </article>

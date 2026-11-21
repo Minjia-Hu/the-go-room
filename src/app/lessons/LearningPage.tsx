@@ -7,7 +7,7 @@ import type { LearningSession } from './learningSession'
 import { openLearningUnit } from './learningSession'
 import { COMPLETION_LABELS, continueLearningUnit, currentLearningUnit, LEARNING_UNITS } from './learningProgress'
 import type { LearningUnit } from './learningProgress'
-import { LearningLink, LearningProgressPanel } from './LearningProgressPanel'
+import { LearningProgressPanel } from './LearningProgressPanel'
 import { startLesson } from './lessonRunner'
 import { LessonPage } from './LessonPage'
 import { survivalNextLabel } from './survivalSteps'
@@ -50,43 +50,52 @@ export function LearningPage({ session, onChange, onPlay, onClear, storageMessag
       return [units.filter((unit) => completed[unit.id]).length, units.length]
     }
     const startRules = () => onChange({ ...session, page: 'rules', rules: { index: 0, run: startLesson(LESSONS[0]) } })
+    function indexLink(unit: LearningUnit, title = unit.title, tag?: '练习' | '慢镜头' | '独立练习') {
+      const mode = completed[unit.id]
+      return <button key={unit.id} className={`course-index__link${tag ? ' course-index__secondary' : ''}`}
+        aria-label={tag && `${tag} ${title}`} aria-current={isNext(unit.id) ? 'step' : undefined}
+        aria-description={mode && COMPLETION_LABELS[mode]} onClick={() => onChange(openLearningUnit(session, unit))}>
+        <span>{tag && <span className="course-index__tag">{tag} </span>}{title}</span>
+        {mode && <span className="course-index__check" aria-hidden="true">✓</span>}
+      </button>
+    }
+    function pairedIndex(page: 'survival' | 'capture') {
+      const entries = LEARNING_UNITS.filter((unit) => unit.page === page).map((unit) => {
+        const scene = page === 'survival' ? SURVIVAL_SCENES[unit.index] : CAPTURE_SCENES[unit.index]
+        return { unit, scene, number: 'course' in scene ? scene.course : scene.lesson }
+      })
+      return <div className="course-index">{entries.filter(({ scene }) => scene.guided).map((lesson) =>
+        <div className="course-pair" role="group" aria-label={`第 ${lesson.number} 课：${lesson.scene.title}`} key={lesson.unit.id}>
+          {entries.filter(({ number }) => number === lesson.number).map(({ unit, scene, number }) =>
+            scene.guided ? indexLink(unit, `${number}. ${scene.title}`) : indexLink(unit, scene.title, '练习'))}
+        </div>)}</div>
+    }
+    function numberedIndex(page: 'endgame' | 'strategy') {
+      return <div className="course-index">{LEARNING_UNITS.filter((unit) => unit.page === page).map((unit) =>
+        <div className="course-pair" key={unit.id}>{indexLink(unit, `${unit.index + 1}. ${unit.title}`)}</div>)}</div>
+    }
     const chapters: ScrollChapter[] = [
-      { number: '壹', title: '认识规则', summary: '落子、气、提子、禁入点和劫；再用两个慢镜头看清提子的先后。', count: '五关 · 两镜头', done: tally(['rules', 'rule-sequence']), content: <>
-        <div className="lesson-list">{LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={lesson.title} mode={completed[`rules/${lesson.id}`]} current={isNext(`rules/${lesson.id}`)} onClick={() => onChange({ ...session, page: 'rules', rules: session.rules.index === index ? session.rules : { index, run: startLesson(lesson) } })} />)}</div>
-        <button className="text-button chapter-supplement" onClick={openSequence}>规则慢镜头：落子后先提谁？</button>
-        <details className="lesson-details"><summary>两个慢镜头的学习记录</summary><div className="lesson-list">{LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence').map((unit) => <LearningLink key={unit.id} label={unit.title} mode={completed[unit.id]} current={isNext(unit.id)} onClick={() => onChange(openLearningUnit(session, unit))} />)}</div></details>
-      </> },
-      { number: '贰', title: '保住自己的棋', summary: '四课八个局面。观察、试下、比较原因。', count: '四课 · 八局', done: tally(['survival']), content:
-        <div className="survival-contents">{SURVIVAL_SCENES.filter((scene) => scene.guided).map((lesson) =>
-          <div className="course-pair" role="group" aria-label={`第 ${lesson.course} 课：${lesson.title}`} key={lesson.id}>
-            {SURVIVAL_SCENES.map((scene, index) => scene.course !== lesson.course ? null :
-              <div key={scene.id} className={scene.guided ? 'course-pair__lesson' : 'course-pair__practice'}>
-                <LearningLink label={scene.guided ? `${scene.course}. ${scene.title}` : `自己试试：${scene.title}`} mode={completed[`survival/${scene.id}`]} current={isNext(`survival/${scene.id}`)} onClick={() => openScene(index)}>
-                  {scene.guided ? undefined : <span className="course-pair__practice-label"><span className="course-pair__tag">自己试试</span><span>{scene.title}</span></span>}
-                </LearningLink>
-              </div>)}
-          </div>)}</div> },
-      { number: '叁', title: '吃掉对方的棋', summary: '找准叫吃方向，练门吃、抱吃、双叫吃和征子。', count: '三课 · 六局', done: tally(['capture']), content:
-        <div className="survival-contents">{CAPTURE_SCENES.filter((scene) => scene.guided).map((lesson) =>
-          <div className="course-pair" role="group" aria-label={`第 ${lesson.lesson} 课：${lesson.title}`} key={lesson.id}>
-            {CAPTURE_SCENES.map((scene, index) => scene.lesson !== lesson.lesson ? null :
-              <div key={scene.id} className={scene.guided ? 'course-pair__lesson' : 'course-pair__practice'}>
-                <LearningLink label={scene.guided ? `${scene.lesson}. ${scene.title}` : `自己试试：${scene.title}`}
-                  mode={completed[`capture/${scene.id}`]} current={isNext(`capture/${scene.id}`)} onClick={() => openCapture(index)}>
-                  {scene.guided ? undefined : <span className="course-pair__practice-label"><span className="course-pair__tag">自己试试</span><span>{scene.title}</span></span>}
-                </LearningLink>
-              </div>)}
-          </div>)}</div> },
-      { number: '肆', title: '围地与终局', summary: '判断空点归属，自己数分，再走完终局。', count: '四课', done: tally(['endgame']), content:
-        <div className="lesson-list">{ENDGAME_LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={`${index + 1}. ${lesson.title}`} mode={completed[`endgame/${lesson.id}`]} current={isNext(`endgame/${lesson.id}`)} onClick={() => openEndgame(index)} />)}</div> },
-      { number: '伍', title: '九路策略入门', summary: '先顾危险，再想围地；比较走法，理解取舍。', count: '三课', done: tally(['strategy']), content:
-        <div className="lesson-list">{STRATEGY_LESSONS.map((lesson, index) => <LearningLink key={lesson.id} label={`${index + 1}. ${lesson.title}`} mode={completed[`strategy/${lesson.id}`]} current={isNext(`strategy/${lesson.id}`)} onClick={() => openStrategy(index)} />)}</div> },
-      { number: '陆', title: '从看懂到自己下', summary: '走完一盘九路，再换没有标记的棋形自己判断。', count: '一盘 · 六题', done: tally(['walkthrough', 'independent']), content: <>
-        <div className="lesson-list"><LearningLink label="一盘九路，从头到尾" mode={completed['walkthrough/full-game']} current={isNext('walkthrough/full-game')} onClick={openWalk} /><LearningLink label="换个棋形，自己判断" current={next?.page === 'independent' && !allDone} onClick={() => openIndependent(session.independentIndex)} /></div>
-        <details className="lesson-details"><summary>六道独立练习 · 已完成 {session.independentRuns.filter((_, index) => independentDone(index)).length} / 6</summary><div className="lesson-list">{LEARNING_UNITS.filter((unit) => unit.page === 'independent').map((unit) => <LearningLink key={unit.id} label={unit.title} mode={completed[unit.id]} onClick={() => openIndependent(unit.index)} />)}</div></details>
-      </> },
-      { number: '柒', title: '有提示的陪练', summary: '每手先试下，看懂提示后再确认；也可以退回重试。不计入课程单元。', count: '一盘', content:
-        <button className="button" onClick={onPlay}>直接开始陪练<span aria-hidden="true"> →</span></button> },
+      { number: '壹', title: '认识规则', count: '五关 · 两镜头', done: tally(['rules', 'rule-sequence']), content:
+        <div className="course-index">
+          {LEARNING_UNITS.filter((unit) => unit.page === 'rules').map((unit) =>
+            <div className="course-pair" key={unit.id}>{indexLink(unit)}</div>)}
+          <div className="course-pair">{LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence').map((unit) =>
+            indexLink(unit, unit.title, '慢镜头'))}</div>
+        </div> },
+      { number: '贰', title: '保住自己的棋', count: '四课 · 八局', done: tally(['survival']), content: pairedIndex('survival') },
+      { number: '叁', title: '吃掉对方的棋', count: '三课 · 六局', done: tally(['capture']), content: pairedIndex('capture') },
+      { number: '肆', title: '围地与终局', count: '四课', done: tally(['endgame']), content: numberedIndex('endgame') },
+      { number: '伍', title: '九路策略入门', count: '三课', done: tally(['strategy']), content: numberedIndex('strategy') },
+      { number: '陆', title: '从看懂到自己下', count: '一盘 · 六题', done: tally(['walkthrough', 'independent']), content:
+        <div className="course-index">
+          <div className="course-pair">{LEARNING_UNITS.filter((unit) => unit.page === 'walkthrough').map((unit) => indexLink(unit))}</div>
+          <div className="course-pair">{LEARNING_UNITS.filter((unit) => unit.page === 'independent').map((unit) =>
+            indexLink(unit, `第 ${unit.index + 1} 题`, '独立练习'))}</div>
+        </div> },
+      { number: '柒', title: '有提示的陪练', count: '一盘', content:
+        <div className="course-index"><div className="course-pair">
+          <button className="course-index__link" onClick={onPlay}>直接开始陪练</button>
+        </div></div> },
     ]
     const chapterOf: Record<LearningUnit['page'], number> = { rules: 0, 'rule-sequence': 0, survival: 1, capture: 2, endgame: 3, strategy: 4, walkthrough: 5, independent: 5 }
     const current = next ? chapterOf[next.page] : 0

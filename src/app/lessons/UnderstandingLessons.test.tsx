@@ -22,7 +22,7 @@ function number(value: string) {
 describe('规则慢镜头与终局课程界面', () => {
   it('每一步都展示盘面变化，两个原因回答正确才完成，切页保留进度', () => {
     const { container } = render(<Harness />)
-    chapter('认识规则'); click('规则慢镜头：落子后先提谁？')
+    chapter('认识规则'); click('慢镜头 只剩一只眼：为什么白棋可以下？')
     expect(container.querySelectorAll('[data-stone="black"]')).toHaveLength(14)
     click('下一步')
     expect(screen.getByText(/尚未判定合法，不是正式落子/)).toBeTruthy()
@@ -38,7 +38,7 @@ describe('规则慢镜头与终局课程界面', () => {
     expect(container.querySelectorAll('[data-stone="black"]')).toHaveLength(13)
     expect(container.querySelector('[data-stone="white"][data-x="3"][data-y="4"]')).toBeNull()
     click('先提对方没气的棋，再检查自己的气')
-    click('返回章节'); chapter('认识规则'); click('规则慢镜头：落子后先提谁？')
+    click('返回章节'); chapter('认识规则'); click('慢镜头 两只眼：为什么同一个位置不能下？')
     click('学习围地与终局')
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('围住的空点属于谁')
   })
