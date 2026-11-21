@@ -1,0 +1,75 @@
+// @vitest-environment jsdom
+import { useState } from 'react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { SURVIVAL_SCENES } from '../../content/survival'
+import { SurvivalPage } from './SurvivalPage'
+import { startSurvival } from './survivalRunner'
+
+afterEach(cleanup)
+const scene = (id: string) => SURVIVAL_SCENES.find((s) => s.id === id)!
+interface HarnessProps { readonly id: string; readonly isLast?: boolean; readonly nextLabel?: string; readonly onNext?: () => void; readonly onScoring?: () => void }
+function Harness({ id, isLast = false, nextLabel, onNext = vi.fn(), onScoring }: HarnessProps) {
+  const [run, setRun] = useState(() => startSurvival(scene(id)))
+  return <SurvivalPage run={run} onChange={setRun} onNext={onNext} isLast={isLast} nextLabel={nextLabel} onScoring={onScoring} />
+}
+const click = (name: string) => fireEvent.click(screen.getByRole('button', { name }))
+const point = (x: number, y: number) => click(`交叉点 ${x},${y}`)
+/** 主操作区里的实心主按钮（不含 ghost 与文字链接）。 */
+const solid = (container: HTMLElement) => [...container.querySelectorAll('.board-primary .button:not(.button--ghost)')].map((b) => b.textContent)
+const folded = (summary: string) => screen.getByText(summary).closest('details')!
+
+describe('生存课分步布局', () => {
+  it('认危险：开场显示引言与第 1 步，讲解默认收起；完成后只有一个主按钮', () => {
+    const { container } = render(<Harness id="danger-check" />)
+    expect(screen.getByText('第 1 步 / 共 2 步 · 找棋')).toBeTruthy()
+    expect(container.querySelector('.board-primary .step-intro')!.textContent).toBe(scene('danger-check').intro)
+    expect(folded('讲解与图例').open).toBe(false)
+    expect(solid(container)).toEqual([])
+    point(0, 3)
+    expect(screen.getByText('第 2 步 / 共 2 步 · 找气')).toBeTruthy()
+    expect(container.querySelector('.board-primary .step-intro')).toBeNull()
+    point(0, 5)
+    expect(screen.getByText('独立完成')).toBeTruthy()
+    expect(solid(container)).toEqual(['下一课 →'])
+    expect(folded('看看对照').open).toBe(false)
+  })
+
+  it('找出路引导题：试下后才有“确认这一步”，确认一种后显示比较进度', () => {
+    const { container } = render(<Harness id="escape-guided" />)
+    point(4, 5)
+    expect(screen.getByText('第 2 步 / 共 2 步 · 看后果，再确认')).toBeTruthy()
+    expect(solid(container)).toEqual(['确认这一步'])
+    click('确认这一步')
+    expect(screen.getByText('第 1 步 / 共 2 步 · 选点试下')).toBeTruthy()
+    expect(screen.getByText('已比较 1 / 2 种')).toBeTruthy()
+    expect(solid(container)).toEqual([])
+    point(4, 2); click('确认这一步')
+    expect(screen.getByText('跟着引导完成')).toBeTruthy()
+    expect(solid(container)).toEqual(['换个局面，自己试试 →'])
+  })
+
+  it('两只眼：说出原因时没有主按钮，对照收在折叠里', () => {
+    const { container } = render(<Harness id="eyes-guided" />)
+    point(3, 4)
+    expect(screen.getByText('第 2 步 / 共 3 步 · 试第二个眼')).toBeTruthy()
+    point(5, 4)
+    expect(screen.getByText('第 3 步 / 共 3 步 · 说出原因')).toBeTruthy()
+    expect(solid(container)).toEqual([])
+    expect(folded('看看对照').open).toBe(false)
+  })
+
+  it('最后一题：主按钮去终局，陪练为次要；调用方的 nextLabel 优先', () => {
+    const onScoring = vi.fn()
+    const { container } = render(<Harness id="eyes-check" isLast onScoring={onScoring} />)
+    point(4, 3); point(4, 5); click('白棋一次只能填一个，另一个还在')
+    expect(solid(container)).toEqual(['学习围地与终局 →'])
+    click('学习围地与终局')
+    expect(onScoring).toHaveBeenCalledOnce()
+    expect(screen.getByRole('button', { name: '开始我的陪练' }).className).toContain('button--ghost')
+    cleanup()
+    const practice = render(<Harness id="danger-check" nextLabel="下一道练习" />)
+    point(0, 3); point(0, 5)
+    expect(solid(practice.container)).toEqual(['下一道练习'])
+  })
+})
