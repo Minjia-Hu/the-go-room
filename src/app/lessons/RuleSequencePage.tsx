@@ -13,9 +13,8 @@ export function RuleSequencePage({ run, onChange, onScoring, completedSceneIds =
   return <BoardLayout
       legend={<p className="small">橙圈：目标黑棋 · 小空心圈：气 · 虚线小圈：被提走的位置</p>}
       feedback={run.message && <LessonFeedback message={run.message} />}
-      heading={<><p className="eyebrow">认识规则 / 落子后先提谁</p><h2>{view.scene.title}</h2><p className="turn">{view.title}</p></>}
+      heading={<><p className="eyebrow">慢镜头 {run.sceneIndex + 1} / 2 · 落子后先提谁</p><h2>{view.scene.title}</h2><p className="turn">{view.title}</p></>}
       board={<>
-      <p className="figure-number">规则慢镜头 / {run.sceneIndex + 1} · 2</p>
       <Board board={view.board} marks={view.marks} disabled />
       <p className={`board-caption${intermediate ? ' board-caption--notice' : ''}`}>{intermediate ? '规则演示中间画面 · 尚未判定合法，不是正式落子' : run.step === 0 ? '原始棋形 · 白棋准备下在 A' : view.legal ? '判定结果：白棋有气，这一手合法' : '判定结果：禁止落子，恢复原来的棋盘'}</p>
     </>}

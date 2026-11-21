@@ -93,7 +93,7 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props)
 
   return <BoardLayout
     heading={<>
-      <p className="eyebrow">吃掉对方的棋 / 第 {scene.lesson} 课 · {scene.guided ? '一起练习' : '自己试试'}</p>
+      <p className="eyebrow">第 {scene.lesson} 课 · {scene.guided ? '一起练习' : '自己试试'}</p>
       <h2>{scene.title}</h2>
       <div className="step-task">
         <p className="step-label">{label}</p>

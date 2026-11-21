@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openCatalog } from './openCatalog.test-helper'
 import { useState } from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -59,7 +60,7 @@ describe('整盘讲解与独立练习界面', () => {
   it('错误回应可以回原图重试，提示和已答问题跨页保留', () => {
     render(<Harness />)
     chapter('从看懂到自己下'); click('一盘九路，从头到尾'); click('先考虑角边和自己的发展方向'); click('到下一讲解点')
-    click('返回章节'); chapter('从看懂到自己下'); click('独立练习 第 1 题'); click('第 2 题')
+    openCatalog(); chapter('从看懂到自己下'); click('独立练习 第 1 题'); click('第 2 题')
     click('给我一点思路'); click('标出需要观察的棋块')
     point(5, 3); point(5, 4); click('确认这一手'); click('看白棋怎样提')
     expect((screen.getByRole('button', { name: '确认这一手' }) as HTMLButtonElement).disabled).toBe(true)
@@ -68,9 +69,9 @@ describe('整盘讲解与独立练习界面', () => {
     expect(screen.queryByRole('button', { name: '下一道独立练习' })).toBeNull()
     click('因为提走白棋，空出位置，目标黑块的气增加了')
     expect(screen.getByText('借助提示完成')).toBeTruthy()
-    click('返回章节'); chapter('从看懂到自己下'); click('一盘九路，从头到尾')
+    openCatalog(); chapter('从看懂到自己下'); click('一盘九路，从头到尾')
     expect(screen.getByText(/关键问题：已答对 1 \/ 6 个/)).toBeTruthy()
-    click('返回章节'); chapter('从看懂到自己下'); click('独立练习 第 2 题')
+    openCatalog(); chapter('从看懂到自己下'); click('独立练习 第 2 题')
     expect(screen.getByText('借助提示完成')).toBeTruthy()
     click('重做这一题')
     expect(screen.getByText('第一步：找危险棋块')).toBeTruthy()

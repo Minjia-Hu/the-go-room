@@ -38,7 +38,7 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
   return <BoardLayout key={scene.id}
       feedback={run.message && <LessonFeedback message={run.message} />}
       heading={<>
-        <p className="eyebrow">{practice?.eyebrow ?? `保住自己的棋 / 第 ${scene.course} 课 · ${scene.guided ? '一起练习' : '自己试试'}`}</p>
+        <p className="eyebrow">{practice?.eyebrow ?? `第 ${scene.course} 课 · ${scene.guided ? '一起练习' : '自己试试'}`}</p>
         <h2>{scene.title}</h2>
         <div className="step-task">
           <p className="step-label">{step.done ? step.label : `第 ${step.current} 步 / 共 ${step.total} 步 · ${step.label}`}</p>
@@ -47,7 +47,7 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
         </div>
       </>}
       board={<>
-      <p className="figure-number">{practice?.figure ?? `第 ${scene.course} 课 / ${scene.guided ? '一起练习' : '自己试试'}`}</p>
+      {practice && <p className="figure-number">{practice.figure}</p>}
       <Board board={shown.board} marks={marks} lastMove={last?.kind === 'play' ? last.point : null}
         disabled={run.view === 'reply' || run.view.startsWith('contrast') || run.stage === 'done' || run.stage === 'reason'}
         ghostColor={run.stage === 'move' ? 'black' : null} onPointClick={(p) => onChange(choosePracticePoint(run, p))} />

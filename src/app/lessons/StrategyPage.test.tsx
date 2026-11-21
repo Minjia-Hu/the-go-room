@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openCatalog } from './openCatalog.test-helper'
 import { useState } from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -48,15 +49,15 @@ describe('九路策略课程界面', () => {
   it('切回章节保留变化、比较记录；重来只重置当前课', () => {
     render(<Harness />)
     chapter('九路策略入门'); click('1. 先救棋，还是去占地？'); click(/^A · 先接出黑棋/); seeTwo()
-    click('返回章节'); chapter('九路策略入门'); click('2. 为什么从角和边开始？')
+    openCatalog(); chapter('九路策略入门'); click('2. 为什么从角和边开始？')
     click(/^C · 中腹补一手/); seeTwo()
-    click('返回章节'); chapter('九路策略入门'); click('1. 先救棋，还是去占地？')
+    openCatalog(); chapter('九路策略入门'); click('1. 先救棋，还是去占地？')
     expect(screen.getByText(/已看完 1 \/ 2 种结果/)).toBeTruthy()
     click('回到落子前')
     expect(screen.getByLabelText('标记 A')).toBeTruthy()
     click('重来本课')
     expect(screen.getByText(/已看完 0 \/ 2 种结果/)).toBeTruthy()
-    click('返回章节'); chapter('九路策略入门'); click('2. 为什么从角和边开始？')
+    openCatalog(); chapter('九路策略入门'); click('2. 为什么从角和边开始？')
     expect(screen.getByText(/已看完 1 \/ 3 种结果/)).toBeTruthy()
   })
   it('终局课程完成后能进入策略第一课', () => {
