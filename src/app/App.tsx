@@ -83,9 +83,9 @@ export function App() {
       setLearning(current => ({ ...current, page: 'home' }))
       navigate('lessons')
     })
-    const courseSwitch = document.getElementById('course-catalog-switch')
-    courseSwitch?.focus({ preventScroll: true })
-    courseSwitch?.scrollIntoView?.({ block: 'start' })
+    const courseHeading = document.getElementById('course-catalog-heading')
+    courseHeading?.focus({ preventScroll: true })
+    courseHeading?.scrollIntoView?.({ block: 'start' })
   }
 
   function finish(completed: Match) {

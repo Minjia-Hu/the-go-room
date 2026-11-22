@@ -37,8 +37,8 @@ This roughly 40-second recording includes cursor movement, click indicators, and
 
 ## Getting started
 
-- **New to Go?** Select **学** (Learn) in the catalog below the board on the home page. Open **认识规则** (Learn the rules) and choose the first lesson to place a stone.
-- **Want to practice a skill?** Switch to **练** (Practice) in the same catalog. Open a group such as **认危险** (Spot danger) or **找出路** (Find an escape), then select a problem.
+- **New to Go?** Find **学** (Learn) below the board on the home page. Open **认识规则** (Learn the rules) and choose the first lesson to place a stone.
+- **Want to practice a skill?** Scroll down to **练** (Practice) below the course catalog. Open a group such as **认危险** (Spot danger) or **找出路** (Find an escape), then select a problem.
 - **Ready for a game?** Select **弈** (Play) in the top navigation. Coaching is on by default, so you can try a move before confirming it. After the game, open **复** (Review) to replay it move by move.
 
 Open the [live site](https://minjia-hu.github.io/the-go-room/) to get started without installing anything. To run it locally or contribute, follow the instructions below.

@@ -16,7 +16,7 @@ const stones = (container: HTMLElement) => container.querySelectorAll('[data-sto
 describe('首页：一子一气与卷目', () => {
   it('首页棋盘可以直接下：接在 A 有三口气，可对照下之前，再练一次回到原题', () => {
     const { container } = render(<Harness />)
-    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('一子一气')
+    expect(screen.getByRole('heading', { level: 2, name: '一子一气' })).toBeTruthy()
     expect(stones(container)).toBe(4)
     click('交叉点 4,5')
     expect(screen.getByText('接上了，三口气！')).toBeTruthy()
@@ -59,7 +59,7 @@ describe('首页：一子一气与卷目', () => {
     expect(first.getAttribute('aria-expanded')).toBe('false')
     expect(screen.queryByRole('button', { name: '第 1 关:落子' })).toBeNull()
     expect(screen.getByRole('button', { name: '1. 认出哪块棋危险' })).toBeTruthy()
-    expect([...document.querySelectorAll('.scroll__spine')].map((spine) => spine.getAttribute('aria-label'))).toEqual([
+    expect([...screen.getByRole('region', { name: '课程卷目' }).querySelectorAll('.scroll__spine')].map((spine) => spine.getAttribute('aria-label'))).toEqual([
       '第壹卷：认识规则', '第贰卷：保住自己的棋', '第叁卷：吃掉对方的棋',
       '第肆卷：围地与终局', '第伍卷：九路策略入门', '第陆卷：从看懂到自己下',
     ])
@@ -68,7 +68,7 @@ describe('首页：一子一气与卷目', () => {
       '练习 别只叫吃一块', '3. 沿着台阶追到边上', '练习 换个方向征白棋']) {
       expect(screen.getByRole('button', { name })).toBeTruthy()
     }
-    expect(screen.getByRole('button', { name: '学 · 课程卷目' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '学' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '去下一盘九路棋' })).toBeTruthy()
   })
 })

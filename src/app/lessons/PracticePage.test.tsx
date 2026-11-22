@@ -28,34 +28,43 @@ const allIndependent = Object.fromEntries(PRACTICE_ITEMS.map((item) => [item.id,
 
 describe('practice hub', () => {
   const shared = PRACTICE_ITEMS.filter((item) => item.source === 'survival' || item.source === 'independent')
-  it('opens every practice group in place on the home page and returns to the course shelf', () => {
+  it('shows both home catalogs and opens each numbered practice group independently', () => {
     window.location.hash = '#/lessons'
     render(<App />)
-    click('练 · 练习分组')
-    for (const group of PRACTICE_GROUPS) {
-      click(group)
+    const study = screen.getByRole('region', { name: '课程卷目' })
+    const practice = screen.getByRole('region', { name: '练习分组' })
+    expect(study.compareDocumentPosition(practice) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    click('第贰卷：保住自己的棋')
+    for (const [index, group] of PRACTICE_GROUPS.entries()) {
+      const number = '壹贰叁肆伍陆柒'[index]
+      const spine = within(practice).getByRole('button', { name: `第${number}卷：${group}` })
+      expect(within(spine).getByText(number)).toBeTruthy()
+      fireEvent.click(spine)
       const panel = screen.getByRole('region', { name: group })
       expect(within(panel).getAllByRole('button').map(button => button.getAttribute('aria-label')))
         .toEqual(PRACTICE_ITEMS.filter(item => item.group === group).map(item => item.title))
     }
     expect(window.location.hash).toBe('#/lessons')
-    click('学 · 课程卷目'); click('练 · 练习分组')
-    expect(screen.getByRole('button', { name: '别被吃' }).getAttribute('aria-expanded')).toBe('true')
+    expect(within(study).getByRole('region', { name: '保住自己的棋' })).toBeTruthy()
+    click('第壹卷：认识规则')
+    expect(screen.getByRole('button', { name: '第柒卷：别被吃' }).getAttribute('aria-expanded')).toBe('true')
     click('教学')
-    expect(screen.getByRole('button', { name: '学 · 课程卷目', pressed: true })).toBeTruthy()
-    expect(screen.getAllByRole('button', { name: /^第.卷：/ })).toHaveLength(6)
+    expect(screen.getByRole('heading', { name: '学' })).toBeTruthy()
+    expect(within(screen.getByRole('region', { name: '课程卷目' })).getAllByRole('button', { name: /^第.卷：/ })).toHaveLength(6)
   })
   it('opens a home shelf exercise with its shared attempt and keeps the course bookmark', () => {
     window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), lastVisited: 'rules/ko' }))
     render(<App />)
-    click('教学'); click('练 · 练习分组'); click('换到边上，自己找一找')
+    click('教学'); click('换到边上，自己找一找')
     expect(window.location.hash).toBe('#/practice')
     point(0, 3); click('练习'); click('换到边上，自己找一找')
     expect(screen.getByText('第 2 步 / 共 2 步 · 找气')).toBeTruthy()
     point(0, 5)
     expect(stored().completed['survival/danger-check']).toBe('independent')
     expect(stored().lastVisited).toBe('rules/ko')
-    click('教学'); click('练 · 练习分组'); click('全部练习')
+    click('教学')
+    expect(within(screen.getByRole('region', { name: '练习分组' })).queryByRole('button', { name: '全部练习' })).toBeNull()
+    click('练习')
     expect(screen.getByRole('heading', { name: '全部练习' })).toBeTruthy()
     expect(screen.getAllByRole('listitem')).toHaveLength(24)
   })
@@ -146,7 +155,7 @@ describe('practice hub', () => {
     expect(screen.getByRole('heading', { name: '边上三颗棋，共用几口气' })).toBeTruthy()
     expect(window.location.hash).toBe('#/practice')
     click('练习'); click('教学')
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: '学 · 课程卷目' }))
+    expect(document.activeElement).toBe(screen.getByRole('heading', { name: '学' }))
     click('继续学习')
     expect(screen.getByRole('heading', { name: '第 2 关:气' })).toBeTruthy()
     openCatalog(); click('第贰卷：保住自己的棋')

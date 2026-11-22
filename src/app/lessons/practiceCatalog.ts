@@ -12,6 +12,7 @@ import { startSurvival } from './survivalRunner'
 import { startIndependent } from './independentRunner'
 
 export const PRACTICE_GROUPS = ['认危险', '找出路', '提子', '连接', '两只眼', '先后判断', '别被吃'] as const
+export const PRACTICE_GROUP_NUMBERS = ['壹', '贰', '叁', '肆', '伍', '陆', '柒'] as const
 export interface PracticeItem {
   readonly id: string
   readonly group: typeof PRACTICE_GROUPS[number]
