@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef } from 'react'
 import type { LearningSession } from './learningSession'
 import { COMPLETION_LABELS } from './learningProgress'
 import type { LearningUnit } from './learningProgress'
-import { PRACTICE_GROUPS, PRACTICE_ITEMS, nextPracticeItem, practiceLabels } from './practiceCatalog'
+import { PRACTICE_GROUP_NUMBERS, PRACTICE_GROUPS, PRACTICE_ITEMS, nextPracticeItem, practiceLabels } from './practiceCatalog'
 import type { PracticeItem } from './practiceCatalog'
 import { LadderDefensePage } from './LadderDefensePage'
 import { PriorityPage } from './PriorityPage'
@@ -96,7 +96,7 @@ export function PracticePage({ active, onOpen, session, onChange, onLesson, onPl
       }
       return <section className="practice-group" key={group} aria-labelledby={`practice-group-${index}`}>
         <header className="practice-group__head">
-          <h3 id={`practice-group-${index}`}><span aria-hidden="true">{['壹', '贰', '叁', '肆', '伍', '陆', '柒'][index]}</span>{group}</h3>
+          <h3 id={`practice-group-${index}`}><span aria-hidden="true">{PRACTICE_GROUP_NUMBERS[index]}</span>{group}</h3>
           {sharedLesson && explanation(items[0])}
         </header>
         <ul className="practice-list">{items.map(item => {

@@ -45,7 +45,7 @@ export function LearningPage({ onPractice, catalogVisit, session, onChange, onPl
     document.body.scrollTop = 0
     if (returningToCatalog.current && session.page === 'home') {
       returningToCatalog.current = false
-      document.getElementById('course-catalog-switch')?.focus()
+      document.getElementById('course-catalog-heading')?.focus()
     }
   }, [currentUnit?.id, session.page])
   const openScene = (sceneIndex: number) => onChange({ ...session, page: 'survival', sceneIndex })

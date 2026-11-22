@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { chooseMove } from '../ai'
 import { App } from './App'
@@ -151,7 +151,7 @@ describe('App', () => {
   it('默认显示教学页和三个导航按钮', () => {
     render(<App />)
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('The Go Room')
-    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('一子一气')
+    expect(screen.getByRole('heading', { level: 2, name: '一子一气' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '教学' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: '对局' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '复盘' })).toBeTruthy()
@@ -189,12 +189,12 @@ describe('默认陪练的应用闭环', () => {
     click('对局'); tick()
     expect(screen.getByText('已下 2 手')).toBeTruthy()
     click('教学')
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: '学 · 课程卷目' }))
+    expect(document.activeElement).toBe(screen.getByRole('heading', { name: '学' }))
     click('继续学习')
     expect(screen.getByText('点出它最后一口气。')).toBeTruthy()
     click('教学')
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: '学 · 课程卷目' }))
-    expect(screen.getAllByRole('button', { name: /^第.卷：/ })).toHaveLength(6)
+    expect(document.activeElement).toBe(screen.getByRole('heading', { name: '学' }))
+    expect(within(screen.getByRole('region', { name: '课程卷目' })).getAllByRole('button', { name: /^第.卷：/ })).toHaveLength(6)
     click('继续学习')
     expect(screen.getByText('点出它最后一口气。')).toBeTruthy()
   })
