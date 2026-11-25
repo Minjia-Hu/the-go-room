@@ -131,7 +131,7 @@ describe('追吃回合', () => {
     expect(captureCompletion(solve(undoCapture(capturePoint(solo, solo.scene.wrongFirst))))).toBe('retry')
     expect(captureCompletion(solve(guided))).toBe('guided')
     expect(captureCompletion(solve(captureHint(guided)))).toBe('hint')
-    const demo = captureHint(captureHint(guided))
+    const demo = captureHint(captureHint(captureHint(guided)))
     expect(demo).toMatchObject({ stage: 'done', hint: 3, assisted: true })
     expect(captureCompletion(demo)).toBe('demo')
   })

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { openCatalog } from './openCatalog.test-helper'
+import { openCatalog, openLessonCheck } from './openCatalog.test-helper'
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from '../App'
@@ -144,7 +144,7 @@ describe('practice hub', () => {
       click('练习')
     }
     const entry = screen.getByRole('region', { name: '提子' })
-    expect(within(entry.querySelector('li')!).getByRole('button', { name: '相关讲解：给自己的棋找出路' })).toBeTruthy()
+    expect(within(entry.querySelector('li')!).getByRole('button', { name: '相关讲解：给自己的棋找出路（长气）' })).toBeTruthy()
   })
   it('records independent completion in the shared catalog without moving restored course position', () => {
     window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), completed: { 'rules/place': 'guided' }, lastVisited: 'rules/place' }))
@@ -158,12 +158,12 @@ describe('practice hub', () => {
     click('练习'); click('教学')
     expect(document.activeElement).toBe(screen.getByRole('heading', { name: '学' }))
     click('继续学习')
-    expect(screen.getByRole('heading', { name: '第 2 关:气' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '气' })).toBeTruthy()
     openCatalog(); click('第贰卷：保住自己的棋')
-    const entry = screen.getByRole('button', { name: '练习 换到边上，自己找一找' })
-    expect(entry.getAttribute('aria-description')).toBe('独立完成')
+    const entry = screen.getByRole('button', { name: '换到边上，自己找一找' })
+    expect(entry.getAttribute('aria-description')).toBe('课程题，独立完成')
     expect(within(entry).getByText('✓')).toBeTruthy()
-    click('练习 换到边上，自己找一找'); click('下一课 · 给自己的棋找出路 →')
+    openLessonCheck('1. 认出哪块棋危险（被叫吃）', '换到边上，自己找一找'); click('下一课 · 给自己的棋找出路（长气） →')
     expect(screen.getByRole('heading', { name: '给自己的棋找出路' })).toBeTruthy()
     openCatalog()
     expect(screen.getByRole('button', { name: '第贰卷：保住自己的棋' })).toBeTruthy()
@@ -200,7 +200,7 @@ describe('practice hub', () => {
     render(<App />)
     click('练一道'); point(0, 3)
     click('练习'); click('教学')
-    click('第贰卷：保住自己的棋'); click('练习 换到边上，自己找一找')
+    click('第贰卷：保住自己的棋'); openLessonCheck('1. 认出哪块棋危险（被叫吃）', '换到边上，自己找一找')
     expect(screen.getByText('点出这整块黑棋最后的一口气。')).toBeTruthy()
     point(0, 5)
     click('练习'); click('换到边上，自己找一找')
@@ -281,7 +281,7 @@ it('先后判断展示真实回应，必须解释原因才记录，刷新保留�
   cleanup(); render(<App />)
   expect(screen.getByText('重试后完成')).toBeTruthy()
   click('教学')
-  expect(screen.getByRole('heading', { name: '已完成 0 / 39 个课程与练习' })).toBeTruthy()
+  expect(screen.getByRole('heading', { name: '已完成 0 / 37 个课程与练习' })).toBeTruthy()
   expect(screen.queryByRole('button', { name: '继续学习' })).toBeNull()
 })
 

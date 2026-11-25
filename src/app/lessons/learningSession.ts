@@ -35,6 +35,7 @@ export interface LearningSession {
   readonly runs: readonly SurvivalRun[]
   readonly captureIndex: number
   readonly captureRuns: readonly CaptureRun[]
+  readonly sequenceReturnTo?: 'survival' | 'rules'
   readonly sequence: RuleSequenceRun
   readonly endgameIndex: number
   readonly endgameRuns: readonly EndgameRun[]
@@ -59,7 +60,7 @@ export function openLearningUnit(session: LearningSession, unit: LearningUnit): 
     case 'rules': return { ...session, page: unit.page, rules: session.rules.index === unit.index ? session.rules : { index: unit.index, run: startLesson(LESSONS[unit.index]) } }
     case 'survival': return { ...session, page: unit.page, sceneIndex: unit.index }
     case 'capture': return { ...session, page: unit.page, captureIndex: unit.index }
-    case 'rule-sequence': return { ...session, page: unit.page, sequence: session.sequence.sceneIndex === unit.index ? session.sequence : { ...session.sequence, sceneIndex: unit.index, step: 0, message: null } }
+    case 'rule-sequence': return { ...session, page: unit.page, sequenceReturnTo: 'rules', sequence: session.sequence.sceneIndex === unit.index ? session.sequence : { ...session.sequence, sceneIndex: unit.index, step: 0, message: null } }
     case 'endgame': return { ...session, page: unit.page, endgameIndex: unit.index }
     case 'strategy': return { ...session, page: unit.page, strategyIndex: unit.index }
     case 'independent': return { ...session, page: unit.page, independentIndex: unit.index }

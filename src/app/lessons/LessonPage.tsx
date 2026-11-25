@@ -7,7 +7,7 @@ import { clickPoint, currentStep, isLessonDone, lessonMarks, startLesson } from 
 import type { RuleProgress } from './learningSession'
 export interface LessonPageProps {
   readonly lessons: readonly Lesson[]
-  /** 最后一关完成后用户点"去对局"时调用。 */
+  /** 最后一课完成后用户点"去对局"时调用。 */
   readonly onFinish: () => void
   readonly progress?: RuleProgress
   readonly onProgress?: (progress: RuleProgress) => void
@@ -30,13 +30,14 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
     <BoardLayout
       feedback={run.message && <LessonFeedback message={run.message?.text ?? null} kind={run.message?.kind} />}
       heading={<>
+        <p className="eyebrow">第 {index + 1} 课</p>
         <h2>{lesson.title}</h2>
         {step ? (
           <div className="step-task">
             <p className="step-label">第 {run.stepIndex + 1} 步 / 共 {lesson.steps.length} 步</p>
             <p className="turn">{step.goal}</p>
           </div>
-        ) : <p className="turn">这一关完成了，看看原因再继续。</p>}
+        ) : <p className="turn">这一课完成了，看看原因再继续。</p>}
       </>}
       board={<>
         <Board
@@ -62,12 +63,12 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
           ))}
         </ol>
         <p className="muted">{lesson.intro}</p>
-        {lesson.id === 'suicide' && onRuleSequence && <button className="text-button" onClick={onRuleSequence}>分步看：为什么不算自杀？</button>}
+        {lesson.id === 'suicide' && onRuleSequence && <button className="text-button" onClick={onRuleSequence}>对照看：一只眼和两只眼</button>}
 
         <p>
           {done && !isLast && (
             <button type="button" className="button" onClick={() => goTo(index + 1)}>
-              下一关
+              下一课
             </button>
           )}
           {done && isLast && (
@@ -79,7 +80,7 @@ export function LessonPage({ lessons, onFinish, progress, onProgress, onSurvival
             </>
           )}{' '}
           <button type="button" className="button button--ghost" onClick={() => goTo(index)}>
-            重来这一关
+            重来本课
           </button>
         </p>
       </BoardLayout>

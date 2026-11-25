@@ -185,7 +185,7 @@ describe('默认陪练的应用闭环', () => {
     expect(screen.queryByRole('button', { name: '下在这里' })).toBeNull()
     click('交叉点 4,4'); click('下在这里'); click('教学'); tick()
     expect(chooseMove).not.toHaveBeenCalled()
-    chapter('保住自己的棋'); click('1. 认出哪块棋危险'); click('交叉点 4,4')
+    chapter('保住自己的棋'); click('1. 认出哪块棋危险（被叫吃）'); click('交叉点 4,4')
     click('对局'); tick()
     expect(screen.getByText('已下 2 手')).toBeTruthy()
     click('教学')

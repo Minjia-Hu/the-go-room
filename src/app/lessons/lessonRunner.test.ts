@@ -35,7 +35,7 @@ describe('startLesson', () => {
 })
 
 describe('place 步骤', () => {
-  it('任意合法点算对,落子生效,本关完成', () => {
+  it('任意合法点算对,落子生效,本课完成', () => {
     const run = clickPoint(startLesson(lesson('place')), { x: 4, y: 4 })
     expect(getCell(run.game.board, { x: 4, y: 4 })).toBe('black')
     expect(run.lastMove).toEqual({ x: 4, y: 4 })

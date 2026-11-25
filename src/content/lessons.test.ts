@@ -67,7 +67,7 @@ describe('LESSONS', () => {
     }
   })
 
-  it('第 2 关的目标点就是圈起来那块棋的全部气', () => {
+  it('第 2 课的目标点就是圈起来那块棋的全部气', () => {
     const lesson = LESSONS.find((l) => l.id === 'liberties')!
     const step = lesson.steps[0]
     if (step.kind !== 'select') throw new Error('关卡定义变了')
@@ -76,7 +76,7 @@ describe('LESSONS', () => {
     expect([...step.targets].sort(byPoint)).toEqual([...group.liberties].sort(byPoint))
   })
 
-  it('第 3 关的正确落点确实提子', () => {
+  it('第 3 课的正确落点确实提子', () => {
     const lesson = LESSONS.find((l) => l.id === 'capture')!
     const step = lesson.steps[0]
     if (step.kind !== 'place' || step.accept === 'any-legal') throw new Error('关卡定义变了')
@@ -84,7 +84,7 @@ describe('LESSONS', () => {
     expect(result.ok && result.state.history[0].kind === 'play' && result.state.history[0].captured.length).toBe(1)
   })
 
-  it('第 4 关的两个标记点一个是禁入点,一个能下', () => {
+  it('第 4 课的两个标记点一个是禁入点,一个能下', () => {
     const lesson = LESSONS.find((l) => l.id === 'suicide')!
     const game = setUp(lesson)
     const [forbidden, allowed] = lesson.highlight!

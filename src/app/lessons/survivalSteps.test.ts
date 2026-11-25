@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { getGroup } from '../../engine'
 import { SURVIVAL_SCENES } from '../../content/survival'
-import { awaitingConfirm, survivalNextLabel, survivalSteps } from './survivalSteps'
-import { choosePracticePoint, chooseReason, confirmPractice, practiceHint, startSurvival, survivalCompletion } from './survivalRunner'
+import { survivalSteps } from './survivalSteps'
+import { choosePracticePoint, chooseReason, practiceHint, startSurvival, survivalCompletion } from './survivalRunner'
 
 const scene = (id: string) => SURVIVAL_SCENES.find((s) => s.id === id)!
 
@@ -18,7 +18,7 @@ describe('完成方式', () => {
     expect(survivalCompletion(finishDanger(practiceHint(start)))).toBe('hint')
     expect(survivalCompletion(practiceHint(practiceHint(practiceHint(start))))).toBe('demo')
   })
-  it('引导题起始自带一级提示，不算借助提示', () => {
+  it('引导题主动打开提示才算借助提示', () => {
     let run = startSurvival(scene('eyes-guided'))
     for (const p of run.scene.eyes!) run = choosePracticePoint(run, p)
     expect(survivalCompletion(chooseReason(run, true))).toBe('guided')
@@ -36,24 +36,21 @@ describe('步骤表', () => {
     expect(survivalSteps(run).task).toBeUndefined()
   })
 
-  it('连接：选点试下 → 看后果，再确认', () => {
+  it('连接：选点后立即完成', () => {
     let run = startSurvival(scene('connect-check'))
-    expect(survivalSteps(run)).toMatchObject({ current: 1, total: 2, label: '选点试下' })
+    expect(survivalSteps(run)).toMatchObject({ current: 1, total: 1, label: '选点试下' })
     run = choosePracticePoint(run, run.scene.examples[0])
-    expect(awaitingConfirm(run)).toBe(true)
-    expect(survivalSteps(run)).toMatchObject({ current: 2, total: 2, label: '看后果，再确认' })
-    expect(survivalSteps(confirmPractice(run)).done).toBe(true)
+    expect(survivalSteps(run)).toMatchObject({ current: 1, total: 1, done: true })
+    expect(run.solved).toEqual([run.scene.examples[0]])
   })
 
-  it('找出路引导题：确认一种后回到第一步，并显示比较进度', () => {
+  it('找出路引导题：找到一种后进入第二步，并显示比较进度', () => {
     const start = startSurvival(scene('escape-guided'))
-    let run = confirmPractice(choosePracticePoint(start, start.scene.examples[0]))
+    let run = choosePracticePoint(start, start.scene.examples[0])
     expect(run.stage).toBe('move')
-    expect(awaitingConfirm(run)).toBe(false)
-    expect(survivalSteps(run)).toMatchObject({ current: 1, label: '选点试下', progress: '已比较 1 / 2 种', task: '从同一起点再试另一种办法：延伸，或提掉白棋。' })
+    expect(survivalSteps(run)).toMatchObject({ current: 2, label: '选点试下', progress: '已比较 1 / 2 种', task: '回到原来的局面，试试另一种救法。' })
     run = choosePracticePoint(run, start.scene.examples[1])
-    expect(survivalSteps(run)).toMatchObject({ current: 2, progress: '已比较 1 / 2 种' })
-    run = confirmPractice(run)
+    expect(run.solved).toHaveLength(2)
     expect(survivalSteps(run)).toMatchObject({ done: true, label: '跟着引导完成' })
     expect(survivalSteps(run).progress).toBeUndefined()
   })
@@ -76,14 +73,5 @@ describe('步骤表', () => {
     expect(survivalSteps(viaHint)).toMatchObject({ label: '借助提示完成', task: '可以重来一次，不看提示试试。' })
     const viaDemo = practiceHint(practiceHint(practiceHint(start)))
     expect(survivalSteps(viaDemo)).toMatchObject({ label: '跟着演示完成', task: '可以重来一次，自己找答案。' })
-  })
-})
-
-describe('下一步去向', () => {
-  it('引导题去检验题，检验题写明下一课标题，最后一题交给页面', () => {
-    expect(survivalNextLabel(2)).toBe('换个局面，自己试试 →')
-    expect(survivalNextLabel(1)).toBe('下一课 · 给自己的棋找出路 →')
-    expect(survivalNextLabel(3)).toBe('下一课 · 把分开的棋连起来 →')
-    expect(survivalNextLabel(SURVIVAL_SCENES.length - 1)).toBeUndefined()
   })
 })

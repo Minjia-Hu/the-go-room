@@ -1,3 +1,5 @@
+import { LessonTitle } from './LessonTitle'
+import { LessonNextActions, type LessonNextProps } from './LessonNextActions'
 import { useState } from 'react'
 import { getGroup } from '../../engine'
 import { Board } from '../board/Board'
@@ -7,13 +9,12 @@ import { LessonFeedback } from './LessonFeedback'
 import { choosePracticePoint, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
 import type { SurvivalRun } from './survivalRunner'
 
-interface Props {
+interface Props extends LessonNextProps {
   run: SurvivalRun
   onChange: (run: SurvivalRun) => void
-  onNext: () => void
 }
 
-export function GuidedDangerPage({ run, onChange, onNext }: Props) {
+export function GuidedDangerPage({ run, onChange, ...next }: Props) {
   const [comparing, setComparing] = useState(false)
   const [variation, setVariation] = useState<'escape' | 'ignore' | null>(null)
   const done = run.stage === 'done'
@@ -36,7 +37,7 @@ export function GuidedDangerPage({ run, onChange, onNext }: Props) {
     for (const point of last.captured) marks.push({ point, kind: 'captured' })
   }
   const step = findingStone ? '第一步 · 找棋' : '第二步 · 找气'
-  const resultPrefix = run.assisted ? '演示完成。' : run.hint >= 2 ? '借助提示完成。' : '找对了。'
+  const resultPrefix = run.assisted ? '演示完成。' : run.hint > 0 ? '借助提示完成。' : '找对了。'
   const feedback = done ? `${resultPrefix}${run.message ?? ''}` : run.message
   const comparisonFeedback = variation === 'ignore'
     ? '黑棋下在远处，白棋随即占住最后一口气，提走了中央黑棋。'
@@ -44,7 +45,7 @@ export function GuidedDangerPage({ run, onChange, onNext }: Props) {
   return <section className="page page--with-board board-flow danger-study">
     <header className="board-task">
       <p className="eyebrow">第 {run.scene.course} 课 · 一起练习</p>
-      <h2>{run.scene.title}</h2>
+      <LessonTitle title={run.scene.title} />
       {!done && <div className="danger-task">
         <span className="danger-step">{step}</span>
         <p className="turn">{findingStone ? '点一颗你觉得快被吃掉的黑棋。' : '点出它最后一口气。'}</p>
@@ -56,7 +57,7 @@ export function GuidedDangerPage({ run, onChange, onNext }: Props) {
         onPointClick={(point) => onChange(choosePracticePoint(run, point))} />
     </div>
     <div className="board-primary">
-      {feedback ? <LessonFeedback message={feedback} /> : <p className="muted">看看每颗黑棋，上下左右还剩几个空点？</p>}
+      {feedback && <LessonFeedback message={feedback} />}
       {done ? <>
         <button className="text-button" aria-expanded={comparing} onClick={() => {
           setVariation(null)
@@ -70,14 +71,14 @@ export function GuidedDangerPage({ run, onChange, onNext }: Props) {
           </div>
           {variation && <LessonFeedback message={comparisonFeedback} />}
         </>}
-        <div className="actions"><button className="button danger-next" onClick={onNext}>下一题：在棋盘边上找危险的黑棋 →</button></div>
+        <LessonNextActions {...next} />
         <div className="restart"><button className="text-button" onClick={() => {
           setVariation(null)
           setComparing(false)
           onChange(startSurvival(run.scene))
         }}>重来这一题</button></div>
       </> : <button className="text-button hint-button" onClick={() => onChange(practiceHint(run))}>
-        {run.hint >= 2 ? '看演示' : '给点提示'}
+        {['给点提示', '标出棋块和气', '看演示'][run.hint]}
       </button>}
     </div>
   </section>

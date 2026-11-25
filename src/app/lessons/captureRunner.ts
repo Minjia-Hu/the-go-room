@@ -78,7 +78,7 @@ const FAILURES: Record<CaptureFailure, string> = {
 export function startCapture(scene: CaptureScene, rows = scene.rows): CaptureRun {
   const game = createGame({ board: parseBoard(rows) })
   return { scene, origin: game, game, rounds: [], moves: 0, stage: 'active', failure: null,
-    mistakes: 0, hint: scene.guided ? 1 : 0, assisted: false, message: null }
+    mistakes: 0, hint: 0, assisted: false, message: null }
 }
 
 export function capturePoint(run: CaptureRun, point: Point): CaptureRun {
@@ -147,7 +147,7 @@ export function captureHint(run: CaptureRun): CaptureRun {
 
 export function captureCompletion(run: CaptureRun): Completion {
   if (run.assisted) return 'demo'
-  if (run.hint > (run.scene.guided ? 1 : 0)) return 'hint'
+  if (run.hint > 0) return 'hint'
   if (run.scene.guided) return 'guided'
   return run.mistakes > 0 ? 'retry' : 'independent'
 }

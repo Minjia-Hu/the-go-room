@@ -23,7 +23,7 @@ Interactive lessons, practice problems, a simple computer opponent, and game rev
 | **Play · 弈** | Play 9×9 Go against a simple computer opponent. Coaching is on by default: try a move, inspect its local consequences, then confirm. Retry the most recent round, mark dead stones, and score the game. |
 | **Review · 复** | Keep the ten most recent completed games and replay them move by move, with explanations of rule events such as captures, ko, and the end of the game. |
 
-The learning path has **39 lesson and practice units**. The Practice page contains **26 problems**, including twelve shared with the lessons, eight additional positions, four move-priority problems, and two ladder defense drills. Shared problems use the same completion record. Practicing does not change your place in the learning path.
+The learning path has **37 lesson and practice units**. Lesson 4 includes an optional step-by-step comparison of one eye and two eyes. The Practice page contains **26 problems**, including twelve shared with the lessons, eight additional positions, four move-priority problems, and two ladder defense drills. Shared problems use the same completion record. Practicing does not change your place in the learning path.
 
 Ten interactive capture problems cover the direction of an atari, double atari, ladders, nets, and connections that fail. In the last lesson, play White’s connecting move and see why Black can capture the whole group. Two defense drills let you compare running with and without a supporting stone.
 
