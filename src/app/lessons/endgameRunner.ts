@@ -57,7 +57,7 @@ export function selectEndgame(run: EndgameRun, point: Point): EndgameRun {
     const question = TERRITORY_QUESTIONS[run.step]
     const region = emptyRegion(run.game.board, question.point)
     return region.some((p) => samePoint(p, point))
-      ? { ...run, picked: true, message: `已圈出 ${question.label} 所在的相连空区。沿着这些空点找边界，再选择归属。` }
+      ? { ...run, picked: true, message: null }
       : { ...run, message: '先点字母标出的空点，或与它相连的同一片空区。棋子本身不是空点。' }
   }
   if (run.lesson.id === 'ending' && run.game.phase === 'scoring') {
@@ -73,7 +73,8 @@ export function answerTerritory(run: EndgameRun, owner: Color | null): EndgameRu
   const expected = lessonScore(run).score.ownership[toIndex(run.game.board, question.point)]
   if (owner !== expected) return { ...run, message: expected === null ? '这片空区同时接触黑棋和白棋，所以不属于任何一方。不能只看哪种棋更近或更多。' : `这片相连的空区只接触${expected === 'black' ? '黑' : '白'}棋，因此归${expected === 'black' ? '黑' : '白'}方；沿边界检查，而不是猜距离。` }
   const step = run.step + 1
-  return { ...run, step, picked: false, done: step === TERRITORY_QUESTIONS.length, message: `${question.label} 判断正确。${expected === null ? '两边都接触的公共空点不计入任何一方。' : `这片空区归${expected === 'black' ? '黑' : '白'}方。`}${step < TERRITORY_QUESTIONS.length ? '接着观察下一个字母。' : '三个例子都完成了。'}` }
+  if (step === TERRITORY_QUESTIONS.length) return { ...run, step, picked: false, done: true, message: null }
+  return { ...run, step, picked: false, message: `${question.label} 判断正确。${expected === null ? '两边都接触的公共空点不计入任何一方。' : `这片空区归${expected === 'black' ? '黑' : '白'}方。`}接着观察下一个字母。` }
 }
 export function submitCount(run: EndgameRun): EndgameRun {
   if (run.done || !['count', 'komi'].includes(run.lesson.id) || (run.lesson.id === 'komi' && run.step !== 0)) return run

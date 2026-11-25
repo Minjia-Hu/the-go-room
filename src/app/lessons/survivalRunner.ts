@@ -23,7 +23,7 @@ export interface SurvivalRun {
 
 export function startSurvival(scene: SurvivalScene): SurvivalRun {
   return { scene, game: createGame({ board: parseBoard(scene.rows), toPlay: scene.kind === 'eyes' ? 'white' : 'black' }), selected: [],
-    stage: scene.kind === 'danger' ? 'group' : scene.kind === 'eyes' ? 'eyes' : 'move', hint: scene.guided ? 1 : 0,
+    stage: scene.kind === 'danger' ? 'group' : scene.kind === 'eyes' ? 'eyes' : 'move', hint: 0,
     assisted: false, mistakes: 0, solved: [], preview: null, view: 'before', message: null }
 }
 
@@ -36,6 +36,11 @@ export function choosePracticePoint(run: SurvivalRun, p: Point): SurvivalRun {
       : group.stones.length === 1
         ? '找到了。现在点出这颗黑棋最后一口气。'
         : '找到了。现在点出这整块棋最后的一口气。斜着的空点不算。'
+    if (run.scene.id === 'danger-guided' && !samePoint(p, run.scene.target)) {
+      const clicked = getGroup(run.game.board, p)
+      if (clicked?.color === 'black') return { ...run, mistakes: run.mistakes + 1,
+        message: `这颗黑棋还有 ${clicked.liberties.length} 口气，白棋一手提不走。再看看另一颗黑棋。` }
+    }
     return group.stones.some((s) => samePoint(s, p))
       ? { ...run, selected: group.stones, stage: 'liberty', message }
       : { ...run, mistakes: run.mistakes + 1, message: '再看看哪块黑棋只剩一个上下左右紧挨着的空点。请点那块棋。' }
@@ -61,23 +66,25 @@ export function choosePracticePoint(run: SurvivalRun, p: Point): SurvivalRun {
     const result = play(run.game, p)
     if (result.ok) throw new Error('两眼课的固定棋形不符合预期')
     const selected = run.selected.some((s) => samePoint(s, p)) ? run.selected : [...run.selected, p]
-    return { ...run, selected, stage: selected.length === 2 ? 'reason' : 'eyes', message: '白棋下不进去：它自己没有气，又提不掉还留着另一口气的黑棋。每次试下都从原图开始。' }
+    return { ...run, selected, stage: selected.length === 2 ? 'reason' : 'eyes', message: selected.length === 2 ? null : '白棋下不进这个眼。' }
   }
   const preview = analyzeAction(run.game, p)
-  return { ...run, preview, mistakes: run.mistakes + (preview.ok ? 0 : 1), view: preview.ok ? 'after' : 'before', message: explainAction(preview) }
-}
-
-export function confirmPractice(run: SurvivalRun): SurvivalRun {
-  const a = run.preview
-  if (run.stage !== 'move' || !a?.ok || !a.point) return run
-  const targets = getGroup(run.game.board, run.scene.target)!.stones
-  if (!targetSurvives(a.after, targets)) {
-    return { ...run, mistakes: run.mistakes + 1, message: `这一步可以下，但还没有解决本题的危险。${explainAction(a)}你可以看白棋怎样提，再重新选点。` }
+  if (!preview.ok) return { ...run, preview, view: 'before', mistakes: run.mistakes + 1, message: explainAction(preview) }
+  const trial: SurvivalRun = { ...run, preview, view: 'after' }
+  const target = getGroup(run.game.board, run.scene.target)!
+  if (!targetSurvives(preview.after, target.stones)) {
+    return { ...trial, mistakes: run.mistakes + 1, message: '目标黑棋还剩一口气，白棋下一手就能提走。再试一个空点。' }
   }
-  if (run.scene.kind === 'connect' && a.connected < 2) return { ...run, mistakes: run.mistakes + 1, message: '这一步暂时解除了危险，但本题要练习把两块黑棋连起来。请再找一个能连接的点。' }
-  const solved = run.solved.some((p) => samePoint(p, a.point!)) ? run.solved : [...run.solved, a.point]
-  const complete = !run.scene.guided || run.scene.kind !== 'escape' || run.scene.examples.every((p) => solved.some((s) => samePoint(p, s)))
-  return { ...run, solved, stage: complete ? 'done' : 'move', message: `这一步暂时救出了原来的黑棋。${explainAction(a)}${complete ? '' : '再从同一起点试另一种方法：延伸或提掉白棋。'}` }
+  if (run.scene.kind === 'connect' && preview.connected < 2) {
+    return { ...trial, mistakes: run.mistakes + 1, message: '黑棋暂时脱险了。再试一个能把两块黑棋连起来的点。' }
+  }
+  const solved = run.solved.some(s => samePoint(s, p)) ? run.solved : [...run.solved, p]
+  const complete = !run.scene.guided || run.scene.kind !== 'escape' || run.scene.examples.every(example => solved.some(s => samePoint(example, s)))
+  const liberties = getGroup(preview.after.board, run.scene.target)!.liberties.length
+  const message = run.scene.kind === 'connect'
+    ? `两块黑棋连在一起，有 ${liberties} 口气。白棋一手提不走了。`
+    : `目标黑棋从 ${target.liberties.length} 口气增到 ${liberties} 口气，暂时脱险了。`
+  return { ...trial, solved, stage: complete ? 'done' : 'move', message }
 }
 
 export function chooseReason(run: SurvivalRun, correct: boolean): SurvivalRun {
@@ -99,7 +106,7 @@ export function practiceHint(run: SurvivalRun): SurvivalRun {
     for (const p of run.scene.eyes!) next = choosePracticePoint(next, p)
     return next
   }
-  for (const p of run.scene.examples) next = confirmPractice(choosePracticePoint(next, p))
+  for (const p of run.scene.examples) next = choosePracticePoint(next, p)
   return next
 }
 
@@ -115,10 +122,10 @@ export function practiceBoard(run: SurvivalRun): GameState {
   return run.preview.after
 }
 
-/** 统一页面和学习记录的完成方式。引导题开场自带的提示不计入辅助。 */
+/** 统一页面和学习记录的完成方式。主动打开提示后记录为借助提示完成。 */
 export function survivalCompletion(run: SurvivalRun): Completion {
   if (run.assisted) return 'demo'
-  if (run.hint > (run.scene.guided ? 1 : 0)) return 'hint'
+  if (run.hint > 0) return 'hint'
   if (run.scene.guided) return 'guided'
   return run.mistakes > 0 ? 'retry' : 'independent'
 }

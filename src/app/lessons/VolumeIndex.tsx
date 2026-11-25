@@ -1,3 +1,4 @@
+import { lessonTitleParts } from './lessonTerms'
 import type { CourseVolume } from './courseVolumes'
 import { COMPLETION_LABELS, type LearningProgress, type LearningUnit } from './learningProgress'
 
@@ -14,13 +15,15 @@ export function VolumeIndex({ volume, currentId, completed, onSelect }: Props) {
     {volume.groups.map(group =>
       <div className="course-pair" key={group.entries[0].unit.id} role={group.label && 'group'} aria-label={group.label}>
         {group.entries.map(({ unit, title, tag }) => {
+          const { name, term } = tag ? { name: title } : lessonTitleParts(title)
           const label = inLesson && tag === '练习' ? '自己试试' : tag
           const current = unit.id === currentId
           const mode = completed?.[unit.id]
-          return <button key={unit.id} className={`course-index__link${tag ? ' course-index__secondary' : ''}`}
-            aria-label={label && `${label} ${title}`} aria-current={current ? 'step' : undefined}
+          return <button key={unit.id} className={`course-index__link${tag ? ' course-index__secondary' : ''}${term ? ' course-index__link--term' : ''}`}
+            aria-label={label ? `${label} ${title}` : term ? title : undefined} aria-current={current ? 'step' : undefined}
             aria-description={mode && COMPLETION_LABELS[mode]} onClick={() => onSelect(unit)}>
-            <span>{label && <span className="course-index__tag">{label}{inLesson ? ' ·' : ' '}</span>}{title}</span>
+            <span>{label && <span className="course-index__tag">{label}{inLesson ? ' ·' : ' '}</span>}{name}</span>
+            {term && <small className="course-index__term">{term}</small>}
             {current && inLesson && <span className="volume-guide__current">当前</span>}
             {mode && <span className="course-index__check" aria-hidden="true">✓</span>}
           </button>

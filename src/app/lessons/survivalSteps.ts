@@ -1,5 +1,4 @@
-import { getGroup, samePoint } from '../../engine'
-import { SURVIVAL_SCENES } from '../../content/survival'
+import { getGroup } from '../../engine'
 import { COMPLETION_LABELS } from './learningProgress'
 import { survivalCompletion } from './survivalRunner'
 import type { SurvivalRun } from './survivalRunner'
@@ -14,17 +13,10 @@ export interface SurvivalStep {
   readonly done: boolean
 }
 
-const TOTAL = { danger: 2, escape: 2, connect: 2, eyes: 3 } as const
-
-/** 试下合法、且这个点还没被确认为本题解法时，才需要“确认这一步”。 */
-export function awaitingConfirm(run: SurvivalRun): boolean {
-  const point = run.preview?.ok ? run.preview.point : null
-  return run.stage === 'move' && !!point && !run.solved.some((p) => samePoint(p, point))
-}
-
 export function survivalSteps(run: SurvivalRun): SurvivalStep {
   const { scene } = run
-  const total = TOTAL[scene.kind]
+  const compareRescues = scene.kind === 'escape' && scene.guided
+  const total = scene.kind === 'eyes' ? 3 : scene.kind === 'danger' || compareRescues ? 2 : 1
   if (run.stage === 'done') {
     const mode = survivalCompletion(run)
     const task = mode === 'demo' ? '可以重来一次，自己找答案。' : mode === 'hint' ? '可以重来一次，不看提示试试。' : undefined
@@ -41,17 +33,10 @@ export function survivalSteps(run: SurvivalRun): SurvivalStep {
       ? { current: 1, total, label: '试第一个眼', task: '替白棋点一个黑棋围住的内部空点，看看能不能下。', done: false }
       : { current: 2, total, label: '试第二个眼', task: '再点另一个内部空点试试。', done: false }
   }
-  const progress = scene.kind === 'escape' && scene.guided && run.solved.length > 0
+  const progress = compareRescues && run.solved.length > 0
     ? `已比较 ${run.solved.length} / ${scene.examples.length} 种` : undefined
-  if (awaitingConfirm(run)) return { current: 2, total, label: '看后果，再确认', task: '比较下之前和下之后，能解除危险就确认这一步。', progress, done: false }
-  return { current: 1, total, label: '选点试下',
-    task: progress ? '从同一起点再试另一种办法：延伸，或提掉白棋。' : '点一个空点试下，看看目标黑棋的气会怎样变化。', progress, done: false }
-}
-
-/** 课程中完成一题后主按钮的文案；最后一题返回 undefined，由页面显示终局与陪练两个去向。 */
-export function survivalNextLabel(index: number): string | undefined {
-  const scene = SURVIVAL_SCENES[index]
-  const next = SURVIVAL_SCENES[index + 1]
-  if (!scene || !next) return undefined
-  return scene.guided ? '换个局面，自己试试 →' : `下一课 · ${next.title} →`
+  return { current: progress ? 2 : 1, total, label: '选点试下',
+    task: progress ? '回到原来的局面，试试另一种救法。'
+      : compareRescues ? '从同一个局面试两种救法。先点一个空点，救出中央的黑棋。'
+      : scene.kind === 'connect' ? '下一颗黑棋，把两块黑棋连起来。' : '点一个空点，救出危险的黑棋。', progress, done: false }
 }

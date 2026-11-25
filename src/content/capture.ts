@@ -24,7 +24,7 @@ const point = (name: string): Point => ({ x: name.charCodeAt(0) - 65, y: Number(
 
 export const CAPTURE_SCENES: readonly CaptureScene[] = [
   {
-    id: "direction-guided", lesson: 1, title: "关住白棋的出路", guided: true,
+    id: "direction-guided", lesson: 1, title: "关住白棋的出路（打吃方向）", guided: true,
     rows: [".........", ".X.X.....", ".XOX.....", ".........", ".........", ".........", ".........", ".........", "........."],
     targets: [point("C3")],
     solution: [point("C4"), point("C2")], wrongFirst: point("C2"), maxMoves: 2,
@@ -42,7 +42,7 @@ export const CAPTURE_SCENES: readonly CaptureScene[] = [
     hints: ["留意上边线和右上角的黑棋。", "标出白棋和它的两口气。", "看黑棋从下方叫吃，把白棋赶向右侧黑棋。"],
   },
   {
-    id: "double-guided", lesson: 2, title: "一手叫吃两块棋", guided: true,
+    id: "double-guided", lesson: 2, title: "一手叫吃两块棋（双打吃）", guided: true,
     rows: [".........", "..X......", ".........", ".XOX.....", "...OX....", ".........", "...X.....", ".........", "........."],
     targets: [point("C4"), point("D5")],
     solution: [point("C5"), point("D6")], wrongFirst: point("C3"), maxMoves: 2,
@@ -60,13 +60,13 @@ export const CAPTURE_SCENES: readonly CaptureScene[] = [
     hints: ["两颗白棋之间的空点同时贴着谁？", "标出两个目标和它们的气。", "看黑棋下在两颗白棋之间，白棋救一边后提另一边。"],
   },
   {
-    id: "ladder-guided", lesson: 3, title: "沿着台阶追到边上", guided: true,
+    id: "ladder-guided", lesson: 3, title: "沿着台阶追到边上（征吃）", guided: true,
     rows: [".........", ".........", "....X....", ".........", "...XOX...", ".........", ".........", ".........", "........."],
     targets: [point("E5")],
     solution: [point("E6"), point("D4"), point("G4"), point("F2"), point("H3"), point("G1"), point("I2"), point("H1")], wrongFirst: point("E4"), maxMoves: 8,
     contrastRows: ["......O..", ".........", "....X....", ".........", "...XOX...", ".........", ".........", ".........", "........."],
     task: "每手叫吃，沿着台阶把白棋追到边上。",
-    intro: "白棋每次逃出会出现新的两口气。选对方向，就能连续叫吃。",
+    intro: "征吃也叫征子。黑棋每手都把白棋逼到只剩一口气，白棋一路斜着逃，走出的形状像台阶。",
     hints: ["想想第一手之后，白棋会被赶向哪边。", "标出目标白棋整块和当前的气。", "看黑棋怎样持续叫吃到边上，再提掉白棋。"],
   },
   {
@@ -80,7 +80,7 @@ export const CAPTURE_SCENES: readonly CaptureScene[] = [
     hints: ["想想你希望白棋向哪个方向逃。", "标出目标白棋整块和当前的气。", "看黑棋怎样沿斜线追到底边。"],
   },
   {
-    id: "net-guided", lesson: 4, title: "先封住出路", guided: true,
+    id: "net-guided", lesson: 4, title: "先封住出路（枷吃）", guided: true,
     rows: [".........", ".........", "...X.....", "..XO.X...", ".O.......", "...XO....", ".........", ".........", "........."],
     targets: [point("D4")], solution: [point("E5"), point("E3"), point("D5")], maxMoves: 3,
     wrongFirst: point("E4"), wrongFollowUp: [point("C5")], wrongLabel: "如果贴着白棋追",
@@ -99,7 +99,7 @@ export const CAPTURE_SCENES: readonly CaptureScene[] = [
     hints: ["先看目标通往另一颗白子的路线。", "找出两口气之间的斜角。", "看黑棋怎样抢先封住出口，再收紧包围。"],
   },
   {
-    id: "connection-guided", lesson: 5, title: "为什么接不回去", guided: true,
+    id: "connection-guided", lesson: 5, title: "为什么接不回去（接不归）", guided: true,
     rows: ["..XO.O...", "....XX...", ".........", ".........", ".........", ".........", ".........", ".........", "........."],
     targets: [point("D1")], solution: [point("D2"), point("E1")], maxMoves: 2,
     wrongFirst: point("G1"), wrongLabel: "如果先堵右边", connection: point("E1"),

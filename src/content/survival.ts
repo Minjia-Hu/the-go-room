@@ -2,11 +2,11 @@ import type { SurvivalScene } from './survivalTypes'
 
 export const SURVIVAL_SCENES: readonly SurvivalScene[] = [
   {
-    id: 'danger-guided', course: 1, title: '认出哪块棋危险', guided: true, kind: 'danger',
+    id: 'danger-guided', course: 1, title: '认出哪块棋危险（被叫吃）', guided: true, kind: 'danger',
     rows: ['.........', '.X.......', '.........', '....O....', '...OXO...', '.........', '.........', '.........', '.........'],
     target: { x: 4, y: 4 }, examples: [{ x: 4, y: 5 }], wrongMove: { x: 8, y: 8 },
     intro: '先找到危险，再想怎么救。看看哪颗黑棋的上下左右只剩一个空点。只剩一口气时，叫做“被叫吃”。',
-    hints: ['看看被白棋围住的黑棋。', '圈起的棋只剩一个紧挨着的空点。', '先点中央黑棋，再点它下面的空点。'],
+    hints: ['看看每颗黑棋，上下左右还剩几个空点？', '圈起的棋只剩一个紧挨着的空点。', '先点中央黑棋，再点它下面的空点。'],
   },
   {
     id: 'danger-check', course: 1, title: '换到边上，自己找一找', guided: false, kind: 'danger',
@@ -16,7 +16,7 @@ export const SURVIVAL_SCENES: readonly SurvivalScene[] = [
     hints: ['留意棋盘左边。', '两颗相连黑棋共用一口气。', '点左边任意一颗黑棋，再点这一块的下方空点。'],
   },
   {
-    id: 'escape-guided', course: 2, title: '给自己的棋找出路', guided: true, kind: 'escape',
+    id: 'escape-guided', course: 2, title: '给自己的棋找出路（长气）', guided: true, kind: 'escape',
     rows: ['.........', '.........', '.........', '...XOX...', '...OXO...', '.........', '.........', '.........', '.........'],
     target: { x: 4, y: 4 }, examples: [{ x: 4, y: 5 }, { x: 4, y: 2 }], wrongMove: { x: 8, y: 8 },
     intro: '从同一起点试两种办法：向下接一颗，或者提掉上面的白棋。比较它们怎样给目标黑棋增加气。',
@@ -30,7 +30,7 @@ export const SURVIVAL_SCENES: readonly SurvivalScene[] = [
     hints: ['别只盯着向外伸，也看看白棋有没有危险。', '上面的白棋只剩它上方的一口气。', '占住上面白棋的最后一口气，提掉它，让目标黑棋多一个空点。'],
   },
   {
-    id: 'connect-guided', course: 3, title: '把分开的棋连起来', guided: true, kind: 'connect',
+    id: 'connect-guided', course: 3, title: '把分开的棋连起来（连接）', guided: true, kind: 'connect',
     rows: ['.........', '.........', '.........', '...O.....', '..OX.X...', '...O.....', '.........', '.........', '.........'],
     target: { x: 3, y: 4 }, examples: [{ x: 4, y: 4 }], wrongMove: { x: 4, y: 3 },
     intro: '左边的黑棋只剩一口气。补上两块之间的缺口，就能借用右边棋块的气。斜着靠近不算连在一起。',
@@ -44,7 +44,7 @@ export const SURVIVAL_SCENES: readonly SurvivalScene[] = [
     hints: ['找上下两颗黑棋的缺口。', '直线相邻才算连接。', '试下在上下两颗黑棋正中间。'],
   },
   {
-    id: 'eyes-guided', course: 4, title: '两个小空点为什么能保命', guided: true, kind: 'eyes',
+    id: 'eyes-guided', course: 4, title: '两个小空点为什么能保命（两眼活棋）', guided: true, kind: 'eyes',
     rows: ['.........', '.........', '.OOOOOOO.', '.OXXXXXO.', '.OX.X.XO.', '.OXXXXXO.', '.OOOOOOO.', '.........', '.........'],
     contrastRows: ['.........', '.........', '.OOOOOOO.', '.OXXXXXO.', '.OX.XXXO.', '.OXXXXXO.', '.OOOOOOO.', '.........', '.........'],
     target: { x: 2, y: 3 }, examples: [], eyes: [{ x: 3, y: 4 }, { x: 5, y: 4 }],

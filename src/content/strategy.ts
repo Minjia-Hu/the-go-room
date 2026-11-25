@@ -25,9 +25,9 @@ const CHASE_ROWS = ['.........', '......X..', '.....XO..', '.........', '..OO...
 
 export const STRATEGY_LESSONS: readonly StrategyLesson[] = [
   {
-    id: 'urgent', title: '先救棋，还是去占地？',
+    id: 'urgent', title: '先救棋，还是去占地？（急所与大场）',
     intro: '你执黑。圈出的两颗黑棋只剩一口气。远处有空点，但这一手若不处理眼前危险，白棋会怎样回应？先选 A 或 B，再逐步看结果。',
-    takeaway: '每手先检查：自己的棋有没有只剩一口气？本题先接出，能避免两颗棋马上被提。气变多只是暂时缓解危险，后面还要继续观察。',
+    takeaway: '这手若耽误，棋就可能被提，眼前要紧的地方叫急所。远处能扩大地盘的好点叫大场。本题先接出，能避免两颗棋马上被提。气变多只是暂时缓解危险，后面还要继续观察。',
     choices: [
       { id: 'extend', letter: 'A', label: '先接出黑棋', rows: URGENT_ROWS, target: { x: 3, y: 4 },
         moves: [
@@ -47,7 +47,7 @@ export const STRATEGY_LESSONS: readonly StrategyLesson[] = [
     ],
   },
   {
-    id: 'edges', title: '为什么从角和边开始？',
+    id: 'edges', title: '为什么从角和边开始？（布局）',
     intro: '比较三张独立示意图：每张都由黑棋补上缺口，再看白棋在外围下一手。目标都是圈住四个空点，看看边界用了多少颗黑子。图中围住的空点还不代表最终得分，也没有保证黑棋已经活了。',
     takeaway: '在这些连成边界的示意图里，同样四个空点，角上用 5 子、边上用 8 子、中腹用 12 子。角有两条边线帮忙，边上有一条；所以没有紧急战斗时，可以先考虑角和边。实际开局不必照着图把小圈填满。',
     choices: [

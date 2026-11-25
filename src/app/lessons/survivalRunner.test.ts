@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { getGroup } from '../../engine'
 import { SURVIVAL_SCENES } from '../../content/survival'
-import { choosePracticePoint, chooseReason, confirmPractice, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
+import { choosePracticePoint, chooseReason, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
 
 describe('生存练习推进', () => {
   for (const scene of SURVIVAL_SCENES) it(`${scene.id} 可独立完成，起始棋局不被演示污染`, () => {
@@ -14,7 +14,7 @@ describe('生存练习推进', () => {
       for (const p of scene.eyes!) run = choosePracticePoint(run, p)
       expect(chooseReason(run, false).stage).toBe('reason')
       run = chooseReason(run, true)
-    } else for (const p of scene.examples) run = confirmPractice(choosePracticePoint(run, p))
+    } else for (const p of scene.examples) run = choosePracticePoint(run, p)
     expect(run.stage).toBe('done')
     expect(run.assisted).toBe(false)
     expect(run.game).toBe(origin)
@@ -22,7 +22,7 @@ describe('生存练习推进', () => {
   })
   it('典型错误可演示，重新选点仍从原图开始；展示答案标记辅助完成', () => {
     const scene = SURVIVAL_SCENES[3]
-    let run = confirmPractice(choosePracticePoint(startSurvival(scene), scene.wrongMove!))
+    let run = choosePracticePoint(startSurvival(scene), scene.wrongMove!)
     expect(run.stage).toBe('move')
     const reply = practiceBoard({ ...run, view: 'reply' })
     expect(reply.history).toHaveLength(2)
@@ -43,20 +43,20 @@ describe('生存练习的重试依据', () => {
     expect(run.mistakes).toBe(2)
     expect(choosePracticePoint(run, { x: 8, y: 8 })).toBe(run)
   })
-  it('合法试下允许比较；只有确认未达目标或选择非法落点才计入重试', () => {
+  it('每次落子立即判定，未救出或落子非法各算一次重试', () => {
     const initial = startSurvival(SURVIVAL_SCENES[3])
     const trial = choosePracticePoint(initial, initial.scene.wrongMove!)
-    expect(trial.mistakes).toBe(0)
-    expect(confirmPractice(trial).mistakes).toBe(1)
-    const finished = confirmPractice(choosePracticePoint(trial, initial.scene.examples[0]))
+    expect(trial.stage).toBe('move')
+    expect(trial.mistakes).toBe(1)
+    const finished = choosePracticePoint(trial, initial.scene.examples[0])
     expect(finished.stage).toBe('done')
-    expect(finished.mistakes).toBe(0)
+    expect(finished.mistakes).toBe(1)
     expect(choosePracticePoint(initial, initial.scene.target).mistakes).toBe(1)
   })
-  it('连接题确认失败后保留重试次数，重新开始清零', () => {
+  it('连接题走错后保留重试次数，重新开始清零', () => {
     const initial = startSurvival(SURVIVAL_SCENES[5])
-    const failed = confirmPractice(choosePracticePoint(initial, initial.scene.wrongMove!))
-    const finished = confirmPractice(choosePracticePoint(failed, initial.scene.examples[0]))
+    const failed = choosePracticePoint(initial, initial.scene.wrongMove!)
+    const finished = choosePracticePoint(failed, initial.scene.examples[0])
     expect(finished.stage).toBe('done')
     expect(finished.mistakes).toBe(1)
     expect(startSurvival(finished.scene).mistakes).toBe(0)

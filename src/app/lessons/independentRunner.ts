@@ -53,7 +53,7 @@ export function confirmIndependent(run: IndependentRun): IndependentRun {
   if (run.stage !== 'move' || !run.point || run.view !== 'after') return run
   const trial = independentTrial(run, run.point)
   if (!trial.meetsGoal) return { ...run, mistakes: run.mistakes + 1, message: trial.reply ? '还没有解除眼前危险，目标仍只剩一口气。可以看白棋怎样提，再回到原图重试。' : '这手还没有完成本题目标。检查是否至少有两口气，以及是否完成了题目要求的提子或连接；这不是对整盘最佳走法的评价。' }
-  return { ...run, stage: 'reason', message: '这手完成了本题目标。再选出它为什么有用，才算完成这一题。' }
+  return { ...run, stage: 'reason', message: null }
 }
 export function independentHint(run: IndependentRun): IndependentRun {
   if (run.stage === 'done' || run.help >= 2) return run

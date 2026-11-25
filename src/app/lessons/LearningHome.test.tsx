@@ -53,19 +53,21 @@ describe('首页：一子一气与卷目', () => {
     render(<Harness />)
     const first = screen.getByRole('button', { name: '第壹卷：认识规则' })
     expect(first.getAttribute('aria-expanded')).toBe('true')
-    expect(screen.getByRole('button', { name: '第 1 关:落子' })).toBeTruthy()
-    expect(screen.queryByRole('button', { name: '1. 认出哪块棋危险' })).toBeNull()
+    expect(screen.getByRole('button', { name: '1. 落子' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '1. 认出哪块棋危险（被叫吃）' })).toBeNull()
     click('第贰卷：保住自己的棋')
     expect(first.getAttribute('aria-expanded')).toBe('false')
-    expect(screen.queryByRole('button', { name: '第 1 关:落子' })).toBeNull()
-    expect(screen.getByRole('button', { name: '1. 认出哪块棋危险' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '1. 落子' })).toBeNull()
+    expect(screen.getByRole('button', { name: '1. 认出哪块棋危险（被叫吃）' })).toBeTruthy()
     expect([...screen.getByRole('region', { name: '课程卷目' }).querySelectorAll('.scroll__spine')].map((spine) => spine.getAttribute('aria-label'))).toEqual([
       '第壹卷：认识规则', '第贰卷：保住自己的棋', '第叁卷：吃掉对方的棋',
       '第肆卷：围地与终局', '第伍卷：九路策略入门', '第陆卷：从看懂到自己下',
     ])
+    expect(screen.getByRole('region', { name: '保住自己的棋' }).querySelectorAll('button')).toHaveLength(4)
     click('第叁卷：吃掉对方的棋')
-    for (const name of ['1. 关住白棋的出路', '练习 赶向有黑棋的一边', '2. 一手叫吃两块棋',
-      '练习 别只叫吃一块', '3. 沿着台阶追到边上', '练习 换个方向征白棋']) {
+    expect(screen.getByRole('region', { name: '吃掉对方的棋' }).querySelectorAll('button')).toHaveLength(5)
+    for (const name of ['1. 关住白棋的出路（打吃方向）', '2. 一手叫吃两块棋（双打吃）',
+      '3. 沿着台阶追到边上（征吃）', '4. 先封住出路（枷吃）', '5. 为什么接不回去（接不归）']) {
       expect(screen.getByRole('button', { name })).toBeTruthy()
     }
     expect(screen.getByRole('heading', { name: '学' })).toBeTruthy()

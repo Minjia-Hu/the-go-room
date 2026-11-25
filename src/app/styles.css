@@ -109,6 +109,20 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .course-index__secondary { padding-left: 24px; color: var(--text-2); font-size: .88rem; }
 .course-index__tag { margin-right: .5em; font-size: .78rem; color: var(--text-muted); }
 .course-index__check { color: var(--text-muted); font-size: .85rem; }
+.course-pair { container-type: inline-size; }
+.course-index__link--term {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto var(--status-width, 1em);
+  column-gap: 12px;
+}
+.volume-guide__lessons { --status-width: 2em; }
+.course-index__term { color: var(--text-muted); font-size: .78rem; justify-self: end; }
+.course-index__link--term :is(.course-index__check, .volume-guide__current) { grid-column: 3; justify-self: end; }
+@container (max-width: 22rem) {
+  .course-index__link--term { grid-template-columns: minmax(0, 1fr) var(--status-width, 1em); row-gap: 2px; }
+  .course-index__term { grid-column: 1; grid-row: 2; justify-self: start; }
+  .course-index__link--term :is(.course-index__check, .volume-guide__current) { grid-column: 2; grid-row: 1; }
+}
 .ink-strokes { display: flex; gap: 4px; margin: 4px 0 18px; }
 .ink-strokes i { flex: 1; height: 5px; border-radius: 3px; background: rgba(28, 26, 23, .1); }
 .ink-strokes i.ink-strokes__on { background: var(--text); }
@@ -308,6 +322,9 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .board-flow > .board-primary { grid-area: primary; min-width: 0; }
 .board-flow > .board-detail { grid-area: detail; }
 .board-task h2 { margin: 0 0 12px; font: 400 1.9rem/1.45 var(--serif); }
+.lesson-term { margin-bottom: .65rem; color: var(--text-muted); font-size: .86rem; }
+.lesson-term summary { width: fit-content; cursor: pointer; }
+.lesson-term[open] summary { margin-bottom: .3rem; }
 .board-task p { margin: 0 0 8px; }
 .board-primary p { margin: 0 0 10px; }
 .board-primary .actions { margin: 10px 0; }
@@ -351,15 +368,15 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   .board-flow > .board-detail { padding-top: 18px; }
   .board-primary .board-compare { margin-top: 2px; }
 }
-.board-primary .study-question { margin: 0; padding: 0; border: 0; }
+.board-task .study-question, .board-primary .study-question { margin: 0; padding: 0; border: 0; }
 .board-primary .strategy-choices { margin: 8px 0; }
 .board-primary .study-input-label { font-size: .85rem; }
 
 /* 每步反馈优先于详情和辅助操作，完整保留原因。 */
 .board-feedback { scroll-margin-block: 12px; border-left: 2px solid var(--accent); padding-left: 10px; line-height: 1.5; }
 .board-feedback--hint { border-left-color: var(--mark); }
-.board-legend { margin-bottom: 16px; }
-.board-legend summary { cursor: pointer; color: var(--accent); padding: 8px 0; font-size: .8rem; }
+.board-legend { margin-top: 4px; text-align: center; }
+.board-legend summary { width: fit-content; margin-inline: auto; cursor: pointer; color: var(--text-muted); padding: 8px 4px; font-size: .8rem; }
 .board-legend .small { margin: 4px 0; }
 @media (max-width: 839px) {
   .board-feedback { font-size: .86rem; }
@@ -441,7 +458,6 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .danger-study .danger-task { margin-top: 16px; border-left: 2px solid var(--accent); padding-left: 14px; }
 .danger-step { color: var(--accent); font-size: .85rem; }
 .danger-study .turn { margin: 3px 0 0; font-family: var(--serif); font-size: 1.12rem; }
-.danger-study .danger-next { white-space: normal; text-align: center; }
 @media (max-width: 680px) {
   .danger-study .danger-task { margin: 6px 0; padding-left: 10px; }
   .danger-study .turn { font-size: 1rem; }
