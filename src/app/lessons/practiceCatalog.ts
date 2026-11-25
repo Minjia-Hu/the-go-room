@@ -2,6 +2,7 @@ import { LADDER_DEFENSE_SCENES } from '../../content/ladderDefense'
 import { CAPTURE_SCENES } from '../../content/capture'
 import { startLadderDefense } from './ladderDefenseRunner'
 import { PRACTICE_DANGER_SCENES, PRACTICE_RESCUE_SCENES, PRIORITY_SCENES } from '../../content/practiceExtras'
+import { startCapture } from './captureRunner'
 import { startPriority } from './priorityRunner'
 import { SURVIVAL_SCENES } from '../../content/survival'
 import { INDEPENDENT_SCENES } from '../../content/independent'
@@ -16,7 +17,7 @@ export const PRACTICE_GROUP_NUMBERS = ['壹', '贰', '叁', '肆', '伍', '陆',
 export interface PracticeItem {
   readonly id: string
   readonly group: typeof PRACTICE_GROUPS[number]
-  readonly source: 'survival' | 'independent' | 'danger' | 'rescue' | 'priority' | 'ladder-defense'
+  readonly source: 'capture' | 'survival' | 'independent' | 'danger' | 'rescue' | 'priority' | 'ladder-defense'
   readonly index: number
   readonly title: string
   readonly courseUnit?: LearningUnit
@@ -44,6 +45,12 @@ const items: Omit<PracticeItem, 'relatedTitle'>[] = [
   })),
   ...PRACTICE_DANGER_SCENES.map((scene, index) => ({ id: `practice/${scene.id}`, group: '认危险' as const, source: 'danger' as const, index, title: scene.title, related: related('danger') })),
   ...PRACTICE_RESCUE_SCENES.map((scene, index) => ({ id: `practice/${scene.id}`, group: independentGroups[scene.kind], source: 'rescue' as const, index, title: scene.title, related: related(scene.kind === 'connect' ? 'connect' : 'escape') })),
+  ...CAPTURE_SCENES.flatMap((scene, index) => {
+    const guidedId = { 'net-check': 'net-guided', 'connection-check': 'connection-guided' }[scene.id]
+    if (!guidedId) return []
+    return [{ id: `capture/${scene.id}`, group: '提子' as const, source: 'capture' as const,
+      index, title: scene.title, related: related(`capture/${guidedId}`) }]
+  }),
   ...PRIORITY_SCENES.map((scene, index) => ({ id: `practice/${scene.id}`, group: '先后判断' as const, source: 'priority' as const, index, title: scene.title, related: related(scene.related) })),
   ...LADDER_DEFENSE_SCENES.map((scene, index) => ({
     id: `practice/${scene.id}`, group: '别被吃' as const, source: 'ladder-defense' as const,
@@ -83,6 +90,10 @@ export function nextPracticeItem(progress: LearningProgress, afterId?: string): 
 
 /** 只重新开始已做完的 run，保留未完成尝试、课程位置和最好记录。 */
 export function openPracticeItem(session: LearningSession, item: PracticeItem): LearningSession {
+  if (item.source === 'capture') {
+    if (session.captureRuns[item.index].stage !== 'done') return session
+    return { ...session, captureRuns: session.captureRuns.map((run, index) => index === item.index ? startCapture(run.scene) : run) }
+  }
   if (item.source === 'survival') {
     if (session.runs[item.index].stage !== 'done') return session
     return { ...session, runs: session.runs.map((run, index) => index === item.index ? startSurvival(run.scene) : run) }

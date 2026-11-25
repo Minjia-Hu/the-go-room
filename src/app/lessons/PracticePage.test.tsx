@@ -4,6 +4,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { App } from '../App'
 import { pageFromHash } from '../router'
+import { CAPTURE_SCENES } from '../../content/capture'
 import { INDEPENDENT_SCENES } from '../../content/independent'
 import { LEARNING_KEY, LEARNING_UNITS, emptyLearningProgress } from './learningProgress'
 import type { Completion } from './learningProgress'
@@ -27,7 +28,7 @@ const finishExtend = () => {
 const allIndependent = Object.fromEntries(PRACTICE_ITEMS.map((item) => [item.id, 'independent' as Completion]))
 
 describe('practice hub', () => {
-  const shared = PRACTICE_ITEMS.filter((item) => item.source === 'survival' || item.source === 'independent')
+  const shared = PRACTICE_ITEMS.filter((item) => item.courseUnit)
   it('shows both home catalogs and opens each numbered practice group independently', () => {
     window.location.hash = '#/lessons'
     render(<App />)
@@ -66,7 +67,7 @@ describe('practice hub', () => {
     expect(within(screen.getByRole('region', { name: '练习分组' })).queryByRole('button', { name: '全部练习' })).toBeNull()
     click('练习')
     expect(screen.getByRole('heading', { name: '全部练习' })).toBeTruthy()
-    expect(screen.getAllByRole('listitem')).toHaveLength(24)
+    expect(screen.getAllByRole('listitem')).toHaveLength(26)
   })
   it('lists the active group and preserves the current attempt when browsing it', () => {
     window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), lastVisited: 'rules/ko' }))
@@ -117,9 +118,9 @@ describe('practice hub', () => {
       click('练习')
     }
   })
-  it('labels only the ten course exercises in the practice list', () => {
+  it('labels only the twelve course exercises in the practice list', () => {
     render(<App />)
-    expect(screen.getAllByText('课程题')).toHaveLength(10)
+    expect(screen.getAllByText('课程题')).toHaveLength(12)
     for (const item of shared) {
       const row = screen.getByRole('button', { name: item.title }).closest('li')!
       expect(within(row).getByText('课程题')).toBeTruthy()
@@ -132,7 +133,7 @@ describe('practice hub', () => {
     expect(within(nav).getAllByRole('button').map((button) => button.textContent)).toEqual(['学', '练', '弈', '复'])
     expect(screen.getByRole('button', { name: '练习' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: '练习' }).title).toBe('练习')
-    expect(screen.getAllByRole('listitem')).toHaveLength(24)
+    expect(screen.getAllByRole('listitem')).toHaveLength(26)
   })
   it('uses per-kind numbering consistently in the list and exercise, with short explanation titles', () => {
     render(<App />)
@@ -143,7 +144,7 @@ describe('practice hub', () => {
       click('练习')
     }
     const entry = screen.getByRole('region', { name: '提子' })
-    expect(within(entry).getByRole('button', { name: '相关讲解：给自己的棋找出路' })).toBeTruthy()
+    expect(within(entry.querySelector('li')!).getByRole('button', { name: '相关讲解：给自己的棋找出路' })).toBeTruthy()
   })
   it('records independent completion in the shared catalog without moving restored course position', () => {
     window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), completed: { 'rules/place': 'guided' }, lastVisited: 'rules/place' }))
@@ -212,7 +213,7 @@ describe('practice hub', () => {
   it('opens the verified explanation in lessons and intentionally updates its position', () => {
     render(<App />)
     const capture = screen.getByRole('region', { name: '提子' })
-    fireEvent.click(within(capture).getByRole('button', { name: /相关讲解/ }))
+    fireEvent.click(within(capture.querySelector('li')!).getByRole('button', { name: /相关讲解/ }))
     expect(window.location.hash).toBe('#/lessons')
     expect(screen.getByRole('button', { name: '教学' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('heading', { name: '给自己的棋找出路' })).toBeTruthy()
@@ -223,7 +224,7 @@ describe('practice hub', () => {
     click('练一道'); point(0, 3); point(0, 5); click('下一道练习')
     view.unmount(); view = render(<App />)
     expect(screen.getByRole('heading', { name: '全部练习' })).toBeTruthy()
-    expect(screen.getByText('1 / 24')).toBeTruthy()
+    expect(screen.getByText('1 / 26')).toBeTruthy()
     expect(screen.queryByRole('button', { name: '交叉点 0,0' })).toBeNull()
     click('练一道')
     expect(screen.getByRole('heading', { name: '边上三颗棋，共用几口气' })).toBeTruthy()
@@ -234,7 +235,7 @@ describe('practice hub', () => {
     render(<App />)
     click('练一道'); point(0, 3); point(0, 5); click('练习')
     expect(screen.getByRole('alert').textContent).toContain('未能保存')
-    expect(screen.getByText('1 / 24')).toBeTruthy()
+    expect(screen.getByText('1 / 26')).toBeTruthy()
   })
 })
 
@@ -256,7 +257,7 @@ it('生存题答错后保留重试记录和推荐资格，独立重做才升级�
   expect(stored().completed['survival/danger-check']).toBe('independent')
   expect(stored().lastVisited).toBe('rules/ko')
   click('返回练习列表')
-  expect(screen.getByText('24 / 24')).toBeTruthy()
+  expect(screen.getByText('26 / 26')).toBeTruthy()
   expect(screen.queryByRole('button', { name: '练一道' })).toBeNull()
 })
 
@@ -280,7 +281,7 @@ it('先后判断展示真实回应，必须解释原因才记录，刷新保留�
   cleanup(); render(<App />)
   expect(screen.getByText('重试后完成')).toBeTruthy()
   click('教学')
-  expect(screen.getByRole('heading', { name: '已完成 0 / 35 个课程与练习' })).toBeTruthy()
+  expect(screen.getByRole('heading', { name: '已完成 0 / 39 个课程与练习' })).toBeTruthy()
   expect(screen.queryByRole('button', { name: '继续学习' })).toBeNull()
 })
 
@@ -320,5 +321,20 @@ it('别被吃两题按顺序推荐，全部独立完成后返回练习列表', (
   expect(stored().completed[ids[1]]).toBe('independent')
   expect(stored().lastVisited).toBe('rules/ko')
   click('返回练习列表')
-  expect(screen.getByText('24 / 24')).toBeTruthy()
+  expect(screen.getByText('26 / 26')).toBeTruthy()
+})
+
+it.each(CAPTURE_SCENES.filter(scene => !scene.guided && scene.lesson >= 4))('$id 从提子组续做并保存课程记录，保留续读位置', (scene) => {
+  window.localStorage.setItem(LEARNING_KEY, JSON.stringify({ ...emptyLearningProgress(), lastVisited: 'rules/ko' }))
+  render(<App />)
+  const solve = (move: { x: number; y: number }) => point(move.x, move.y)
+  click(scene.title)
+  solve(scene.solution[0])
+  click('练习'); click(scene.title)
+  scene.solution.slice(1).forEach(solve)
+  expect(stored().completed[`capture/${scene.id}`]).toBe('independent')
+  expect(stored().lastVisited).toBe('rules/ko')
+  click('练习'); click(scene.title)
+  expect(screen.getByText(`追吃中 · 已下 0 手 / 最多 ${scene.maxMoves} 手`)).toBeTruthy()
+  expect(screen.getByLabelText('已记录的学习结果').textContent).toContain('独立完成')
 })

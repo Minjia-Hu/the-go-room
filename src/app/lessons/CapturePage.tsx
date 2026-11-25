@@ -7,8 +7,11 @@ import { LessonFeedback } from './LessonFeedback'
 import { COMPLETION_LABELS } from './learningProgress'
 import { captureCompletion, captureHint, capturePoint, captureReplay, startCapture, undoCapture } from './captureRunner'
 import type { CaptureReplayKind, CaptureRun } from './captureRunner'
+import { ConnectionComparison } from './ConnectionComparison'
+import type { PracticeLabels } from './practiceCatalog'
 
 interface Props {
+  readonly practice?: PracticeLabels
   readonly run: CaptureRun
   readonly onChange: (run: CaptureRun) => void
   readonly nextLabel: string
@@ -22,9 +25,10 @@ interface Replay extends ReturnType<typeof captureReplay> {
 }
 const HINTS = ['提醒我看哪里', '标出目标白棋和气', '演示一种做法']
 
-export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props) {
+export function CapturePage({ run, onChange, nextLabel, onNext, onPlay, practice }: Props) {
   const { scene, stage } = run
   const [replay, setReplay] = useState<Replay | null>(null)
+  const [comparingConnection, setComparingConnection] = useState(false)
   const automatic = replay?.automatic ?? false
   useEffect(() => {
     if (!automatic) return
@@ -37,6 +41,8 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props)
     }, 450)
     return () => window.clearInterval(timer)
   }, [automatic])
+
+  if (comparingConnection) return <ConnectionComparison scene={scene} onReturn={() => setComparingConnection(false)} />
 
   const shown = replay ? replay.frames[replay.step] : run.game
   const last = shown.history.at(-1)
@@ -84,6 +90,9 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props)
   const label = stage === 'done' ? COMPLETION_LABELS[captureCompletion(run)]
     : stage === 'failed' ? '这次没吃到'
     : `追吃中 · 已下 ${run.moves} 手 / 最多 ${scene.maxMoves} 手`
+  const firstMove = run.rounds[0]?.black.history.at(-1)
+  const canCompareConnection = scene.connection && !replay && (stage === 'done' || (scene.guided && stage === 'active'
+    && firstMove?.kind === 'play' && firstMove.point.x === scene.solution[0].x && firstMove.point.y === scene.solution[0].y))
   const replayControls = replay && <div className="actions">
     <button className="text-button" disabled={replay.step === 0} onClick={() => setReplay({ ...replay, step: replay.step - 1, automatic: false })}>上一手</button>
     <button className="text-button" disabled={replayEnd} onClick={() => setReplay({ ...replay, step: replay.step + 1, automatic: false })}>下一手</button>
@@ -93,7 +102,7 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props)
 
   return <BoardLayout
     heading={<>
-      <p className="eyebrow">第 {scene.lesson} 课 · {scene.guided ? '一起练习' : '自己试试'}</p>
+      <p className="eyebrow">{practice?.eyebrow ?? `第 ${scene.lesson} 课 · ${scene.guided ? '一起练习' : '自己试试'}`}</p>
       <h2>{scene.title}</h2>
       <div className="step-task">
         <p className="step-label">{label}</p>
@@ -101,6 +110,7 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props)
       </div>
     </>}
     board={<>
+      {practice && <p className="figure-number">{practice.figure}</p>}
       <Board board={shown.board} marks={marks} lastMove={last?.kind === 'play' ? last.point : null}
         disabled={stage !== 'active' || !!replay} ghostColor="black"
         onPointClick={(point) => onChange(capturePoint(run, point))} />
@@ -113,11 +123,13 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props)
         {run.rounds.length > 0 && <button className="text-button" onClick={() => onChange(undoCapture(run))}>退回一手</button>}
         <button className="text-button hint-button" onClick={hint}>{HINTS[run.hint]}</button>
       </>}
+      {canCompareConnection && <button className="text-button" onClick={() => setComparingConnection(true)}>如果白棋硬接</button>}
       {stage === 'failed' && <div className="actions">
         <button className="button" onClick={() => onChange(undoCapture(run))}>退回一手</button>
         <button className="text-button" onClick={restart}>重来这一题</button>
       </div>}
       {stage === 'done' && <>
+        {scene.takeaway && !replay && <p>{scene.takeaway}</p>}
         <div className="actions next-lesson">
           <button className="button" onClick={onNext}>{nextLabel}</button>
           {onPlay && <button className="button button--ghost" onClick={onPlay}>开始我的陪练</button>}
@@ -131,7 +143,7 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay }: Props)
         }}>
           <summary>看看对照</summary>
           <div className="actions">
-            <button className="button button--ghost" aria-pressed={replay?.kind === 'wrong'} onClick={() => startReplay('wrong')}>如果先从另一边叫吃</button>
+            <button className="button button--ghost" aria-pressed={replay?.kind === 'wrong'} onClick={() => startReplay('wrong')}>{scene.wrongLabel ?? '如果先从另一边叫吃'}</button>
             {scene.contrastRows && <button className="button button--ghost" aria-pressed={replay?.kind === 'contrast'} onClick={() => startReplay('contrast')}>如果路上有白子</button>}
           </div>
           {replay && replay.kind !== 'solution' && replayControls}

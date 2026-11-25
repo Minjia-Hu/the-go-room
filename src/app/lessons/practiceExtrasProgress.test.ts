@@ -39,7 +39,7 @@ describe('专项练习进度与课程隔离', () => {
     expect(saved.completed).toEqual({ [item.id]: 'independent' })
     expect(saved.lastVisited).toBe('rules/ko')
     expect(parseLearningProgress(JSON.stringify(saved))).toEqual(saved)
-    expect(LEARNING_UNITS).toHaveLength(35)
+    expect(LEARNING_UNITS).toHaveLength(39)
     expect(LEARNING_UNITS.some((unit) => unit.id === item.id)).toBe(false)
     const reopened = openPracticeItem({ ...session, progress: saved }, item)
     expect(reopened.page).toBe(oldPage)

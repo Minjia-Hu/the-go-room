@@ -44,7 +44,7 @@ export const COURSE_VOLUMES: readonly CourseVolume[] = [
     { entries: units('rule-sequence').map(unit => ({ unit, title: unit.title, tag: '慢镜头' })) },
   ] },
   { number: '贰', title: '保住自己的棋', count: '四课 · 八局', groups: paired('survival') },
-  { number: '叁', title: '吃掉对方的棋', count: '三课 · 六局', groups: paired('capture') },
+  { number: '叁', title: '吃掉对方的棋', count: '五课 · 十局', groups: paired('capture') },
   { number: '肆', title: '围地与终局', count: '四课', groups: numbered('endgame') },
   { number: '伍', title: '九路策略入门', count: '三课', groups: numbered('strategy') },
   { number: '陆', title: '从看懂到自己下', count: '一盘 · 六题', groups: [
