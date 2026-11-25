@@ -8,7 +8,7 @@ import { WALK_MOVES, WALK_QUESTIONS } from '../../content/walkthrough'
 import { createLearningSession, openLearningUnit, restoreLearningSession } from './learningSession'
 import { continueLearningUnit, emptyLearningProgress, LEARNING_KEY, LEARNING_UNITS, parseLearningProgress, readLearningProgress, recordLearningProgress, writeLearningProgress } from './learningProgress'
 import { clickPoint, startLesson } from './lessonRunner'
-import { choosePracticePoint, chooseReason, confirmPractice, practiceHint, startSurvival } from './survivalRunner'
+import { choosePracticePoint, chooseReason, practiceHint, startSurvival } from './survivalRunner'
 import { answerIndependent, confirmIndependent, independentHint, independentPoint, startIndependent } from './independentRunner'
 import type { IndependentRun } from './independentRunner'
 import { countHint, startEndgame, submitCount } from './endgameRunner'
@@ -61,7 +61,7 @@ describe('学习记录的完成依据', () => {
     expect(recordLearningProgress(progress, { ...base, runs: [own] }).completed).toBe(progress.completed)
     expect(recordLearningProgress(progress, { ...base, runs: [solve(practiceHint(own))] }).completed).toBe(progress.completed)
     const demo = practiceHint(practiceHint(practiceHint(startSurvival(SURVIVAL_SCENES[5]))))
-    const demoDone = confirmPractice(demo)
+    const demoDone = demo
     expect(demoDone.stage).toBe('done')
     expect(recordLearningProgress(progress, { ...base, runs: [demoDone] }).completed['survival/connect-check']).toBe('demo')
   })
@@ -141,10 +141,10 @@ describe('生存检验题的完成等级', () => {
         for (const point of scene.eyes!) run = choosePracticePoint(run, point)
         return chooseReason(run, true)
       }
-      return confirmPractice(choosePracticePoint(run, scene.examples[0]))
+      return choosePracticePoint(run, scene.examples[0])
     }
     const failed = scene.kind === 'escape' || scene.kind === 'connect'
-      ? confirmPractice(choosePracticePoint(initial, scene.wrongMove!))
+      ? choosePracticePoint(initial, scene.wrongMove!)
       : choosePracticePoint(initial, { x: 8, y: 8 })
     const id = `survival/${scene.id}`
     const record = (run: typeof initial) => recordLearningProgress(base.progress, { ...base, runs: [solve(run)] })

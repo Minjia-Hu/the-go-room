@@ -46,7 +46,7 @@ export function PracticePage({ active, onOpen, session, onChange, onLesson, onPl
     return <>
       {notice}
       <DirectoryToolbar title={`练 · ${active.group}`} navLabel={`${active.group}练习目录`}
-        currentId={active.id} catalog={{ label: '全部练习', onOpen: returnToHub }}>
+        autoCloseKey={active.id} catalog={{ label: '全部练习', onOpen: returnToHub }}>
         <div className="volume-guide__lessons">
           {PRACTICE_ITEMS.filter(item => item.group === active.group).map(item =>
             <div className="course-pair" key={item.id}>
@@ -59,7 +59,7 @@ export function PracticePage({ active, onOpen, session, onChange, onLesson, onPl
         </div>
       </DirectoryToolbar>
       {active.source === 'survival' || active.source === 'danger'
-        ? <SurvivalPage run={(active.source === 'survival' ? session.runs : session.practiceDangerRuns)[active.index]} practice={practiceLabels(active)} isLast={false} nextLabel={nextLabel} onNext={onNext}
+        ? <SurvivalPage run={(active.source === 'survival' ? session.runs : session.practiceDangerRuns)[active.index]} practice={practiceLabels(active)} nextLabel={nextLabel} onNext={onNext}
             onChange={(run) => { const key = active.source === 'survival' ? 'runs' : 'practiceDangerRuns'; onChange({ ...session, [key]: session[key].map((old, index) => index === active.index ? run : old) }) }} />
         : active.source === 'capture'
           ? <CapturePage key={active.id} run={session.captureRuns[active.index]} practice={practiceLabels(active)} nextLabel={nextLabel} onNext={onNext}

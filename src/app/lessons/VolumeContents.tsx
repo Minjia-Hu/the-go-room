@@ -13,7 +13,7 @@ interface Props {
 
 export function VolumeContents({ volume, currentId, onSelect, onCatalog, onPlay }: Props) {
   return <DirectoryToolbar title={`卷${volume.number} · ${volume.title}`} navLabel={`卷${volume.number}目录`}
-    currentId={currentId} catalog={{ label: '全部卷目', onOpen: onCatalog }} onPlay={onPlay}>
+    catalog={{ label: '全部卷目', onOpen: onCatalog }} onPlay={onPlay}>
     <VolumeIndex volume={volume} currentId={currentId} onSelect={onSelect} />
   </DirectoryToolbar>
 }

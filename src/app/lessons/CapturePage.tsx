@@ -1,3 +1,5 @@
+import { LessonTitle } from './LessonTitle'
+import { LessonNextActions, type LessonNextProps } from './LessonNextActions'
 import { useEffect, useState } from 'react'
 import { getCell, getGroup, toIndex } from '../../engine'
 import { Board } from '../board/Board'
@@ -10,13 +12,10 @@ import type { CaptureReplayKind, CaptureRun } from './captureRunner'
 import { ConnectionComparison } from './ConnectionComparison'
 import type { PracticeLabels } from './practiceCatalog'
 
-interface Props {
+interface Props extends LessonNextProps {
   readonly practice?: PracticeLabels
   readonly run: CaptureRun
   readonly onChange: (run: CaptureRun) => void
-  readonly nextLabel: string
-  readonly onNext: () => void
-  readonly onPlay?: () => void
 }
 interface Replay extends ReturnType<typeof captureReplay> {
   readonly kind: CaptureReplayKind
@@ -25,7 +24,7 @@ interface Replay extends ReturnType<typeof captureReplay> {
 }
 const HINTS = ['提醒我看哪里', '标出目标白棋和气', '演示一种做法']
 
-export function CapturePage({ run, onChange, nextLabel, onNext, onPlay, practice }: Props) {
+export function CapturePage({ run, onChange, practice, ...next }: Props) {
   const { scene, stage } = run
   const [replay, setReplay] = useState<Replay | null>(null)
   const [comparingConnection, setComparingConnection] = useState(false)
@@ -103,7 +102,7 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay, practice
   return <BoardLayout
     heading={<>
       <p className="eyebrow">{practice?.eyebrow ?? `第 ${scene.lesson} 课 · ${scene.guided ? '一起练习' : '自己试试'}`}</p>
-      <h2>{scene.title}</h2>
+      <LessonTitle title={scene.title} />
       <div className="step-task">
         <p className="step-label">{label}</p>
         {stage === 'active' && <p className="turn">{scene.task}</p>}
@@ -119,7 +118,6 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay, practice
     feedback={feedback && <LessonFeedback message={feedback} />}
     primary={<>
       {stage === 'active' && <>
-        {!run.message && <p className="step-intro">{scene.intro}{scene.guided && <> {scene.hints[0]}</>}</p>}
         {run.rounds.length > 0 && <button className="text-button" onClick={() => onChange(undoCapture(run))}>退回一手</button>}
         <button className="text-button hint-button" onClick={hint}>{HINTS[run.hint]}</button>
       </>}
@@ -130,10 +128,7 @@ export function CapturePage({ run, onChange, nextLabel, onNext, onPlay, practice
       </div>}
       {stage === 'done' && <>
         {scene.takeaway && !replay && <p>{scene.takeaway}</p>}
-        <div className="actions next-lesson">
-          <button className="button" onClick={onNext}>{nextLabel}</button>
-          {onPlay && <button className="button button--ghost" onClick={onPlay}>开始我的陪练</button>}
-        </div>
+        <LessonNextActions {...next} />
         {run.assisted && replay?.kind !== 'solution' && <div className="actions">
           <button className="text-button" onClick={() => startReplay('solution')}>回看演示</button>
         </div>}

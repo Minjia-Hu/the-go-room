@@ -12,8 +12,11 @@ interface Props {
 export function BoardLayout({ heading, board, primary, feedback, legend, children }: Props) {
   return <section className="page page--with-board board-flow">
     <header className="board-task">{heading}</header>
-    <div className="board-frame">{board}</div>
+    <div className="board-frame">
+      {board}
+      {legend && <details className="board-legend"><summary>棋盘图例</summary>{legend}</details>}
+    </div>
     {(feedback || primary) && <div className="board-primary">{feedback}{primary}</div>}
-    <div className="panel board-detail">{legend && <details className="board-legend"><summary>棋盘图例</summary>{legend}</details>}{children}</div>
+    <div className="panel board-detail">{children}</div>
   </section>
 }

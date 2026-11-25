@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { continueLearningUnit, LEARNING_UNITS } from './learningProgress'
+import { continueLearningUnit, COURSE_PROGRESS_UNITS } from './learningProgress'
 import type { LearningProgress, LearningUnit } from './learningProgress'
 
 interface Props {
@@ -10,14 +10,14 @@ interface Props {
 export function LearningProgressPanel({ progress, onContinue, onClear }: Props) {
   const [confirmClear, setConfirmClear] = useState(false)
   const unit = continueLearningUnit(progress)
-  const count = LEARNING_UNITS.filter((item) => progress.completed[item.id]).length
+  const count = COURSE_PROGRESS_UNITS.filter((item) => progress.completed[item.id]).length
   return <section className="learning-record" aria-label="我的学习记录">
     <div>
       <p className="eyebrow">学习手记</p>
-      <h3>已完成 {count} / {LEARNING_UNITS.length} 个课程与练习</h3>
-      <div className="ink-strokes" aria-hidden="true">{LEARNING_UNITS.map((item) => <i key={item.id} className={progress.completed[item.id] ? 'ink-strokes__on' : undefined} />)}</div>
+      <h3>已完成 {count} / {COURSE_PROGRESS_UNITS.length} 个课程与练习</h3>
+      <div className="ink-strokes" aria-hidden="true">{COURSE_PROGRESS_UNITS.map((item) => <i key={item.id} className={progress.completed[item.id] ? 'ink-strokes__on' : undefined} />)}</div>
       <p className="muted small">每题保留最好的一次完成记录。引导课程与独立练习分开标注，完成不代表已经掌握。</p>
-      {unit && <div className="continue-learning"><button className="button" onClick={() => onContinue(unit)}>{count === LEARNING_UNITS.length ? '回看最近一课' : '继续学习'}</button><p>{unit.title}</p></div>}
+      {unit && <div className="continue-learning"><button className="button" onClick={() => onContinue(unit)}>{count === COURSE_PROGRESS_UNITS.length ? '回看最近一课' : '继续学习'}</button><p>{unit.title}</p></div>}
       <p className="muted small">刷新后回到待继续的题目，从该题开头开始；中途棋盘不保存。记录只在此浏览器中，清除浏览器数据后会丢失。</p>
     </div>
     {onClear && <div className="learning-record__reset">{confirmClear ? <div role="group" aria-label="确认清除学习记录">

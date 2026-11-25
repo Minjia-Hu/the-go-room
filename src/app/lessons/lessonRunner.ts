@@ -13,7 +13,7 @@ export interface LessonMessage {
 export interface LessonRun {
   readonly lesson: Lesson
   readonly game: GameState
-  /** 当前步骤下标;等于步骤总数时表示本关完成。 */
+  /** 当前步骤下标;等于步骤总数时表示本课完成。 */
   readonly stepIndex: number
   /** select 步骤里用户已点出的点。 */
   readonly selected: readonly Point[]

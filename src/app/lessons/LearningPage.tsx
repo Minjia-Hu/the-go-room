@@ -5,16 +5,15 @@ import { CapturePage } from './CapturePage'
 import { SURVIVAL_SCENES } from '../../content/survival'
 import type { LearningSession } from './learningSession'
 import { openLearningUnit } from './learningSession'
-import { COMPLETION_LABELS, continueLearningUnit, currentLearningUnit, LEARNING_UNITS } from './learningProgress'
+import { COMPLETION_LABELS, COURSE_PROGRESS_UNITS, continueLearningUnit, currentLearningUnit, LEARNING_UNITS } from './learningProgress'
 import { LearningProgressPanel } from './LearningProgressPanel'
 import { startLesson } from './lessonRunner'
 import { LessonPage } from './LessonPage'
-import { survivalNextLabel } from './survivalSteps'
 import { SurvivalPage } from './SurvivalPage'
 import { HeroExercise } from './HeroExercise'
 import { VolumeContents } from './VolumeContents'
 import { VolumeIndex } from './VolumeIndex'
-import { COURSE_VOLUMES, volumeFor } from './courseVolumes'
+import { COURSE_VOLUMES, homeVolume, volumeFor } from './courseVolumes'
 import { ScrollContents } from './ScrollContents'
 import type { PracticeItem } from './practiceCatalog'
 import type { ScrollChapter } from './ScrollContents'
@@ -38,7 +37,6 @@ interface Props {
 export function LearningPage({ onPractice, catalogVisit, session, onChange, onPlay, onClear, storageMessage }: Props) {
   const completed = session.progress.completed
   const currentUnit = currentLearningUnit(session)
-  const recorded = currentUnit ? completed[currentUnit.id] : undefined
   const returningToCatalog = useRef(false)
   useLayoutEffect(() => {
     document.documentElement.scrollTop = 0
@@ -52,8 +50,15 @@ export function LearningPage({ onPractice, catalogVisit, session, onChange, onPl
   const openCapture = (captureIndex: number) => onChange({ ...session, page: 'capture', captureIndex })
   const survivalLast = session.sceneIndex === SURVIVAL_SCENES.length - 1
   const capture = session.captureRuns[session.captureIndex]
-  const nextCapture = CAPTURE_SCENES[session.captureIndex + 1]
-  const openSequence = () => onChange({ ...session, page: 'rule-sequence' })
+  const survival = SURVIVAL_SCENES[session.sceneIndex]
+  const nextSurvival = SURVIVAL_SCENES.findIndex(scene => scene.guided && scene.course === survival.course + 1)
+  const advanceSurvival = () => nextSurvival < 0 ? openCapture(0) : openScene(nextSurvival)
+  const nextCapture = CAPTURE_SCENES.findIndex(scene => scene.guided && scene.lesson === capture.scene.lesson + 1)
+  const openSequence = () => onChange({ ...session, page: 'rule-sequence', sequenceReturnTo: session.page === 'survival' ? 'survival' : 'rules' })
+  const returnFromSequence = () => {
+    if (session.sequenceReturnTo === 'survival') openScene(session.sceneIndex)
+    else onChange(openLearningUnit(session, LEARNING_UNITS.find(unit => unit.id === 'rules/suicide')!))
+  }
   const openEndgame = (endgameIndex: number) => onChange({ ...session, page: 'endgame', endgameIndex })
   const openStrategy = (strategyIndex: number) => onChange({ ...session, page: 'strategy', strategyIndex })
   const openWalk = () => onChange({ ...session, page: 'walkthrough' })
@@ -62,10 +67,10 @@ export function LearningPage({ onPractice, catalogVisit, session, onChange, onPl
   const allIndependentDone = session.independentRuns.every((_, index) => independentDone(index))
   if (session.page === 'home') {
     const next = continueLearningUnit(session.progress)
-    const allDone = LEARNING_UNITS.every((unit) => completed[unit.id])
+    const allDone = COURSE_PROGRESS_UNITS.every((unit) => completed[unit.id])
     const startRules = () => onChange({ ...session, page: 'rules', rules: { index: 0, run: startLesson(LESSONS[0]) } })
     const current = next ? COURSE_VOLUMES.indexOf(volumeFor(next)) : 0
-    const chapters: ScrollChapter[] = COURSE_VOLUMES.map(volume => {
+    const chapters: ScrollChapter[] = COURSE_VOLUMES.map(homeVolume).map(volume => {
       const entries = volume.groups.flatMap(group => group.entries)
       return {
         number: volume.number, title: volume.title, count: volume.count,
@@ -94,7 +99,7 @@ export function LearningPage({ onPractice, catalogVisit, session, onChange, onPl
       onCatalog={() => { returningToCatalog.current = true; onChange({ ...session, page: 'home' }) }} />}
 
     {session.page === 'rules' && <LessonPage lessons={LESSONS} progress={session.rules} completedIds={LESSONS.filter((lesson) => completed[`rules/${lesson.id}`]).map((lesson) => lesson.id)} onProgress={(rules) => onChange({ ...session, rules })} onFinish={onPlay} onSurvival={() => openScene(0)} onRuleSequence={openSequence} />}
-    {session.page === 'rule-sequence' && <RuleSequencePage run={session.sequence} completedSceneIds={LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence' && completed[unit.id]).map((unit) => unit.id.slice('rule-sequence/'.length))} onChange={(sequence) => onChange({ ...session, sequence })} onScoring={() => openEndgame(0)} />}
+    {session.page === 'rule-sequence' && <RuleSequencePage run={session.sequence} completedSceneIds={LEARNING_UNITS.filter((unit) => unit.page === 'rule-sequence' && completed[unit.id]).map((unit) => unit.id.slice('rule-sequence/'.length))} onChange={(sequence) => onChange({ ...session, sequence })} onReturn={returnFromSequence} returnLabel={session.sequenceReturnTo === 'survival' ? '返回两眼课' : '返回第 4 课 · 禁入点'} />}
     {session.page === 'endgame' && <><EndgamePage run={session.endgameRuns[session.endgameIndex]} onChange={(run) => onChange({ ...session, endgameRuns: session.endgameRuns.map((old, index) => index === session.endgameIndex ? run : old) })} isLast={session.endgameIndex === ENDGAME_LESSONS.length - 1} onNext={() => session.endgameIndex === ENDGAME_LESSONS.length - 1 ? onPlay() : openEndgame(session.endgameIndex + 1)} onStrategy={() => openStrategy(0)} />
       <div className="learning-toolbar archive-note">{session.endgameIndex > 0 && <button className="text-button" onClick={() => openEndgame(session.endgameIndex - 1)}>回看上一课</button>}<button className="text-button" onClick={() => session.endgameIndex === ENDGAME_LESSONS.length - 1 ? onPlay() : openEndgame(session.endgameIndex + 1)}>先跳过这一课</button></div></>}
     {session.page === 'strategy' && <><StrategyPage run={session.strategyRuns[session.strategyIndex]} onChange={(run) => onChange({ ...session, strategyRuns: session.strategyRuns.map((old, index) => index === session.strategyIndex ? run : old) })} isLast={session.strategyIndex === STRATEGY_LESSONS.length - 1} onNext={() => session.strategyIndex === STRATEGY_LESSONS.length - 1 ? onPlay() : openStrategy(session.strategyIndex + 1)} onWalk={openWalk} />
@@ -102,18 +107,19 @@ export function LearningPage({ onPractice, catalogVisit, session, onChange, onPl
     {session.page === 'walkthrough' && <WalkthroughPage run={session.walk} onChange={(walk) => onChange({ ...session, walk })} onPractice={() => openIndependent(0)} />}
     {session.page === 'independent' && <><IndependentPage run={session.independentRuns[session.independentIndex]} index={session.independentIndex} allDone={allIndependentDone} onChange={(run) => onChange({ ...session, independentRuns: session.independentRuns.map((old, index) => index === session.independentIndex ? run : old) })} onNext={() => allIndependentDone ? onPlay() : openIndependent(session.independentIndex < 5 ? session.independentIndex + 1 : session.independentRuns.findIndex((_, index) => !independentDone(index)))} /><div className="independent-index" aria-label="独立练习题目">{session.independentRuns.map((run, index) => <button key={run.scene.id} className="button button--ghost" aria-pressed={index === session.independentIndex} onClick={() => openIndependent(index)}>第 {index + 1} 题{completed[`independent/${run.scene.id}`] ? ` · ${COMPLETION_LABELS[completed[`independent/${run.scene.id}`]]}` : run.stage === 'done' ? run.help > 0 ? ' · 用过提示' : ' · 已完成' : ''}</button>)}</div></>}
     {session.page === 'survival' && <><SurvivalPage run={session.runs[session.sceneIndex]} onChange={(run) => onChange({ ...session, runs: session.runs.map((r, i) => i === session.sceneIndex ? run : r) })} onRuleSequence={openSequence}
-        nextLabel={survivalLast ? '下一章 · 吃掉对方的棋 →' : survivalNextLabel(session.sceneIndex)}
-        isLast={survivalLast} onNextChapter={survivalLast ? () => openCapture(0) : undefined}
-        onNext={() => survivalLast ? onPlay() : openScene(session.sceneIndex + 1)} />
+        nextLabel={nextSurvival < 0 ? '下一章 · 吃掉对方的棋 →' : `下一课 · ${SURVIVAL_SCENES[nextSurvival].title} →`}
+        onNext={advanceSurvival}
+        onTry={survival.guided ? () => openScene(session.sceneIndex + 1) : undefined}
+        onPlay={survivalLast ? onPlay : undefined} />
       <div className="learning-toolbar learning-toolbar--quiet archive-note">
         {session.sceneIndex > 0 && <button className="text-button" onClick={() => openScene(session.sceneIndex - 1)}>回看上一题</button>}
-        <button className="text-button" onClick={() => survivalLast ? onPlay() : openScene(session.sceneIndex + 1)}>先跳过这一题</button>
+        <button className="text-button" onClick={advanceSurvival}>先跳过这一题</button>
       </div></>}
     {session.page === 'capture' && <CapturePage key={capture.scene.id} run={capture}
       onChange={(run) => onChange({ ...session, captureRuns: session.captureRuns.map((old, index) => index === session.captureIndex ? run : old) })}
-      nextLabel={nextCapture ? (capture.scene.guided ? '换个局面，自己试试 →' : `下一课 · ${nextCapture.title} →`) : '学习围地与终局 →'}
-      onNext={() => nextCapture ? openCapture(session.captureIndex + 1) : openEndgame(0)}
-      onPlay={nextCapture ? undefined : onPlay} />}
-    {recorded && <p className="completion-note learning-recorded" aria-label="已记录的学习结果">已有记录：{COMPLETION_LABELS[recorded]}。可以再练一次；保留最好的一次记录。</p>}
+      nextLabel={nextCapture < 0 ? '下一章 · 围地与终局 →' : `下一课 · ${CAPTURE_SCENES[nextCapture].title} →`}
+      onNext={() => nextCapture < 0 ? openEndgame(0) : openCapture(nextCapture)}
+      onTry={capture.scene.guided ? () => openCapture(session.captureIndex + 1) : undefined}
+      onPlay={!capture.scene.guided && nextCapture < 0 ? onPlay : undefined} />}
   </>
 }

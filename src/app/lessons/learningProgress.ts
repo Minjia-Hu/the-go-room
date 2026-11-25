@@ -35,6 +35,7 @@ export const LEARNING_UNITS: readonly LearningUnit[] = [
   { id: 'walkthrough/full-game', page: 'walkthrough', index: 0, title: '一盘九路，从头到尾' },
   ...INDEPENDENT_SCENES.map((scene, index) => ({ id: `independent/${scene.id}`, page: 'independent' as const, index, title: `独立练习 · 第 ${index + 1} 题` })),
 ]
+export const COURSE_PROGRESS_UNITS = LEARNING_UNITS.filter(unit => unit.page !== 'rule-sequence')
 const PRACTICE_IDS = [...PRACTICE_DANGER_SCENES, ...PRACTICE_RESCUE_SCENES, ...PRIORITY_SCENES, ...LADDER_DEFENSE_SCENES].map((scene) => `practice/${scene.id}`)
 
 export interface LearningProgress {
@@ -79,10 +80,20 @@ export function recordLearningProgress(progress: LearningProgress, session: Lear
 /** 未完成则回到该题；已完成则从后面寻找下一道未完成题，全部完成后回看最近一课。 */
 export function continueLearningUnit(progress: LearningProgress): LearningUnit | undefined {
   const last = LEARNING_UNITS.findIndex((unit) => unit.id === progress.lastVisited)
-  if (last < 0) return LEARNING_UNITS.some((unit) => progress.completed[unit.id]) ? LEARNING_UNITS.find((unit) => !progress.completed[unit.id]) : undefined
+  if (last < 0) return LEARNING_UNITS.some((unit) => progress.completed[unit.id]) ? COURSE_PROGRESS_UNITS.find((unit) => !progress.completed[unit.id]) : undefined
   if (!progress.completed[LEARNING_UNITS[last].id]) return LEARNING_UNITS[last]
   const ordered = [...LEARNING_UNITS.slice(last + 1), ...LEARNING_UNITS.slice(0, last)]
-  return ordered.find((unit) => !progress.completed[unit.id]) ?? LEARNING_UNITS[last]
+  const readingComparison = LEARNING_UNITS[last].page === 'rule-sequence'
+  if (readingComparison) {
+    const other = ordered.find(unit => unit.page === 'rule-sequence' && !progress.completed[unit.id])
+    if (other) return other
+  }
+  const remaining = ordered.filter(unit => unit.page !== 'rule-sequence' && !progress.completed[unit.id])
+  return remaining.find(unit => {
+    if (unit.page === 'survival') return SURVIVAL_SCENES[unit.index].guided
+    if (unit.page === 'capture') return CAPTURE_SCENES[unit.index].guided
+    return true
+  }) ?? remaining[0] ?? LEARNING_UNITS[last]
 }
 
 function object(value: unknown): value is Record<string, unknown> { return typeof value === 'object' && value !== null && !Array.isArray(value) }

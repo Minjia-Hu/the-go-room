@@ -39,12 +39,16 @@ function numbered(page: 'endgame' | 'strategy'): Group[] {
 }
 
 export const COURSE_VOLUMES: readonly CourseVolume[] = [
-  { number: '壹', title: '认识规则', count: '五关 · 两镜头', groups: [
-    ...units('rules').map(unit => ({ entries: [{ unit, title: unit.title }] })),
-    { entries: units('rule-sequence').map(unit => ({ unit, title: unit.title, tag: '慢镜头' })) },
-  ] },
-  { number: '贰', title: '保住自己的棋', count: '四课 · 八局', groups: paired('survival') },
-  { number: '叁', title: '吃掉对方的棋', count: '五课 · 十局', groups: paired('capture') },
+  { number: '壹', title: '认识规则', count: '五课', groups: units('rules').map(unit => ({
+    entries: [
+      { unit, title: `${unit.index + 1}. ${unit.title}` },
+      ...(unit.id === 'rules/suicide' ? units('rule-sequence').map(scene => ({
+        unit: scene, title: scene.title, tag: '慢镜头' as const,
+      })) : []),
+    ],
+  })) },
+  { number: '贰', title: '保住自己的棋', count: '四课', groups: paired('survival') },
+  { number: '叁', title: '吃掉对方的棋', count: '五课', groups: paired('capture') },
   { number: '肆', title: '围地与终局', count: '四课', groups: numbered('endgame') },
   { number: '伍', title: '九路策略入门', count: '三课', groups: numbered('strategy') },
   { number: '陆', title: '从看懂到自己下', count: '一盘 · 六题', groups: [
@@ -55,4 +59,11 @@ export const COURSE_VOLUMES: readonly CourseVolume[] = [
 
 export function volumeFor(unit: LearningUnit) {
   return COURSE_VOLUMES.find(volume => volume.groups.some(group => group.entries.some(entry => entry.unit.id === unit.id)))!
+}
+
+/** 课内目录保留配套题；首页按课展示，并按同一组条目统计进度。 */
+export function homeVolume(volume: CourseVolume): CourseVolume {
+  return { ...volume, groups: volume.groups.map(group => ({
+    ...group, entries: group.entries.filter(entry => entry.tag !== '练习' && entry.tag !== '慢镜头'),
+  })) }
 }

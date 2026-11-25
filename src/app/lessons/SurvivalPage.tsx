@@ -1,4 +1,6 @@
-import { awaitingConfirm, survivalSteps } from './survivalSteps'
+import { LessonTitle } from './LessonTitle'
+import { LessonNextActions, type LessonNextProps } from './LessonNextActions'
+import { survivalSteps } from './survivalSteps'
 import { GuidedDangerPage } from './GuidedDangerPage'
 import { LessonFeedback } from './LessonFeedback'
 import { Board } from '../board/Board'
@@ -7,15 +9,20 @@ import { BoardLayout } from '../board/BoardLayout'
 import type { BoardMark } from '../board/marks'
 import { analyzeAction, analyzePosition } from '../coaching/analysis'
 import { groupMarks } from '../coaching/explanations'
-import { choosePracticePoint, chooseReason, confirmPractice, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
+import { choosePracticePoint, chooseReason, practiceBoard, practiceHint, startSurvival } from './survivalRunner'
 import type { SurvivalRun } from './survivalRunner'
 
 import type { PracticeLabels } from './practiceCatalog'
 
-interface Props { readonly practice?: PracticeLabels; readonly nextLabel?: string; readonly run: SurvivalRun; readonly onChange: (run: SurvivalRun) => void; readonly onNext: () => void; readonly isLast: boolean; readonly onRuleSequence?: () => void; readonly onNextChapter?: () => void }
-export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, onNextChapter, nextLabel, practice }: Props) {
+interface Props extends LessonNextProps {
+  readonly practice?: PracticeLabels
+  readonly run: SurvivalRun
+  readonly onChange: (run: SurvivalRun) => void
+  readonly onRuleSequence?: () => void
+}
+export function SurvivalPage({ run, onChange, onRuleSequence, practice, ...next }: Props) {
   const { scene } = run
-  if (scene.id === 'danger-guided') return <GuidedDangerPage run={run} onChange={onChange} onNext={onNext} />
+  if (scene.id === 'danger-guided') return <GuidedDangerPage run={run} onChange={onChange} {...next} />
   const shown = practiceBoard(run)
   const reveal = run.hint >= 2 || run.stage === 'done' || run.stage === 'liberty' || run.stage === 'reason' || run.preview?.ok
   const target = analyzePosition(shown).find((g) => g.stones.some((p) => p.x === scene.target.x && p.y === scene.target.y))
@@ -39,11 +46,15 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
       feedback={run.message && <LessonFeedback message={run.message} />}
       heading={<>
         <p className="eyebrow">{practice?.eyebrow ?? `第 ${scene.course} 课 · ${scene.guided ? '一起练习' : '自己试试'}`}</p>
-        <h2>{scene.title}</h2>
+        <LessonTitle title={scene.title} />
         <div className="step-task">
-          <p className="step-label">{step.done ? step.label : `第 ${step.current} 步 / 共 ${step.total} 步 · ${step.label}`}</p>
+          <p className="step-label">{step.done || step.total === 1 ? step.label : `第 ${step.current} 步 / 共 ${step.total} 步 · ${step.label}`}</p>
           {step.progress && <p className="step-progress">{step.progress}</p>}
           {step.task && <p className="turn">{step.task}</p>}
+          {run.stage === 'reason' && <div className="reason-choices">
+            <button className="button button--ghost" onClick={() => onChange(chooseReason(run, false))}>因为黑棋比白棋多</button>
+            <button className="button button--ghost" onClick={() => onChange(chooseReason(run, true))}>白棋一次只能填一个，另一个还在</button>
+          </div>}
         </div>
       </>}
       board={<>
@@ -51,12 +62,11 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
       <Board board={shown.board} marks={marks} lastMove={last?.kind === 'play' ? last.point : null}
         disabled={run.view === 'reply' || run.view.startsWith('contrast') || run.stage === 'done' || run.stage === 'reason'}
         ghostColor={run.stage === 'move' ? 'black' : null} onPointClick={(p) => onChange(choosePracticePoint(run, p))} />
-      <p className="board-caption">{run.view === 'reply' ? '演示：白棋可能这样应对' : run.view === 'contrast-before' ? '对照：这块棋只剩一个眼，没有外气' : run.view === 'contrast' ? '对照：白棋填最后一气，黑棋被提走' : run.preview?.ok && run.view === 'after' ? '试下中 · 从题目起点观察后果' : scene.kind === 'eyes' ? '这一步暂时替白棋试下' : '9 路练习 · 你执黑'}</p>
+      <p className="board-caption">{run.view === 'reply' ? '演示：白棋可能这样应对' : run.view === 'contrast-before' ? '对照：这块棋只剩一个眼，没有外气' : run.view === 'contrast' ? '对照：白棋填最后一气，黑棋被提走' : run.preview?.ok && run.view === 'after' ? '落子后' : scene.kind === 'eyes' ? '这一步暂时替白棋试下' : '9 路练习 · 你执黑'}</p>
     </>}
       primary={<>
-        {!run.message && !run.preview && !done && <p className="step-intro">{scene.intro}</p>}
+        {!scene.guided && !run.message && !run.preview && !done && run.stage !== 'reason' && <p className="step-intro">{scene.intro}</p>}
         {run.preview && <>{(!run.message || run.view === 'reply') && <p className="board-brief">{run.view === 'reply' ? '演示：白棋能占住最后一气，提走危险黑棋。' : briefExplanation(run.preview)}</p>}{run.preview.ok && <>
-          {awaitingConfirm(run) && run.view !== 'reply' && <div className="actions"><button className="button" onClick={() => onChange(confirmPractice(run))}>确认这一步</button></div>}
           <div className="actions">
           <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'before' })}>下之前</button>
           <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'after' })}>下之后</button>
@@ -64,14 +74,8 @@ export function SurvivalPage({ run, onChange, onNext, isLast, onRuleSequence, on
           {run.stage === 'move' && <button className="text-button" onClick={() => onChange({ ...run, preview: null, view: 'before', message: null })}>重新选点</button>}
           </div>
         </>}</>}
-        {run.stage === 'reason' && <div className="reason-choices">
-          <button className="button button--ghost" onClick={() => onChange(chooseReason(run, false))}>因为黑棋比白棋多</button>
-          <button className="button button--ghost" onClick={() => onChange(chooseReason(run, true))}>白棋一次只能填一个，另一个还在</button>
-        </div>}
         {!done && run.hint < 3 && <button className="text-button hint-button" onClick={() => onChange(practiceHint(run))}>{['提醒我看哪里', '标出相关棋块和气', '演示一种做法'][run.hint]}</button>}
-        {done && <div className="actions next-lesson">{isLast && onNextChapter && nextLabel !== undefined
-          ? <><button className="button" onClick={onNextChapter}>{nextLabel}</button><button className="button button--ghost" onClick={onNext}>开始我的陪练</button></>
-          : <button className="button" onClick={onNext}>{nextLabel ?? (isLast ? '开始我的陪练' : scene.guided ? '换个局面，自己试试 →' : '下一课 →')}</button>}</div>}
+        {done && <LessonNextActions {...next} />}
         {(dangerCompare || eyesCompare) && <details className="step-compare" key={run.stage}><summary>看看对照</summary>
           {dangerCompare && <div className="actions"><button className="button button--ghost" onClick={() => demo('ignore')}>如果去远处下</button><button className="button button--ghost" onClick={() => demo('escape')}>如果接向空处</button></div>}
           {eyesCompare && <div className="actions">
