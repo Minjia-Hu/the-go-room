@@ -9,6 +9,10 @@ export interface CaptureScene {
   readonly targets: readonly Point[]
   readonly solution: readonly Point[]
   readonly wrongFirst: Point
+  readonly wrongFollowUp?: readonly Point[]
+  readonly wrongLabel?: string
+  readonly connection?: Point
+  readonly takeaway?: string
   readonly maxMoves: number
   readonly contrastRows?: readonly string[]
   readonly task: string
@@ -74,5 +78,43 @@ export const CAPTURE_SCENES: readonly CaptureScene[] = [
     task: "先看路线，再一路叫吃提掉白棋。",
     intro: "阶梯换了方向。先看白棋逃跑的路线，确认那里没有接应。",
     hints: ["想想你希望白棋向哪个方向逃。", "标出目标白棋整块和当前的气。", "看黑棋怎样沿斜线追到底边。"],
+  },
+  {
+    id: "net-guided", lesson: 4, title: "先封住出路", guided: true,
+    rows: [".........", ".........", "...X.....", "..XO.X...", ".O.......", "...XO....", ".........", ".........", "........."],
+    targets: [point("D4")], solution: [point("E5"), point("E3"), point("D5")], maxMoves: 3,
+    wrongFirst: point("E4"), wrongFollowUp: [point("C5")], wrongLabel: "如果贴着白棋追",
+    task: "围住中间那颗白棋，再把它提走。",
+    intro: "这颗白棋可以往右伸，也可以往下伸。先找一个能同时封住两条出路的位置。",
+    hints: ["看两个出口斜对着的那个空点。", "看圈出的白棋和它还能走的两个点。", "先封在外围，再堵住白棋伸出后的出口。"],
+    takeaway: "第一手落在白棋斜前方。白棋当时还有两口气，往哪边伸却都冲不出去。这就是枷吃。",
+  },
+  {
+    id: "net-check", lesson: 4, title: "换个方向封住白棋", guided: false,
+    rows: [".........", ".........", ".........", "....OX...", ".........", "...X.OX..", ".....X...", ".........", "........."],
+    targets: [point("F6")], solution: [point("E5"), point("G5"), point("E6")], maxMoves: 3,
+    wrongFirst: point("E6"), wrongFollowUp: [point("G5")],
+    task: "围住右下方的白棋，把它提走。",
+    intro: "留意左上方的白子。被追的白棋朝哪边走能得到接应？",
+    hints: ["先看目标通往另一颗白子的路线。", "找出两口气之间的斜角。", "看黑棋怎样抢先封住出口，再收紧包围。"],
+  },
+  {
+    id: "connection-guided", lesson: 5, title: "为什么接不回去", guided: true,
+    rows: ["..XO.O...", "....XX...", ".........", ".........", ".........", ".........", ".........", ".........", "........."],
+    targets: [point("D1")], solution: [point("D2"), point("E1")], maxMoves: 2,
+    wrongFirst: point("G1"), wrongLabel: "如果先堵右边", connection: point("E1"),
+    task: "叫吃上边靠左的白子，把它留在边上。",
+    intro: "两颗白子之间空了一点。让左边这颗只剩往同伴那边接的一口气。",
+    hints: ["先堵住左边白子通向棋盘中央的那口气。", "圈出的是要吃的白子。", "看黑棋怎样把白子逼向同伴。"],
+    takeaway: "白棋硬接，两边就只剩同一口气，黑棋能把它们一起提走。这种接了也救不回来的棋形叫接不归。",
+  },
+  {
+    id: "connection-check", lesson: 5, title: "边上的白棋能接回去吗", guided: false,
+    rows: [".........", "........X", "........O", ".......X.", ".......XO", ".......XO", ".........", ".........", "........."],
+    targets: [point("I3")], solution: [point("H3"), point("I4")], maxMoves: 2,
+    wrongFirst: point("I7"), connection: point("I4"),
+    task: "吃掉右边靠上的那颗白子。",
+    intro: "下面有两颗相连的白子。算一算，三颗白棋接上以后会有几口气？",
+    hints: ["先堵住目标白子通向中央的路。", "沿右边线找出白棋想接上的空点。", "看黑棋堵住出口，再提走留在边线上的白子。"],
   },
 ]

@@ -116,10 +116,24 @@ export type CaptureReplayKind = 'solution' | 'wrong' | 'contrast'
 export function captureReplay(scene: CaptureScene, kind: CaptureReplayKind) {
   const rows = kind === 'contrast' ? scene.contrastRows : scene.rows
   if (!rows) throw new Error(`缺少征子对照：${scene.id}`)
-  const moves = kind === 'wrong' ? [scene.wrongFirst] : scene.solution
+  const moves = kind === 'wrong' ? [scene.wrongFirst, ...(scene.wrongFollowUp ?? [])] : scene.solution
   const run = moves.reduce(capturePoint, startCapture(scene, rows))
   const frames = [run.origin, ...run.rounds.flatMap((round) => round.white ? [round.black, round.white] : [round.black])]
   return { run, frames }
+}
+
+/** 白棋主动接回去的对照，与正常解题的白棋策略和记录分开。 */
+export function connectionFrames(scene: CaptureScene): readonly GameState[] {
+  const origin = startCapture(scene).game
+  const attack = play(origin, scene.solution[0])
+  if (!attack.ok || !scene.connection) throw new Error(`缺少硬接局面：${scene.id}`)
+  const connect = play(attack.state, scene.connection)
+  if (!connect.ok) throw new Error(`白棋不能硬接：${scene.id}`)
+  const group = getGroup(connect.state.board, scene.targets[0])
+  if (group?.liberties.length !== 1) throw new Error(`硬接后应只剩一口气：${scene.id}`)
+  const capture = play(connect.state, group.liberties[0])
+  if (!capture.ok) throw new Error(`黑棋不能提走硬接的白棋：${scene.id}`)
+  return [attack.state, connect.state, capture.state]
 }
 
 export function captureHint(run: CaptureRun): CaptureRun {

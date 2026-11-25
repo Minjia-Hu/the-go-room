@@ -6,6 +6,7 @@ import { PRACTICE_GROUP_NUMBERS, PRACTICE_GROUPS, PRACTICE_ITEMS, nextPracticeIt
 import type { PracticeItem } from './practiceCatalog'
 import { LadderDefensePage } from './LadderDefensePage'
 import { PriorityPage } from './PriorityPage'
+import { CapturePage } from './CapturePage'
 import { SurvivalPage } from './SurvivalPage'
 import { IndependentPage } from './IndependentPage'
 import { PracticeItemButton } from './PracticeItemButton'
@@ -60,6 +61,9 @@ export function PracticePage({ active, onOpen, session, onChange, onLesson, onPl
       {active.source === 'survival' || active.source === 'danger'
         ? <SurvivalPage run={(active.source === 'survival' ? session.runs : session.practiceDangerRuns)[active.index]} practice={practiceLabels(active)} isLast={false} nextLabel={nextLabel} onNext={onNext}
             onChange={(run) => { const key = active.source === 'survival' ? 'runs' : 'practiceDangerRuns'; onChange({ ...session, [key]: session[key].map((old, index) => index === active.index ? run : old) }) }} />
+        : active.source === 'capture'
+          ? <CapturePage key={active.id} run={session.captureRuns[active.index]} practice={practiceLabels(active)} nextLabel={nextLabel} onNext={onNext}
+              onChange={(run) => onChange({ ...session, captureRuns: session.captureRuns.map((old, index) => index === active.index ? run : old) })} />
         : active.source === 'ladder-defense'
           ? <LadderDefensePage run={session.ladderDefenseRuns[active.index]} nextLabel={nextLabel} onNext={onNext}
               onChange={(run) => onChange({ ...session, ladderDefenseRuns: session.ladderDefenseRuns.map((old, index) => index === active.index ? run : old) })} />

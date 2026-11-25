@@ -50,7 +50,7 @@ describe('学习进度跨刷新', () => {
     expect(view.container.querySelectorAll('[data-mark="selected"]')).toHaveLength(0)
     expect(view.container.querySelectorAll('.progress__step--done')).toHaveLength(1)
     openCatalog()
-    expect(screen.getByRole('heading', { name: '已完成 1 / 35 个课程与练习' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '已完成 1 / 39 个课程与练习' })).toBeTruthy()
     expect(screen.getByRole('button', { name: '第 1 关:落子' }).getAttribute('aria-description')).toBe('跟着引导完成')
     click('继续学习')
     expect(screen.getByRole('heading', { name: '第 2 关:气' })).toBeTruthy()
@@ -88,7 +88,7 @@ describe('学习进度跨刷新', () => {
     }
     expect(screen.getByRole('button', { name: '去陪练试试' })).toBeTruthy()
     openCatalog()
-    expect(screen.getByRole('heading', { name: '已完成 6 / 35 个课程与练习' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '已完成 6 / 39 个课程与练习' })).toBeTruthy()
     // 回到首页时展开的是下一课所在的卷，这里手动展开第陆卷查看记录。
     chapter('从看懂到自己下')
     for (let n = 1; n <= 6; n++) {
@@ -118,7 +118,7 @@ describe('清除与存储降级', () => {
     expect(window.localStorage.getItem(COACHING_KEY)).toBe(preference)
     click('对局'); expect(screen.getByText('已下 2 手')).toBeTruthy()
     click('教学'); view.unmount(); render(<App />)
-    expect(screen.getByRole('heading', { name: '已完成 0 / 35 个课程与练习' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '已完成 0 / 39 个课程与练习' })).toBeTruthy()
   })
   it('损坏或未来版本不在初始化时覆盖，提示后仍可以继续学习', () => {
     for (const raw of ['{bad', JSON.stringify({ version: 99, completed: {}, lastVisited: null })]) {
@@ -138,7 +138,7 @@ describe('清除与存储降级', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota') })
     const view = render(<App />)
     openCatalog(); click('清除学习记录'); click('确认清除学习记录')
-    expect(screen.getByRole('heading', { name: '已完成 0 / 35 个课程与练习' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: '已完成 0 / 39 个课程与练习' })).toBeTruthy()
     expect(screen.getByRole('alert').textContent).toContain('恢复旧记录')
     click('从第一课开始'); point(4, 4)
     expect(screen.getByRole('button', { name: '下一关' })).toBeTruthy()
@@ -186,9 +186,16 @@ it('完成生存末题可进入吃子卷并续读，吃子末题去终局或陪�
   openCatalog(); chapter('吃掉对方的棋'); click('练习 换个方向征白棋')
   for (const move of CAPTURE_SCENES[5].solution) point(move.x, move.y)
   expect(stored().completed['capture/ladder-check']).toBe('independent')
+  click('下一课 · 先封住出路 →')
+  for (const scene of CAPTURE_SCENES.slice(6)) {
+    expect(screen.getByRole('heading', { name: scene.title })).toBeTruthy()
+    for (const move of scene.solution) point(move.x, move.y)
+    if (scene.guided) click('换个局面，自己试试 →')
+    else if (scene.lesson === 4) click('下一课 · 为什么接不回去 →')
+  }
   click('学习围地与终局 →')
   expect(screen.getByRole('heading', { name: '围住的空点属于谁' })).toBeTruthy()
-  openCatalog(); chapter('吃掉对方的棋'); click('练习 换个方向征白棋')
+  openCatalog(); chapter('吃掉对方的棋'); click('练习 边上的白棋能接回去吗')
   click('开始我的陪练')
   expect(screen.getByRole('heading', { name: '对局' })).toBeTruthy()
 })

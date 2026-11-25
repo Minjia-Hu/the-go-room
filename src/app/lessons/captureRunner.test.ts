@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { createGame, getCell, getGroup, parseBoard, play } from '../../engine'
 import type { Point } from '../../engine'
 import { CAPTURE_SCENES } from '../../content/capture'
-import { captureCompletion, captureHint, capturePoint, captureReply, captureReplay, startCapture, undoCapture } from './captureRunner'
+import { captureCompletion, captureHint, capturePoint, captureReply, captureReplay, connectionFrames, startCapture, undoCapture } from './captureRunner'
 
 const point = (name: string): Point => ({ x: name.charCodeAt(0) - 65, y: Number(name[1]) - 1 })
 const chase = (rows: readonly string[], white: boolean) => createGame({ board: parseBoard(rows), toPlay: white ? 'white' : 'black' })
@@ -46,7 +46,7 @@ describe('白棋应对', () => {
   })
 })
 
-describe('六道追吃棋形', () => {
+describe('追吃棋形', () => {
   it.each([
     ['direction-guided', '提掉了这颗白棋。'],
     ['ladder-check', '提掉了 9 颗白棋。'],
@@ -54,22 +54,23 @@ describe('六道追吃棋形', () => {
     const scene = CAPTURE_SCENES.find((item) => item.id === id)!
     expect(scene.solution.reduce(capturePoint, startCapture(scene)).message).toBe(message)
   })
-  it.each(CAPTURE_SCENES)('$id 正解在限手内得子，错手在白棋第一回合逃出', (scene) => {
+  it.each(CAPTURE_SCENES)('$id 正解在限手内得子，错手让白棋逃出', (scene) => {
     const start = startCapture(scene)
     const groups = scene.targets.map((target) => getGroup(start.game.board, target))
     expect(groups.every((g) => g?.color === 'white' && g.liberties.length === 2)).toBe(true)
     const call = play(start.game, scene.solution[0])
     if (!call.ok) throw new Error(call.reason)
-    for (const target of scene.targets) expect(getGroup(call.state.board, target)?.liberties).toHaveLength(1)
+    for (const target of scene.targets) expect(getGroup(call.state.board, target)?.liberties).toHaveLength(scene.wrongFollowUp ? 2 : 1)
     const run = scene.solution.reduce(capturePoint, start)
     expect(run.stage).toBe('done')
     expect(run.moves).toBeLessThanOrEqual(scene.maxMoves)
     expect(scene.targets.some((target) => getCell(run.game.board, target) === null)).toBe(true)
 
-    const wrong = capturePoint(start, scene.wrongFirst)
-    expect(wrong).toMatchObject({ stage: 'failed', failure: 'escape', moves: 1, mistakes: 1 })
-    expect(wrong.game.history).toHaveLength(2)
-    expect(captureReplay(scene, 'wrong').frames).toHaveLength(3)
+    const wrong = captureReplay(scene, 'wrong')
+    const wrongMoves = 1 + (scene.wrongFollowUp?.length ?? 0)
+    expect(wrong.run).toMatchObject({ stage: 'failed', failure: 'escape', moves: wrongMoves, mistakes: 1 })
+    expect(wrong.run.game.history).toHaveLength(wrongMoves * 2)
+    expect(wrong.frames).toHaveLength(wrongMoves * 2 + 1)
     if (scene.targets.length === 2) {
       const first = capturePoint(start, scene.solution[0])
       expect(first.stage).toBe('active')
@@ -134,4 +135,17 @@ describe('追吃回合', () => {
     expect(demo).toMatchObject({ stage: 'done', hint: 3, assisted: true })
     expect(captureCompletion(demo)).toBe('demo')
   })
+})
+
+it.each([['connection-guided', 3], ['connection-check', 4]] as const)('%s 硬接合法，整块只剩一气，下一手一起被提', (id, count) => {
+  const scene = CAPTURE_SCENES.find(scene => scene.id === id)!
+  const [attack, connect, captured] = connectionFrames(scene)
+  expect(captureReply(attack, scene.targets)).toBeNull()
+  expect(getGroup(attack.board, scene.targets[0])!.stones).toHaveLength(1)
+  const group = getGroup(connect.board, scene.connection!)!
+  expect(group.stones).toHaveLength(count)
+  expect(group.stones).toContainEqual(scene.targets[0])
+  expect(group.liberties).toHaveLength(1)
+  for (const stone of group.stones) expect(getCell(captured.board, stone)).toBeNull()
+  expect(captured.history.at(-1)).toMatchObject({ kind: 'play', color: 'black', point: group.liberties[0], captured: expect.arrayContaining([...group.stones]) })
 })
