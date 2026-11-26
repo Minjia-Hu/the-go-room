@@ -41,11 +41,13 @@ export function HeroExercise({ onStart, onSurvival }: Props) {
         <button className="text-button" onClick={feedback.next[1]}>{feedback.next[0]} →</button>
       </> : <>
         <p className="ink-hero__lede">棋子靠身边的空点呼吸。<br />看见它还剩几口气，<br />你就看懂了围棋的第一课。</p>
-        <p className="ink-hero__try">现在就试：点棋盘上的 <b>A</b> 或 <b>B</b>，救中间那颗黑棋。</p>
-        {run.hint && <p className="ink-note">提示：数一数带圈黑棋旁边还空着的交叉点。气只算上下左右紧挨着的空点。</p>}
+        <p className="ink-hero__try">点棋盘上的 <b>A</b> 或 <b>B</b>，试着救它。</p>
         {run.notice && <p className="ink-note">{run.notice}</p>}
-        <div className="actions"><button className="button button--ghost" onClick={() => setRun({ ...run, hint: !run.hint })}>{run.hint ? '收起提示' : '给我一点提示'}</button></div>
-        <button className="text-button" onClick={onStart}>从第一课开始</button>
+        {run.hint && <p className="ink-note">提示：数一数带圈黑棋旁边还空着的交叉点。气只算上下左右紧挨着的空点。</p>}
+        <div className="actions">
+          <button type="button" className="text-button" aria-expanded={run.hint} onClick={() => setRun({ ...run, hint: !run.hint })}>{run.hint ? '收起提示' : '给点提示'}</button>
+          <button className="text-button" onClick={onStart}>从第一课开始</button>
+        </div>
       </>}
     </div>
   </>

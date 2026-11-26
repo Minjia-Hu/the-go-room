@@ -25,7 +25,7 @@ describe('首页：一子一气与卷目', () => {
     expect(screen.getByText('下之前：只有一口气')).toBeTruthy()
     expect(stones(container)).toBe(4)
     click('再练一次')
-    expect(screen.getByText(/现在就试/)).toBeTruthy()
+    expect(container.querySelector('.ink-hero__try')?.textContent).toBe('点棋盘上的 A 或 B，试着救它。')
   })
 
   it('下在 B 还是一口气；看白棋应对后整块被提走，可以换到 A', () => {
@@ -45,8 +45,11 @@ describe('首页：一子一气与卷目', () => {
     click('交叉点 0,0')
     expect(screen.getByText(/先比较 A 和 B/)).toBeTruthy()
     expect(stones(container)).toBe(4)
-    click('给我一点提示')
+    click('给点提示')
+    expect(screen.getByText(/先比较 A 和 B/).nextElementSibling).toBe(screen.getByText(/数一数带圈黑棋/))
     expect(container.querySelectorAll('[data-mark="liberty"]')).toHaveLength(1)
+    click('收起提示')
+    expect(container.querySelectorAll('[data-mark="liberty"]')).toHaveLength(0)
   })
 
   it('卷目一次展开一卷：默认第壹卷，点书脊换到另一卷', () => {
