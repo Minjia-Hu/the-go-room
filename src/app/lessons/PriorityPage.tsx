@@ -16,9 +16,9 @@ export function PriorityPage({ run, onChange, onNext, nextLabel }: Props) {
       {run.stage === 'choose' && <div className="actions priority-options">{run.scene.choices.map((choice, index) => <button key={choice.label} className="button button--ghost" aria-pressed={run.selected === index} onClick={() => onChange(choosePriority(run, index))}>{String.fromCharCode(65 + index)} · {choice.label}</button>)}
       </div>}
       {run.selected !== null && <div className="actions">
-        <button className="text-button" onClick={() => onChange({ ...run, view: 'before' })}>看原图</button>
-        <button className="text-button" onClick={() => onChange({ ...run, view: 'after' })}>看黑棋这一手</button>
-        {run.view === 'reply' || run.stage !== 'choose' || run.mistakes > 0 ? <button className="text-button" onClick={() => onChange({ ...run, view: 'reply' })}>看白棋回应</button> : null}
+        {run.view !== 'before' && <button className="text-button" onClick={() => onChange({ ...run, view: 'before' })}>看原图</button>}
+        {run.view !== 'after' && <button className="text-button" onClick={() => onChange({ ...run, view: 'after' })}>看黑棋这一手</button>}
+        {run.view !== 'reply' && (run.stage !== 'choose' || run.mistakes > 0) && <button className="text-button" onClick={() => onChange({ ...run, view: 'reply' })}>看白棋回应</button>}
       </div>}
       {run.stage === 'reason' && <div className="reason-choices">{run.scene.reasons.map((reason, index) => <button key={reason} className="button button--ghost" onClick={() => onChange(answerPriority(run, index))}>{reason}</button>)}</div>}
       {run.stage === 'done' && <button className="button" onClick={onNext}>{nextLabel}</button>}
