@@ -4,15 +4,15 @@
 
 > Before trying to win, understand each move.
 
-A browser-based introduction to Go (Weiqi / Baduk) for complete beginners. Place stones, explore what happens, and learn why a move works before playing your first full game.
+Learn Go (Weiqi / Baduk) by playing on a 9×9 board. The black stone on the home page has just one liberty. Try A or B to save it, then see how White can respond.
 
-**The interface and lessons are currently in Simplified Chinese.** This English README introduces the project; it does not indicate English-language support in the app.
+**The interface and lessons are in Simplified Chinese.**
 
 **[Try it online (Chinese) →](https://minjia-hu.github.io/the-go-room/)**
 
 Interactive lessons, practice problems, a simple computer opponent, and game review all run locally in your browser. No account, API key, or paid Go service is required to use the app.
 
-![Current home page: choose A or B to try to save a group](docs/images/home.png)
+![Home page showing a circled black stone surrounded on three sides by White, with A and B marked on the board](docs/images/home.png)
 
 ## Learn · Practice · Play · Review
 
@@ -23,25 +23,23 @@ Interactive lessons, practice problems, a simple computer opponent, and game rev
 | **Play · 弈** | Play 9×9 Go against a simple computer opponent. Coaching is on by default: try a move, inspect its local consequences, then confirm. Retry the most recent round, mark dead stones, and score the game. |
 | **Review · 复** | Keep the ten most recent completed games and replay them move by move, with explanations of rule events such as captures, ko, and the end of the game. |
 
-The learning path has **37 lesson and practice units**. Lesson 4 includes an optional step-by-step comparison of one eye and two eyes. The Practice page contains **26 problems**, including twelve shared with the lessons, eight additional positions, four move-priority problems, and two ladder defense drills. Shared problems use the same completion record. Practicing does not change your place in the learning path.
+The home page puts the course catalog above the practice catalog. Each chapter lists its lessons, with Go terms alongside the titles. For example, the lesson on blocking an escape introduces the net (枷吃). Open the term in the lesson to read its definition. The chapter menu stays open as you switch lessons or select a companion exercise.
 
-Ten interactive capture problems cover the direction of an atari, double atari, ladders, nets, and connections that fail. In the last lesson, play White’s connecting move and see why Black can capture the whole group. Two defense drills let you compare running with and without a supporting stone.
+The six chapters cover **37 lesson and practice units**. The five opening lessons introduce placement, liberties, captures, suicide, and ko. The suicide lesson includes an optional step-by-step comparison of one eye and two eyes. Practice has **26 problems**, including 12 that share completion records with the lessons. Practicing preserves your place in the course.
 
-Move-priority problems ask you to compare choices such as saving a group versus capturing, or extending versus capturing to escape. Try a move, confirm it, see White's reply, then explain the result. Records distinguish independent completion, retries, and help from hints or demonstrations, keeping each problem's best result.
+## Watch a problem unfold
 
-This roughly 40-second recording includes cursor movement, click indicators, and pauses to read each result: try extending → see Black captured → retry by capturing to save the group → explain why.
+In **练 → 先后判断 → 救棋，不一定是往外伸**, Black can extend upward or capture the white stones on the right. After the extension, White can still capture the whole black group. Capturing White first frees up liberties for Black. This 23-second recording shows both lines and the final question about why the capture works.
 
-![Practice walkthrough comparing an unsuccessful extension with a saving capture](docs/images/practice-demo.gif)
+![Practice recording showing White capturing Black after move A, then Black playing B to capture White and gain liberties](docs/images/practice-demo.gif)
 
-[View a still screenshot with the explanation in Chinese](docs/qa/practice-expansion/priority-wrong-desktop.png)
+[Still image showing why the extension fails](docs/images/practice-result.png)
 
 ## Getting started
 
-- **New to Go?** Find **学** (Learn) below the board on the home page. Open **认识规则** (Learn the rules) and choose the first lesson to place a stone.
-- **Want to practice a skill?** Scroll down to **练** (Practice) below the course catalog. Open a group such as **认危险** (Spot danger) or **找出路** (Find an escape), then select a problem.
-- **Ready for a game?** Select **弈** (Play) in the top navigation. Coaching is on by default, so you can try a move before confirming it. After the game, open **复** (Review) to replay it move by move.
-
-Open the [live site](https://minjia-hu.github.io/the-go-room/) to get started without installing anything. To run it locally or contribute, follow the instructions below.
+- **Learn the rules.** Try A or B on the home board, or select **从第一课开始** to start the first lesson on placing a stone.
+- **Practice a skill.** Choose a problem from the lower catalog, or select **练** in the top navigation to browse all problems.
+- **Play a game.** Select **弈**. Coaching lets you try a move before confirming it and seeing the computer’s response. Open **复** after the game to review it.
 
 ## Run locally
 

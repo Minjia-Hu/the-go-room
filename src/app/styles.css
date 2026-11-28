@@ -92,7 +92,6 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .scroll__title { writing-mode: vertical-rl; font-size: 1.55rem; line-height: 1.2; letter-spacing: .18em; }
 .scroll__meta { display: grid; gap: 4px; color: var(--text-muted); font-size: .72rem; line-height: 1.5; }
 .scroll__done { font-family: var(--latin); }
-.scroll__done--full { color: var(--text); }
 .scroll__panel { flex: 1; min-width: 0; padding: 24px 30px 30px; border-left: 1px dashed rgba(28, 26, 23, .2); }
 .scroll__panel--unroll { animation: ink-unroll .55s cubic-bezier(.2, .8, .2, 1) both; }
 .lesson-link { width: 100%; display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 6px 10px 0; border: 0; border-bottom: 1px solid var(--line-soft); background: transparent; color: var(--text); text-align: left; font: 1rem/1.6 var(--serif); cursor: pointer; min-height: 46px; }

@@ -26,7 +26,7 @@ export function SurvivalPage({ run, onChange, onRuleSequence, practice, ...next 
   const shown = practiceBoard(run)
   const reveal = run.hint >= 2 || run.stage === 'done' || run.stage === 'liberty' || run.stage === 'reason' || run.preview?.ok
   const target = analyzePosition(shown).find((g) => g.stones.some((p) => p.x === scene.target.x && p.y === scene.target.y))
-  const marks: BoardMark[] = reveal ? groupMarks(target) : []
+  const marks: BoardMark[] = reveal ? groupMarks(target, run.stage !== 'liberty' || run.hint >= 2) : []
   if (scene.kind === 'eyes' && !run.view.startsWith('contrast') && (reveal || scene.guided)) scene.eyes!.forEach((point, index) => marks.push({ point, kind: 'label', text: index === 0 ? 'A' : 'B' }))
   run.selected.forEach((point) => { if (shown.board.cells[point.y * 9 + point.x] === null) marks.push({ point, kind: 'selected' }) })
   if (run.preview?.ok && run.preview.point && run.view === 'after') marks.push({ point: run.preview.point, kind: 'preview' })
@@ -68,9 +68,9 @@ export function SurvivalPage({ run, onChange, onRuleSequence, practice, ...next 
         {!scene.guided && !run.message && !run.preview && !done && run.stage !== 'reason' && <p className="step-intro">{scene.intro}</p>}
         {run.preview && <>{(!run.message || run.view === 'reply') && <p className="board-brief">{run.view === 'reply' ? '演示：白棋能占住最后一气，提走危险黑棋。' : briefExplanation(run.preview)}</p>}{run.preview.ok && <>
           <div className="actions">
-          <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'before' })}>下之前</button>
-          <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'after' })}>下之后</button>
-          {run.preview.dangers.length > 0 && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'reply' })}>看白棋怎样提</button>}
+          {run.view !== 'before' && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'before' })}>下之前</button>}
+          {run.view !== 'after' && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'after' })}>下之后</button>}
+          {run.view !== 'reply' && run.preview.dangers.length > 0 && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'reply' })}>看白棋怎样提</button>}
           {run.stage === 'move' && <button className="text-button" onClick={() => onChange({ ...run, preview: null, view: 'before', message: null })}>重新选点</button>}
           </div>
         </>}</>}
@@ -79,9 +79,9 @@ export function SurvivalPage({ run, onChange, onRuleSequence, practice, ...next 
         {(dangerCompare || eyesCompare) && <details className="step-compare" key={run.stage}><summary>看看对照</summary>
           {dangerCompare && <div className="actions"><button className="button button--ghost" onClick={() => demo('ignore')}>如果去远处下</button><button className="button button--ghost" onClick={() => demo('escape')}>如果接向空处</button></div>}
           {eyesCompare && <div className="actions">
-            <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'contrast-before' })}>只剩一个眼时</button>
-            <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'contrast' })}>白棋填最后一气</button>
-            <button className="text-button" onClick={() => onChange({ ...run, view: 'before' })}>回到两眼原图</button>
+            {run.view !== 'contrast-before' && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'contrast-before' })}>只剩一个眼时</button>}
+            {run.view !== 'contrast' && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'contrast' })}>白棋填最后一气</button>}
+            {run.view !== 'before' && <button className="text-button" onClick={() => onChange({ ...run, view: 'before' })}>回到两眼原图</button>}
           </div>}
         </details>}
         {done && restart}

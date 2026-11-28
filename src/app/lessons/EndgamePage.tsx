@@ -18,9 +18,9 @@ export function EndgamePage({ run, onChange, onNext, isLast, onStrategy }: Props
   const showTotal = (done && lesson.id !== 'territory') || lesson.id === 'komi'
   const showKomi = (lesson.id === 'komi' && run.step > 0) || (lesson.id === 'ending' && done)
   const numberQuestion = !done && (lesson.id === 'count' || (lesson.id === 'komi' && run.step === 0))
-  const inputLabel = lesson.id === 'count' ? `${countQuestion(run).label}有多少？` : '白方加上贴目后是多少分？'
+  const inputLabel = lesson.id === 'count' ? countQuestion(run).question : '白方加上贴目后是多少分？'
   return <BoardLayout
-      legend={<p className="small">{lesson.id === 'count' && !done ? '棋子上的圈：本次要数的活子 · 空心小圈：本次要数的空点' : lesson.id === 'ending' && !done ? '橙圈：本题死子 · 叉号：已标记移除 · 虚线小圈：演示中被提的位置' : '深色底：黑方归属 · 浅色底：白方归属 · 字母：当前观察的空区'}</p>}
+      legend={<p className="small">{lesson.id === 'count' && !done ? '棋子上的圈：本次要数的活子 · 红点：本次要数的空点' : lesson.id === 'ending' && !done ? '橙圈：本题死子 · 叉号：已标记移除 · 虚线小圈：演示中被提的位置' : '深色底：黑方归属 · 浅色底：白方归属 · 字母：当前观察的空区'}</p>}
       feedback={run.message && <LessonFeedback message={run.message} />}
       heading={<><p className="eyebrow">第 {course} 课 · 共四课</p><LessonTitle title={lesson.title} />
       {lesson.id === 'territory' && !done && <div className="study-question">
@@ -29,7 +29,7 @@ export function EndgamePage({ run, onChange, onNext, isLast, onStrategy }: Props
       </div>}
       {numberQuestion && <form className="study-question" onSubmit={(event) => { event.preventDefault(); onChange(submitCount(run)) }}>
         {lesson.id === 'count' && <p className="eyebrow">分开数 / {run.step + 1} · 4</p>}
-        <p className="small">{lesson.id === 'count' ? '沿每一行数当前标出的交叉点。只数这一类，每个点数一次。' : `白方盘面 ${score.white} 分，再加 ${score.komi} 分。`}</p>
+        <p className="small">{lesson.id === 'count' ? '从上往下一行行数，把总数填在下面。' : `白方盘面 ${score.white} 分，再加 ${score.komi} 分。`}</p>
         <label className="study-input-label" htmlFor="study-number">{inputLabel}</label>
         <div className="study-input-row"><input id="study-number" type="number" inputMode={lesson.id === 'komi' ? 'decimal' : 'numeric'} min="0" step={lesson.id === 'komi' ? '0.5' : '1'} value={run.input} onChange={(event) => onChange({ ...run, input: event.target.value })} /><button className="button" type="submit">核对答案</button></div>
         {lesson.id === 'count' && <button className="text-button hint-button" type="button" onClick={() => onChange(countHint(run))}>帮我数一遍</button>}

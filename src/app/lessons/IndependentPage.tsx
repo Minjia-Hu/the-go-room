@@ -23,9 +23,9 @@ export function IndependentPage({ run, index, onChange, onNext, allDone, nextLab
     </>}
       primary={view.trial?.result.ok && <>{(run.stage === "move" && (!run.message || run.view === "reply")) && <p className="board-brief">{run.view === "reply" ? "白棋填住最后一口气，提走了目标黑棋。回到原图再试。" : `试下后目标有 ${view.trial.group?.liberties.length ?? 0} 口气，提走 ${view.trial.captured} 颗白棋。${view.trial.meetsGoal ? "这手完成了本题目标。" : "这手还没有完成本题目标。"}`}</p>}<div className="actions">
         {run.stage === 'move' && <><button className="button" disabled={run.view !== 'after'} onClick={() => onChange(confirmIndependent(run))}>确认这一手</button><button className="text-button" onClick={() => onChange({ ...run, point: null, view: 'before', message: null })}>回到原图重试</button></>}</div><div className="actions">
-        <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'before' })}>看原图</button>
-        <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'after' })}>看试下结果</button>
-        {view.trial.reply && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'reply' })}>看白棋怎样提</button>}
+        {run.view !== 'before' && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'before' })}>看原图</button>}
+        {run.view !== 'after' && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'after' })}>看试下结果</button>}
+        {run.view !== 'reply' && view.trial.reply && <button className="button button--ghost" onClick={() => onChange({ ...run, view: 'reply' })}>看白棋怎样提</button>}
       </div></>}
     >
       {run.stage !== 'reason' && <p className="muted">{run.stage === 'find' ? '先点出只有一口气的黑棋。棋盘上还有其他黑棋，别只看哪块旁边白棋最多。相连的整块选任意一颗都可以。' : goal}</p>}

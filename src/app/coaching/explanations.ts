@@ -21,10 +21,12 @@ export function explainAction(a: ActionAnalysis): string {
   return parts.join('')
 }
 
-export function groupMarks(group: GroupFact | null | undefined): BoardMark[] {
+export function groupMarks(group: GroupFact | null | undefined, showLiberties = true): BoardMark[] {
   if (!group) return []
+  const stones = group.stones.map((point): BoardMark => ({ point, kind: 'target' }))
+  if (!showLiberties) return stones
   return [
-    ...group.stones.map((point): BoardMark => ({ point, kind: 'target' })),
+    ...stones,
     ...group.liberties.map((point): BoardMark => ({ point, kind: 'liberty' })),
     ...(group.liberties.length === 1 ? [{ point: group.liberties[0], kind: 'label' as const, text: 'A' }] : []),
   ]

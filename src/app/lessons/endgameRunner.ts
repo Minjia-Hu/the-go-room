@@ -45,10 +45,10 @@ export function lessonScore(run: EndgameRun) {
 export function countQuestion(run: EndgameRun) {
   const score = lessonScore(run)
   return [
-    { label: '黑方活子', points: score.blackStones, color: 'black' as const, stones: true },
-    { label: '黑方围住的空点', points: score.blackEmpty, color: 'black' as const, stones: false },
-    { label: '白方活子', points: score.whiteStones, color: 'white' as const, stones: true },
-    { label: '白方围住的空点', points: score.whiteEmpty, color: 'white' as const, stones: false },
+    { label: '黑方活子', question: '带红圈的黑棋一共有几颗？', points: score.blackStones, color: 'black' as const, stones: true },
+    { label: '黑方围住的空点', question: '黑棋围住的空点里，有几个标了红点？', points: score.blackEmpty, color: 'black' as const, stones: false },
+    { label: '白方活子', question: '带红圈的白棋一共有几颗？', points: score.whiteStones, color: 'white' as const, stones: true },
+    { label: '白方围住的空点', question: '白棋围住的空点里，有几个标了红点？', points: score.whiteEmpty, color: 'white' as const, stones: false },
   ][Math.min(run.step, 3)]
 }
 export function selectEndgame(run: EndgameRun, point: Point): EndgameRun {

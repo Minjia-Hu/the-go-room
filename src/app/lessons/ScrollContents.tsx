@@ -61,7 +61,7 @@ function ScrollRow({ id, entries, initialOpen }: {
           <span className="scroll__title" aria-hidden="true">{chapter.title}</span>
           <span className="scroll__meta" aria-hidden="true">
             <span>{chapter.count}</span>
-            {chapter.done && <span className={chapter.done[0] === chapter.done[1] ? 'scroll__done scroll__done--full' : 'scroll__done'}>{chapter.done[0]} / {chapter.done[1]}</span>}
+            {chapter.done && <span className="scroll__done">{chapter.done[0]} / {chapter.done[1]}</span>}
           </span>
         </button>
         {isOpen && <div id={panelId} className={`scroll__panel${animate ? ' scroll__panel--unroll' : ''}`} role="region" aria-label={chapter.title}>
